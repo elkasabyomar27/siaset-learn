@@ -1,0 +1,213 @@
+[
+  {
+    "id": "tn5",
+    "element": "Tn5 conservative DNA transposition",
+    "context": "E. coli-derived representative conservative model; evidence includes a hyperactive in vitro system",
+    "references": [
+      "tn5-conservative",
+      "tn5-tsd",
+      "tn5-ends"
+    ],
+    "tsdBp": 9,
+    "status": "implemented",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated.",
+      "TIR labels identify symbolic terminal end regions. Tn5 terminal recognition regions are not asserted to be perfect 19 bp inverted repeats; the full composite IS50 anatomy is not expanded."
+    ],
+    "limitations": [
+      "One element moves; donor repair is not modeled.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "tn3",
+    "element": "Tn3 replicative transposition",
+    "context": "Intact Tn3; symbolic E. coli interplasmid model",
+    "references": [
+      "heffron1979",
+      "kitts1982",
+      "takeya1979",
+      "bennett1983"
+    ],
+    "tsdBp": 5,
+    "status": "implemented",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Selected cointegrate pathway; not obligatory for every event.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "tn3-resolution",
+    "element": "Tn3 TnpR-mediated resolution",
+    "context": "Permissive directly repeated res sites in a circular cointegrate",
+    "references": [
+      "kostriken1981",
+      "kitts1983",
+      "bennett1983",
+      "tn3-topology"
+    ],
+    "tsdBp": 5,
+    "status": "implemented",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Res sites are assumed competent; products may remain topologically linked.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "acds",
+    "element": "Ac/Ds",
+    "context": "Maize",
+    "references": [
+      "mcclintock1950",
+      "acds"
+    ],
+    "tsdBp": null,
+    "status": "planned",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Autonomous Ac and nonautonomous Ds must be distinguished.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "class-i-ty",
+    "element": "Class I RNA-mediated retrotransposition: Ty exemplar",
+    "context": "Saccharomyces cerevisiae Ty",
+    "references": [
+      "ty"
+    ],
+    "tsdBp": null,
+    "status": "planned",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Ty example only; LTR and non-LTR mechanisms require separate future profiles.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "tn7-tnsd",
+    "element": "Tn7 TnsD-dependent targeting",
+    "context": "Bacterial attTn7 near glmS",
+    "references": [
+      "tn7d",
+      "tn7-glms"
+    ],
+    "tsdBp": null,
+    "status": "planned",
+    "evidenceStatus": "primary abstract verified; not implemented",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Distinct from TnsE; target selection is not implemented.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "tn7-tnse",
+    "element": "Tn7 TnsE-associated targeting",
+    "context": "Replication/transfer-related DNA contexts",
+    "references": [
+      "tn7e"
+    ],
+    "tsdBp": null,
+    "status": "planned",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Not interchangeable with TnsD targeting.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "insertion-sequence",
+    "element": "Insertion sequence anatomy",
+    "context": "IS50 within Tn5",
+    "references": [
+      "tn5-conservative",
+      "tn5-ends"
+    ],
+    "tsdBp": null,
+    "status": "planned",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Detailed IS50 autonomy needs dedicated profile validation.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  },
+  {
+    "id": "composite",
+    "element": "Composite transposon anatomy",
+    "context": "Tn5 representative only",
+    "references": [
+      "tn5-tsd",
+      "tn5-ends"
+    ],
+    "tsdBp": null,
+    "status": "planned",
+    "evidenceStatus": "primary literature supports core claims; see reference-specific access limits",
+    "sequenceProvenance": "No nucleotide sequence. All coordinates are symbolic teaching choices.",
+    "assumptions": [
+      "No insertion preference, reaction rate or experimental yield is calculated."
+    ],
+    "limitations": [
+      "Flanking insertion sequences and terminal recognition sites are different structural levels.",
+      "Protein geometry and strand topology are not modeled."
+    ],
+    "unresolvedQuestions": [
+      "Sequence-specific targeting, regulation and host-context effects are outside this model."
+    ]
+  }
+]

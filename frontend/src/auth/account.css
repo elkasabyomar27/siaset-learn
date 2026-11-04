@@ -1,0 +1,7 @@
+.account-page { max-width: 48rem; }
+.account-page form { display: grid; gap: 1rem; margin-block: 1.5rem; max-width: 30rem; }
+.account-page label { display: grid; gap: .4rem; }
+.account-page input { width: 100%; padding: .8rem; border: 1px solid #85968c; border-radius: .35rem; background: white; color: #172c23; box-sizing: border-box; }
+.account-page button { padding: .8rem 1rem; margin: .3rem .4rem .3rem 0; cursor: pointer; white-space: normal; }
+.account-page button:disabled { opacity: .6; cursor: wait; }
+.account-page :focus-visible { outline: 3px solid #247351; outline-offset: 3px; }

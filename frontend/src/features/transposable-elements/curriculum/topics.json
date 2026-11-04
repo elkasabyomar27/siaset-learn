@@ -1,0 +1,624 @@
+[
+  {
+    "id": "introduction",
+    "order": 1,
+    "title": "Introduction to Transposable Elements",
+    "learningObjectives": [
+      "Infer autonomy from encoded functions.",
+      "Separate autonomy from present mobility."
+    ],
+    "essentialTerminology": [
+      "autonomous",
+      "non-autonomous",
+      "in trans"
+    ],
+    "mechanismProfiles": [
+      "acds"
+    ],
+    "plannedActivities": [
+      "Inspect all variants",
+      "Ds moves when Ac protein is supplied. What is Ds?"
+    ],
+    "assessmentObjectives": [
+      "Ds moves when Ac protein is supplied. What is Ds?",
+      "Does an intact transposase gene guarantee an insertion now?"
+    ],
+    "references": [
+      "acds"
+    ],
+    "status": "implemented",
+    "lessonId": "introduction",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "discovery",
+    "order": 2,
+    "title": "History and Discovery",
+    "learningObjectives": [
+      "Connect McClintock’s maize observations to mobile DNA.",
+      "Predict representative Ds dependence on Ac."
+    ],
+    "essentialTerminology": [
+      "maize",
+      "Ac",
+      "Ds",
+      "mutable locus"
+    ],
+    "mechanismProfiles": [
+      "acds"
+    ],
+    "plannedActivities": [
+      "Inspect all variants",
+      "Remove Ac and every other compatible transposase source. Predict Ds mobility."
+    ],
+    "assessmentObjectives": [
+      "Remove Ac and every other compatible transposase source. Predict Ds mobility.",
+      "Why qualify claims about Ds?"
+    ],
+    "references": [
+      "mcclintock1950",
+      "acds"
+    ],
+    "status": "implemented",
+    "lessonId": "discovery",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "anatomy",
+    "order": 3,
+    "title": "Transposon Structure and Anatomy",
+    "learningObjectives": [
+      "Identify ends, coding regions and orientation.",
+      "Distinguish TIRs from TSDs."
+    ],
+    "essentialTerminology": [
+      "TIR",
+      "TSD",
+      "orientation",
+      "transposase",
+      "cargo"
+    ],
+    "mechanismProfiles": [
+      "tn5",
+      "tn3"
+    ],
+    "plannedActivities": [
+      "Inspect all variants",
+      "Which regions move as part of this element?"
+    ],
+    "assessmentObjectives": [
+      "Which regions move as part of this element?",
+      "Two flanking direct host repeats demonstrate what?"
+    ],
+    "references": [
+      "tn5-ends",
+      "tn5-tsd"
+    ],
+    "status": "implemented",
+    "lessonId": "anatomy",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {
+      "includeEvidence": true
+    }
+  },
+  {
+    "id": "classification",
+    "order": 4,
+    "title": "Classification",
+    "learningObjectives": [
+      "Classify pathways by their intermediates.",
+      "Explain why Class II does not imply cut-and-paste."
+    ],
+    "essentialTerminology": [
+      "Class I",
+      "Class II",
+      "RNA intermediate",
+      "reverse transcription"
+    ],
+    "mechanismProfiles": [
+      "class-i-ty",
+      "tn5",
+      "tn3"
+    ],
+    "plannedActivities": [
+      "Inspect all variants",
+      "An element uses RNA followed by reverse transcription. Classify it."
+    ],
+    "assessmentObjectives": [
+      "An element uses RNA followed by reverse transcription. Classify it.",
+      "Does DNA-based movement always require conservative excision?"
+    ],
+    "references": [
+      "ty",
+      "tn5-conservative",
+      "kitts1982"
+    ],
+    "status": "implemented",
+    "lessonId": "classification",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "dna-diversity",
+    "order": 5,
+    "title": "DNA Transposons",
+    "learningObjectives": [
+      "Compare conservative and replicative copy outcomes.",
+      "Separate transposition from resolution."
+    ],
+    "essentialTerminology": [
+      "conservative",
+      "replicative",
+      "cointegrate",
+      "res",
+      "TnpR"
+    ],
+    "mechanismProfiles": [
+      "tn5",
+      "tn3",
+      "tn7-tnsd",
+      "tn7-tnse"
+    ],
+    "plannedActivities": [
+      "Inspect all variants",
+      "One circle contains both backbones and two direct Tn3 copies. What occurred?"
+    ],
+    "assessmentObjectives": [
+      "One circle contains both backbones and two direct Tn3 copies. What occurred?",
+      "How many Tn3 copies remain after resolution?"
+    ],
+    "references": [
+      "tn5-conservative",
+      "kitts1982",
+      "bennett1983",
+      "kostriken1981"
+    ],
+    "status": "implemented",
+    "lessonId": "dna-diversity",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "conservative",
+    "order": 6,
+    "title": "Conservative Cut-and-Paste Transposition",
+    "learningObjectives": [
+      "Predict movement with one conserved element copy."
+    ],
+    "essentialTerminology": [
+      "excision",
+      "insertion",
+      "Tn5"
+    ],
+    "mechanismProfiles": [
+      "tn5"
+    ],
+    "plannedActivities": [
+      "Tn5 guided experiment"
+    ],
+    "assessmentObjectives": [
+      "Predict movement with one conserved element copy."
+    ],
+    "references": [
+      "tn5-conservative",
+      "tn5-tsd"
+    ],
+    "status": "implemented-awaiting-browser-validation",
+    "learning": {
+      "kind": "laboratory",
+      "experiment": "tn5"
+    },
+    "assessment": {
+      "checkpoint": "tn5",
+      "references": [
+        "tn5-conservative",
+        "tn5-tsd"
+      ]
+    }
+  },
+  {
+    "id": "replicative",
+    "order": 7,
+    "title": "Replicative Transposition",
+    "learningObjectives": [
+      "Explain copy gain, cointegrate formation and separate resolution."
+    ],
+    "essentialTerminology": [
+      "cointegrate",
+      "TnpR",
+      "res"
+    ],
+    "mechanismProfiles": [
+      "tn3",
+      "tn3-resolution"
+    ],
+    "plannedActivities": [
+      "Tn3 cointegrate and resolution guided experiment"
+    ],
+    "assessmentObjectives": [
+      "Explain copy gain, cointegrate formation and separate resolution."
+    ],
+    "references": [
+      "heffron1979",
+      "kitts1982",
+      "takeya1979",
+      "bennett1983",
+      "kostriken1981",
+      "kitts1983"
+    ],
+    "status": "implemented-awaiting-browser-validation",
+    "learning": {
+      "kind": "laboratory",
+      "experiment": "tn3"
+    },
+    "assessment": {
+      "checkpoint": "tn3",
+      "references": [
+        "kitts1982",
+        "kostriken1981"
+      ],
+      "additionalCheckpoints": [
+        "resolution"
+      ]
+    }
+  },
+  {
+    "id": "insertion-sequences",
+    "order": 8,
+    "title": "Insertion Sequences",
+    "learningObjectives": [
+      "Identify terminal regions and transposition-related genes.",
+      "Distinguish movement machinery from accessory cargo."
+    ],
+    "essentialTerminology": [
+      "IS",
+      "IS10",
+      "terminal region",
+      "transposition gene"
+    ],
+    "mechanismProfiles": [
+      "insertion-sequence"
+    ],
+    "plannedActivities": [
+      "Inspect all variants",
+      "Which region directly supplies movement machinery?"
+    ],
+    "assessmentObjectives": [
+      "Which region directly supplies movement machinery?",
+      "Can one IS diagram establish every IS family’s mechanism?"
+    ],
+    "references": [
+      "is10-primary",
+      "tn5-ends"
+    ],
+    "status": "implemented",
+    "lessonId": "insertion-sequences",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "composite",
+    "order": 9,
+    "title": "Composite Transposons",
+    "learningObjectives": [
+      "Compare Tn5, Tn10 and Tn9 architectures.",
+      "Separate IS modules, cargo, terminal motifs and TSDs."
+    ],
+    "essentialTerminology": [
+      "composite transposon",
+      "IS50",
+      "IS10",
+      "IS1",
+      "accessory cargo"
+    ],
+    "mechanismProfiles": [
+      "composite"
+    ],
+    "plannedActivities": [
+      "Inspect all variants",
+      "Both Tn9 IS1 arrows point the same way. What follows?"
+    ],
+    "assessmentObjectives": [
+      "Both Tn9 IS1 arrows point the same way. What follows?",
+      "Does resistance cargo itself encode the movement machinery in these examples?"
+    ],
+    "references": [
+      "tn5-ends",
+      "is10-primary",
+      "tn9-primary"
+    ],
+    "status": "implemented",
+    "lessonId": "composite",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "genomic-consequences",
+    "order": 10,
+    "title": "Genomic Consequences",
+    "learningObjectives": [
+      "Distinguish insertion from recombination.",
+      "Trace all products of rearrangements."
+    ],
+    "essentialTerminology": [
+      "insertion",
+      "deletion",
+      "inversion",
+      "duplication",
+      "homology"
+    ],
+    "mechanismProfiles": [
+      "tn3"
+    ],
+    "plannedActivities": [
+      "Insertion",
+      "Direct-repeat recombination",
+      "Inverted-repeat recombination",
+      "Unequal crossover",
+      "Which event produces the modeled duplication?"
+    ],
+    "assessmentObjectives": [
+      "Which event produces the modeled duplication?",
+      "Where is the excised interval after direct-repeat recombination?",
+      "Does inversion require a new transposition event here?"
+    ],
+    "references": [
+      "rearrangements",
+      "tn5-conservative"
+    ],
+    "status": "implemented",
+    "lessonId": "genomic-consequences",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "phenotypes",
+    "order": 11,
+    "title": "Phenotypic Consequences",
+    "learningObjectives": [
+      "Separate molecular disruption from phenotype.",
+      "Use undetermined when context is missing."
+    ],
+    "essentialTerminology": [
+      "loss of function",
+      "conditional phenotype",
+      "neutral",
+      "undetermined"
+    ],
+    "mechanismProfiles": [
+      "acds"
+    ],
+    "plannedActivities": [
+      "Coding insertion",
+      "Intergenic insertion",
+      "Regulatory insertion",
+      "Condition changed",
+      "An insertion lies in a regulatory region, but the assay and promoter functions are unknown. Predict phenotype."
+    ],
+    "assessmentObjectives": [
+      "An insertion lies in a regulatory region, but the assay and promoter functions are unknown. Predict phenotype.",
+      "Can supplementation mask a biosynthetic defect?",
+      "Does a coding insertion prove every measured trait changes?"
+    ],
+    "references": [
+      "is2-expression",
+      "mcclintock1950"
+    ],
+    "status": "implemented",
+    "lessonId": "phenotypes",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "expression",
+    "order": 12,
+    "title": "Gene Expression Effects",
+    "learningObjectives": [
+      "Predict qualitative transcription effects under explicit assumptions.",
+      "Distinguish promoter effects, termination and coding disruption."
+    ],
+    "essentialTerminology": [
+      "promoter",
+      "read-through",
+      "termination",
+      "operon polarity",
+      "orientation"
+    ],
+    "mechanismProfiles": [
+      "acds"
+    ],
+    "plannedActivities": [
+      "Promoter disruption",
+      "Outward promoter aligned",
+      "Outward promoter reversed",
+      "Operon termination",
+      "Read-through",
+      "A TE disrupts gene A but an independent promoter drives B. Must B transcription decrease?"
+    ],
+    "assessmentObjectives": [
+      "A TE disrupts gene A but an independent promoter drives B. Must B transcription decrease?",
+      "Can a reversed outward promoter directly transcribe a rightward gene?",
+      "What is needed to infer strong downstream transcriptional polarity here?"
+    ],
+    "references": [
+      "is3-promoter",
+      "is2-expression"
+    ],
+    "status": "implemented",
+    "lessonId": "expression",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "tsd",
+    "order": 13,
+    "title": "Target-Site Duplication",
+    "learningObjectives": [
+      "Trace host-derived duplicated target intervals.",
+      "Compare Tn5 9 bp and Tn3 5 bp without generalizing."
+    ],
+    "essentialTerminology": [
+      "TSD",
+      "TIR",
+      "staggered strand transfer",
+      "gap filling"
+    ],
+    "mechanismProfiles": [
+      "tn5",
+      "tn3"
+    ],
+    "plannedActivities": [
+      "Tn5 junction",
+      "Tn3 junction",
+      "Non-universal outcome",
+      "Which features are host-derived?"
+    ],
+    "assessmentObjectives": [
+      "Which features are host-derived?",
+      "Do two TSDs imply two element copies?",
+      "Can Tn5’s 9 bp rule be assigned to every element?"
+    ],
+    "references": [
+      "tn5-tsd",
+      "takeya1979",
+      "is608"
+    ],
+    "status": "implemented",
+    "lessonId": "tsd",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {
+      "includeEvidence": true
+    }
+  },
+  {
+    "id": "regulation",
+    "order": 14,
+    "title": "Regulation of Transposable Elements",
+    "learningObjectives": [
+      "Identify element and organism-specific regulation.",
+      "Separate molecular permission from event probability."
+    ],
+    "essentialTerminology": [
+      "transposase",
+      "antisense RNA",
+      "RNA-OUT",
+      "DDM1",
+      "silencing"
+    ],
+    "mechanismProfiles": [
+      "acds"
+    ],
+    "plannedActivities": [
+      "Maize: Ds without Ac",
+      "Maize: Ac supplied",
+      "Bacterial IS10: RNA-OUT",
+      "Bacterial IS10: promoter inactive",
+      "Arabidopsis CACTA1: silenced",
+      "Arabidopsis: ddm1 context",
+      "RNA-OUT pairing is functional in bacterial IS10. What is the supported qualitative direction?"
+    ],
+    "assessmentObjectives": [
+      "RNA-OUT pairing is functional in bacterial IS10. What is the supported qualitative direction?",
+      "Does supplied Ac convert Ds into an autonomous element?",
+      "Does ddm1 guarantee movement of every Arabidopsis TE?"
+    ],
+    "references": [
+      "acds",
+      "is10-antisense",
+      "is10-promoters",
+      "ddm1"
+    ],
+    "status": "implemented",
+    "lessonId": "regulation",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {}
+  },
+  {
+    "id": "bacterial-hgt",
+    "order": 15,
+    "title": "Bacterial Transposable Elements and Horizontal Gene Transfer",
+    "learningObjectives": [
+      "Distinguish DNA replicons, mobile elements and bacterial cells.",
+      "Separate transposition, conjugation, cassette capture and selection.",
+      "Compare Tn7 target-selection pathways without predicting insertion frequencies."
+    ],
+    "essentialTerminology": [
+      "chromosome",
+      "plasmid",
+      "conjugative",
+      "nonconjugative",
+      "HGT",
+      "TnsD/TniQ",
+      "TnsE",
+      "integron",
+      "gene cassette"
+    ],
+    "mechanismProfiles": [
+      "tn3",
+      "tn7-tnse"
+    ],
+    "plannedActivities": [
+      "1 · Identify bacterial DNA",
+      "2 · Within-cell movement",
+      "2 · Between-cell transfer",
+      "2 · Nonconjugative plasmid",
+      "3 · Resistance: starting state",
+      "3 · Resistance: plasmid loading",
+      "3 · Resistance: recipient acquisition",
+      "4 · Tn7: glmS context",
+      "4 · Tn7: transfer-related replication",
+      "4 · Tn7: mismatched route",
+      "5 · Integron cassette capture",
+      "5 · Nested mobile DNA",
+      "Tn5 enters a plasmid, then the plasmid is conjugated into another cell. Which step is HGT?"
+    ],
+    "assessmentObjectives": [
+      "Tn5 enters a plasmid, then the plasmid is conjugated into another cell. Which step is HGT?",
+      "Which target selector supports the established E. coli glmS-associated Tn7 route?",
+      "An integron carrying a resistance cassette is on a plasmid. What follows?"
+    ],
+    "references": [
+      "tn7d",
+      "tn7-glms",
+      "tn7e",
+      "tn7-assembly",
+      "rp4-transfer",
+      "cassette-capture",
+      "tn5-ends"
+    ],
+    "status": "implemented",
+    "lessonId": "bacterial-hgt",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {
+      "includeEvidence": true
+    }
+  }
+]

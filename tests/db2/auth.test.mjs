@@ -1,0 +1,55 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {publicAuthConfig, safeDestination} from '../../frontend/src/auth/config.js';
+import {startAuthFlow, finishAuthFlow, restartAuthFlow} from '../../frontend/src/auth/flows.js';
+const memory = () => { const map = new Map(); return {getItem: key => map.get(key) ?? null, setItem: (key, value) => map.set(key, value), removeItem: key => map.delete(key), map}; };
+const locks = {request: async (_name, action) => action()};
+const history = {state: {key: 1}, replaceState(_state, _unused, path) { this.path = path; }};
+test('browser config fails closed for privileged/legacy keys and unsafe redirect values', () => {
+  assert.equal(publicAuthConfig({}), null);
+  assert.deepEqual(publicAuthConfig({VITE_SUPABASE_URL: 'https://example.supabase.co', VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_synthetic'}), {url: 'https://example.supabase.co', key: 'sb_publishable_synthetic'});
+  for (const key of ['sb_secret_private', 'eyJ.role.service_role', '', undefined]) assert.throws(() => publicAuthConfig({VITE_SUPABASE_URL: 'https://example.supabase.co', VITE_SUPABASE_PUBLISHABLE_KEY: key}));
+  for (const url of ['http://example.com', 'https://a:b@example.com', 'https://example.com/auth', 'https://example.com?token=x']) assert.throws(() => publicAuthConfig({VITE_SUPABASE_URL: url, VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_synthetic'}));
+  for (const next of ['https://evil.example', '//evil.example', '/\\evil.example', '/%2f%2fevil', '/account?next=evil', null]) assert.equal(safeDestination(next), '/account');
+  assert.equal(safeDestination('/learn/transposable-elements'), '/learn/transposable-elements');
+});
+test('auth initiation has a cross-tab lease, rejects unavailable storage/locks, and releases failed requests', async () => {
+  const storage = memory(), options = {locks, storage, now: () => 1000, makeId: () => 'flow'};
+  let calls = 0;
+  await startAuthFlow('google', async () => { calls++; return {data: {}}; }, options);
+  await assert.rejects(startAuthFlow('signup', async () => { calls++; }, options), /pending/);
+  assert.equal(calls, 1);
+  await restartAuthFlow(options);
+  await assert.rejects(startAuthFlow('signup', async () => ({error: true}), options));
+  assert.equal(storage.map.size, 0);
+  await assert.rejects(startAuthFlow('google', async () => ({}), {...options, locks: null}));
+  await assert.rejects(startAuthFlow('google', async () => ({}), {...options, storage: {getItem() { throw Error('unavailable'); }}}));
+});
+test('PKCE callback exchanges once, verifies identity, scrubs parameters, rejects stale/wrong recovery and cancelled links', async () => {
+  const storage = memory(), options = {locks, storage, history, now: () => 1000};
+  let exchanges = 0;
+  const client = {auth: {exchangeCodeForSession: async () => { exchanges++; return {data: {session: {user: {id: 'synthetic'}}}}; }, getUser: async () => ({data: {user: {id: 'synthetic'}}})}};
+  await startAuthFlow('google', async () => ({}), options);
+  const url = 'https://app.example/auth/callback?code=synthetic-once&next=//evil.example';
+  const first = finishAuthFlow(client, url, options), second = finishAuthFlow(client, url, options);
+  assert.equal(first, second); assert.equal((await first).destination, '/account');
+  assert.equal(exchanges, 1); assert.equal(history.path, '/auth/callback');
+  assert.equal(storage.map.size, 0);
+  await assert.rejects(finishAuthFlow(client, 'https://app.example/auth/callback?error=cancelled', options));
+  await assert.rejects(finishAuthFlow(client, 'https://app.example/auth/recovery?code=no-flow', options));
+  await startAuthFlow('google', async () => ({}), options);
+  await assert.rejects(finishAuthFlow(client, 'https://app.example/auth/recovery?code=wrong-flow', options));
+  await assert.rejects(finishAuthFlow(client, 'https://app.example/auth/callback?code=expired', {...options, now: () => 1000000}));
+  await restartAuthFlow(options);
+  await startAuthFlow('recovery', async () => ({}), options);
+  assert.equal((await finishAuthFlow(client, 'https://app.example/auth/recovery?code=recovery-valid', options)).recovery, true);
+  assert.equal(exchanges, 2);
+});
+test('account routes preserve learning integration and never import or write browser progress', async () => {
+  const source = await readFile('frontend/src/auth/Account.jsx', 'utf8');
+  for (const forbidden of ['progressRepository', 'learnerRecords', '.rpc(', '.from(', 'service_role', 'localStorage.setItem']) assert.equal(source.includes(forbidden), false);
+  for (const sdk of ['signInWithPassword', 'signUp', 'resetPasswordForEmail', 'updateUser', 'signInWithOAuth', 'signOut']) assert.ok(source.includes(sdk));
+  const main = await readFile('frontend/src/main.jsx', 'utf8');
+  for (const path of ['/account', '/auth/callback', '/auth/recovery']) assert.ok(main.indexOf(`path="${path}"`) < main.indexOf('path="*"'));
+});

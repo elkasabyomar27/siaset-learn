@@ -1,0 +1,1972 @@
+{
+  "version": "siaset-v1",
+  "topics": [
+    {
+      "id": "introduction",
+      "order": 1,
+      "title": "Introduction to Transposable Elements",
+      "learningObjectives": [
+        "Infer autonomy from encoded functions.",
+        "Separate autonomy from present mobility."
+      ],
+      "essentialTerminology": [
+        "autonomous",
+        "non-autonomous",
+        "in trans"
+      ],
+      "mechanismProfiles": [
+        "acds"
+      ],
+      "plannedActivities": [
+        "Inspect all variants",
+        "Ds moves when Ac protein is supplied. What is Ds?"
+      ],
+      "assessmentObjectives": [
+        "Ds moves when Ac protein is supplied. What is Ds?",
+        "Does an intact transposase gene guarantee an insertion now?"
+      ],
+      "references": [
+        "acds"
+      ],
+      "status": "implemented",
+      "lessonId": "introduction",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "discovery",
+      "order": 2,
+      "title": "History and Discovery",
+      "learningObjectives": [
+        "Connect McClintock’s maize observations to mobile DNA.",
+        "Predict representative Ds dependence on Ac."
+      ],
+      "essentialTerminology": [
+        "maize",
+        "Ac",
+        "Ds",
+        "mutable locus"
+      ],
+      "mechanismProfiles": [
+        "acds"
+      ],
+      "plannedActivities": [
+        "Inspect all variants",
+        "Remove Ac and every other compatible transposase source. Predict Ds mobility."
+      ],
+      "assessmentObjectives": [
+        "Remove Ac and every other compatible transposase source. Predict Ds mobility.",
+        "Why qualify claims about Ds?"
+      ],
+      "references": [
+        "mcclintock1950",
+        "acds"
+      ],
+      "status": "implemented",
+      "lessonId": "discovery",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "anatomy",
+      "order": 3,
+      "title": "Transposon Structure and Anatomy",
+      "learningObjectives": [
+        "Identify ends, coding regions and orientation.",
+        "Distinguish TIRs from TSDs."
+      ],
+      "essentialTerminology": [
+        "TIR",
+        "TSD",
+        "orientation",
+        "transposase",
+        "cargo"
+      ],
+      "mechanismProfiles": [
+        "tn5",
+        "tn3"
+      ],
+      "plannedActivities": [
+        "Inspect all variants",
+        "Which regions move as part of this element?"
+      ],
+      "assessmentObjectives": [
+        "Which regions move as part of this element?",
+        "Two flanking direct host repeats demonstrate what?"
+      ],
+      "references": [
+        "tn5-ends",
+        "tn5-tsd"
+      ],
+      "status": "implemented",
+      "lessonId": "anatomy",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {
+        "includeEvidence": true
+      }
+    },
+    {
+      "id": "classification",
+      "order": 4,
+      "title": "Classification",
+      "learningObjectives": [
+        "Classify pathways by their intermediates.",
+        "Explain why Class II does not imply cut-and-paste."
+      ],
+      "essentialTerminology": [
+        "Class I",
+        "Class II",
+        "RNA intermediate",
+        "reverse transcription"
+      ],
+      "mechanismProfiles": [
+        "class-i-ty",
+        "tn5",
+        "tn3"
+      ],
+      "plannedActivities": [
+        "Inspect all variants",
+        "An element uses RNA followed by reverse transcription. Classify it."
+      ],
+      "assessmentObjectives": [
+        "An element uses RNA followed by reverse transcription. Classify it.",
+        "Does DNA-based movement always require conservative excision?"
+      ],
+      "references": [
+        "ty",
+        "tn5-conservative",
+        "kitts1982"
+      ],
+      "status": "implemented",
+      "lessonId": "classification",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "dna-diversity",
+      "order": 5,
+      "title": "DNA Transposons",
+      "learningObjectives": [
+        "Compare conservative and replicative copy outcomes.",
+        "Separate transposition from resolution."
+      ],
+      "essentialTerminology": [
+        "conservative",
+        "replicative",
+        "cointegrate",
+        "res",
+        "TnpR"
+      ],
+      "mechanismProfiles": [
+        "tn5",
+        "tn3",
+        "tn7-tnsd",
+        "tn7-tnse"
+      ],
+      "plannedActivities": [
+        "Inspect all variants",
+        "One circle contains both backbones and two direct Tn3 copies. What occurred?"
+      ],
+      "assessmentObjectives": [
+        "One circle contains both backbones and two direct Tn3 copies. What occurred?",
+        "How many Tn3 copies remain after resolution?"
+      ],
+      "references": [
+        "tn5-conservative",
+        "kitts1982",
+        "bennett1983",
+        "kostriken1981"
+      ],
+      "status": "implemented",
+      "lessonId": "dna-diversity",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "conservative",
+      "order": 6,
+      "title": "Conservative Cut-and-Paste Transposition",
+      "learningObjectives": [
+        "Predict movement with one conserved element copy."
+      ],
+      "essentialTerminology": [
+        "excision",
+        "insertion",
+        "Tn5"
+      ],
+      "mechanismProfiles": [
+        "tn5"
+      ],
+      "plannedActivities": [
+        "Tn5 guided experiment"
+      ],
+      "assessmentObjectives": [
+        "Predict movement with one conserved element copy."
+      ],
+      "references": [
+        "tn5-conservative",
+        "tn5-tsd"
+      ],
+      "status": "implemented-awaiting-browser-validation",
+      "learning": {
+        "kind": "laboratory",
+        "experiment": "tn5"
+      },
+      "assessment": {
+        "checkpoint": "tn5",
+        "references": [
+          "tn5-conservative",
+          "tn5-tsd"
+        ]
+      }
+    },
+    {
+      "id": "replicative",
+      "order": 7,
+      "title": "Replicative Transposition",
+      "learningObjectives": [
+        "Explain copy gain, cointegrate formation and separate resolution."
+      ],
+      "essentialTerminology": [
+        "cointegrate",
+        "TnpR",
+        "res"
+      ],
+      "mechanismProfiles": [
+        "tn3",
+        "tn3-resolution"
+      ],
+      "plannedActivities": [
+        "Tn3 cointegrate and resolution guided experiment"
+      ],
+      "assessmentObjectives": [
+        "Explain copy gain, cointegrate formation and separate resolution."
+      ],
+      "references": [
+        "heffron1979",
+        "kitts1982",
+        "takeya1979",
+        "bennett1983",
+        "kostriken1981",
+        "kitts1983"
+      ],
+      "status": "implemented-awaiting-browser-validation",
+      "learning": {
+        "kind": "laboratory",
+        "experiment": "tn3"
+      },
+      "assessment": {
+        "checkpoint": "tn3",
+        "references": [
+          "kitts1982",
+          "kostriken1981"
+        ],
+        "additionalCheckpoints": [
+          "resolution"
+        ]
+      }
+    },
+    {
+      "id": "insertion-sequences",
+      "order": 8,
+      "title": "Insertion Sequences",
+      "learningObjectives": [
+        "Identify terminal regions and transposition-related genes.",
+        "Distinguish movement machinery from accessory cargo."
+      ],
+      "essentialTerminology": [
+        "IS",
+        "IS10",
+        "terminal region",
+        "transposition gene"
+      ],
+      "mechanismProfiles": [
+        "insertion-sequence"
+      ],
+      "plannedActivities": [
+        "Inspect all variants",
+        "Which region directly supplies movement machinery?"
+      ],
+      "assessmentObjectives": [
+        "Which region directly supplies movement machinery?",
+        "Can one IS diagram establish every IS family’s mechanism?"
+      ],
+      "references": [
+        "is10-primary",
+        "tn5-ends"
+      ],
+      "status": "implemented",
+      "lessonId": "insertion-sequences",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "composite",
+      "order": 9,
+      "title": "Composite Transposons",
+      "learningObjectives": [
+        "Compare Tn5, Tn10 and Tn9 architectures.",
+        "Separate IS modules, cargo, terminal motifs and TSDs."
+      ],
+      "essentialTerminology": [
+        "composite transposon",
+        "IS50",
+        "IS10",
+        "IS1",
+        "accessory cargo"
+      ],
+      "mechanismProfiles": [
+        "composite"
+      ],
+      "plannedActivities": [
+        "Inspect all variants",
+        "Both Tn9 IS1 arrows point the same way. What follows?"
+      ],
+      "assessmentObjectives": [
+        "Both Tn9 IS1 arrows point the same way. What follows?",
+        "Does resistance cargo itself encode the movement machinery in these examples?"
+      ],
+      "references": [
+        "tn5-ends",
+        "is10-primary",
+        "tn9-primary"
+      ],
+      "status": "implemented",
+      "lessonId": "composite",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "genomic-consequences",
+      "order": 10,
+      "title": "Genomic Consequences",
+      "learningObjectives": [
+        "Distinguish insertion from recombination.",
+        "Trace all products of rearrangements."
+      ],
+      "essentialTerminology": [
+        "insertion",
+        "deletion",
+        "inversion",
+        "duplication",
+        "homology"
+      ],
+      "mechanismProfiles": [
+        "tn3"
+      ],
+      "plannedActivities": [
+        "Insertion",
+        "Direct-repeat recombination",
+        "Inverted-repeat recombination",
+        "Unequal crossover",
+        "Which event produces the modeled duplication?"
+      ],
+      "assessmentObjectives": [
+        "Which event produces the modeled duplication?",
+        "Where is the excised interval after direct-repeat recombination?",
+        "Does inversion require a new transposition event here?"
+      ],
+      "references": [
+        "rearrangements",
+        "tn5-conservative"
+      ],
+      "status": "implemented",
+      "lessonId": "genomic-consequences",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "phenotypes",
+      "order": 11,
+      "title": "Phenotypic Consequences",
+      "learningObjectives": [
+        "Separate molecular disruption from phenotype.",
+        "Use undetermined when context is missing."
+      ],
+      "essentialTerminology": [
+        "loss of function",
+        "conditional phenotype",
+        "neutral",
+        "undetermined"
+      ],
+      "mechanismProfiles": [
+        "acds"
+      ],
+      "plannedActivities": [
+        "Coding insertion",
+        "Intergenic insertion",
+        "Regulatory insertion",
+        "Condition changed",
+        "An insertion lies in a regulatory region, but the assay and promoter functions are unknown. Predict phenotype."
+      ],
+      "assessmentObjectives": [
+        "An insertion lies in a regulatory region, but the assay and promoter functions are unknown. Predict phenotype.",
+        "Can supplementation mask a biosynthetic defect?",
+        "Does a coding insertion prove every measured trait changes?"
+      ],
+      "references": [
+        "is2-expression",
+        "mcclintock1950"
+      ],
+      "status": "implemented",
+      "lessonId": "phenotypes",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "expression",
+      "order": 12,
+      "title": "Gene Expression Effects",
+      "learningObjectives": [
+        "Predict qualitative transcription effects under explicit assumptions.",
+        "Distinguish promoter effects, termination and coding disruption."
+      ],
+      "essentialTerminology": [
+        "promoter",
+        "read-through",
+        "termination",
+        "operon polarity",
+        "orientation"
+      ],
+      "mechanismProfiles": [
+        "acds"
+      ],
+      "plannedActivities": [
+        "Promoter disruption",
+        "Outward promoter aligned",
+        "Outward promoter reversed",
+        "Operon termination",
+        "Read-through",
+        "A TE disrupts gene A but an independent promoter drives B. Must B transcription decrease?"
+      ],
+      "assessmentObjectives": [
+        "A TE disrupts gene A but an independent promoter drives B. Must B transcription decrease?",
+        "Can a reversed outward promoter directly transcribe a rightward gene?",
+        "What is needed to infer strong downstream transcriptional polarity here?"
+      ],
+      "references": [
+        "is3-promoter",
+        "is2-expression"
+      ],
+      "status": "implemented",
+      "lessonId": "expression",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "tsd",
+      "order": 13,
+      "title": "Target-Site Duplication",
+      "learningObjectives": [
+        "Trace host-derived duplicated target intervals.",
+        "Compare Tn5 9 bp and Tn3 5 bp without generalizing."
+      ],
+      "essentialTerminology": [
+        "TSD",
+        "TIR",
+        "staggered strand transfer",
+        "gap filling"
+      ],
+      "mechanismProfiles": [
+        "tn5",
+        "tn3"
+      ],
+      "plannedActivities": [
+        "Tn5 junction",
+        "Tn3 junction",
+        "Non-universal outcome",
+        "Which features are host-derived?"
+      ],
+      "assessmentObjectives": [
+        "Which features are host-derived?",
+        "Do two TSDs imply two element copies?",
+        "Can Tn5’s 9 bp rule be assigned to every element?"
+      ],
+      "references": [
+        "tn5-tsd",
+        "takeya1979",
+        "is608"
+      ],
+      "status": "implemented",
+      "lessonId": "tsd",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {
+        "includeEvidence": true
+      }
+    },
+    {
+      "id": "regulation",
+      "order": 14,
+      "title": "Regulation of Transposable Elements",
+      "learningObjectives": [
+        "Identify element and organism-specific regulation.",
+        "Separate molecular permission from event probability."
+      ],
+      "essentialTerminology": [
+        "transposase",
+        "antisense RNA",
+        "RNA-OUT",
+        "DDM1",
+        "silencing"
+      ],
+      "mechanismProfiles": [
+        "acds"
+      ],
+      "plannedActivities": [
+        "Maize: Ds without Ac",
+        "Maize: Ac supplied",
+        "Bacterial IS10: RNA-OUT",
+        "Bacterial IS10: promoter inactive",
+        "Arabidopsis CACTA1: silenced",
+        "Arabidopsis: ddm1 context",
+        "RNA-OUT pairing is functional in bacterial IS10. What is the supported qualitative direction?"
+      ],
+      "assessmentObjectives": [
+        "RNA-OUT pairing is functional in bacterial IS10. What is the supported qualitative direction?",
+        "Does supplied Ac convert Ds into an autonomous element?",
+        "Does ddm1 guarantee movement of every Arabidopsis TE?"
+      ],
+      "references": [
+        "acds",
+        "is10-antisense",
+        "is10-promoters",
+        "ddm1"
+      ],
+      "status": "implemented",
+      "lessonId": "regulation",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {}
+    },
+    {
+      "id": "bacterial-hgt",
+      "order": 15,
+      "title": "Bacterial Transposable Elements and Horizontal Gene Transfer",
+      "learningObjectives": [
+        "Distinguish DNA replicons, mobile elements and bacterial cells.",
+        "Separate transposition, conjugation, cassette capture and selection.",
+        "Compare Tn7 target-selection pathways without predicting insertion frequencies."
+      ],
+      "essentialTerminology": [
+        "chromosome",
+        "plasmid",
+        "conjugative",
+        "nonconjugative",
+        "HGT",
+        "TnsD/TniQ",
+        "TnsE",
+        "integron",
+        "gene cassette"
+      ],
+      "mechanismProfiles": [
+        "tn3",
+        "tn7-tnse"
+      ],
+      "plannedActivities": [
+        "1 · Identify bacterial DNA",
+        "2 · Within-cell movement",
+        "2 · Between-cell transfer",
+        "2 · Nonconjugative plasmid",
+        "3 · Resistance: starting state",
+        "3 · Resistance: plasmid loading",
+        "3 · Resistance: recipient acquisition",
+        "4 · Tn7: glmS context",
+        "4 · Tn7: transfer-related replication",
+        "4 · Tn7: mismatched route",
+        "5 · Integron cassette capture",
+        "5 · Nested mobile DNA",
+        "Tn5 enters a plasmid, then the plasmid is conjugated into another cell. Which step is HGT?"
+      ],
+      "assessmentObjectives": [
+        "Tn5 enters a plasmid, then the plasmid is conjugated into another cell. Which step is HGT?",
+        "Which target selector supports the established E. coli glmS-associated Tn7 route?",
+        "An integron carrying a resistance cassette is on a plasmid. What follows?"
+      ],
+      "references": [
+        "tn7d",
+        "tn7-glms",
+        "tn7e",
+        "tn7-assembly",
+        "rp4-transfer",
+        "cassette-capture",
+        "tn5-ends"
+      ],
+      "status": "implemented",
+      "lessonId": "bacterial-hgt",
+      "learning": {
+        "kind": "lesson"
+      },
+      "assessment": {
+        "includeEvidence": true
+      }
+    }
+  ],
+  "lessons": [
+    {
+      "id": "introduction",
+      "variants": [
+        {
+          "label": "Intact Ac",
+          "blocks": [
+            "end",
+            "Ac transposase gene",
+            "end"
+          ],
+          "explanation": "Ac encodes its transposase and is autonomous."
+        },
+        {
+          "label": "Ds alone",
+          "blocks": [
+            "end",
+            "Ds: no functional transposase",
+            "end"
+          ],
+          "explanation": "This representative Ds cannot supply transposase."
+        },
+        {
+          "label": "Ds with Ac",
+          "blocks": [
+            "end",
+            "Ds + Ac protein in trans",
+            "end"
+          ],
+          "explanation": "Compatible Ac protein can support movement. Ds remains non-autonomous."
+        }
+      ],
+      "exercise": {
+        "question": "Ds moves when Ac protein is supplied. What is Ds?",
+        "options": [
+          "Autonomous now",
+          "Non-autonomous, complemented in trans",
+          "An RNA element"
+        ],
+        "correct": 1,
+        "explanation": "Supplying protein changes mobility conditions, not the genetic capacity encoded by Ds."
+      },
+      "check": {
+        "question": "Does an intact transposase gene guarantee an insertion now?",
+        "options": [
+          "Yes",
+          "No: compatible ends, protein activity and host conditions also matter"
+        ],
+        "correct": 1,
+        "explanation": "Autonomy describes capacity, not a guaranteed event."
+      },
+      "check2": null
+    },
+    {
+      "id": "discovery",
+      "variants": [
+        {
+          "label": "Maize observations",
+          "blocks": [
+            "chromosome",
+            "mutable locus",
+            "chromosome"
+          ],
+          "explanation": "Genetic and cytological observations supported the controlling-element interpretation; this is not a reconstructed experiment."
+        },
+        {
+          "label": "Ac absent",
+          "blocks": [
+            "Ds ends",
+            "no compatible transposase",
+            "Ds ends"
+          ],
+          "explanation": "The selected Ds cannot undergo Ac-dependent movement without compatible transposase."
+        },
+        {
+          "label": "Ac present",
+          "blocks": [
+            "Ds ends",
+            "Ac transposase available",
+            "Ds ends"
+          ],
+          "explanation": "Movement becomes possible, not certain."
+        }
+      ],
+      "exercise": {
+        "question": "Remove Ac and every other compatible transposase source. Predict Ds mobility.",
+        "options": [
+          "Ds self-mobilizes",
+          "Ac-dependent movement is unsupported",
+          "Ds becomes Class I"
+        ],
+        "correct": 1,
+        "explanation": "The selected Ds cannot encode functional transposase."
+      },
+      "check": {
+        "question": "Why qualify claims about Ds?",
+        "options": [
+          "All copies are identical",
+          "Different Ds derivatives have different structures"
+        ],
+        "correct": 1,
+        "explanation": "A single schematic cannot explain every Ds-associated chromosome or phenotype outcome."
+      },
+      "check2": null
+    },
+    {
+      "id": "anatomy",
+      "variants": [
+        {
+          "label": "Boundaries",
+          "blocks": [
+            "TSD →",
+            "TIR →",
+            "transposase →",
+            "← TIR",
+            "TSD →"
+          ],
+          "explanation": "The outer TSDs are host-derived. Opposing terminal arrows represent inverted end motifs."
+        },
+        {
+          "label": "Genes",
+          "blocks": [
+            "TIR →",
+            "transposase →",
+            "cargo →",
+            "← TIR"
+          ],
+          "explanation": "Coding arrows show schematic orientation; cargo and transposase have different roles."
+        },
+        {
+          "label": "Insertion junction",
+          "blocks": [
+            "host",
+            "TSD →",
+            "element →",
+            "TSD →",
+            "host"
+          ],
+          "explanation": "Both TSD copies trace to one target site, not two elements."
+        }
+      ],
+      "exercise": {
+        "question": "Which regions move as part of this element?",
+        "options": [
+          "Host TSDs",
+          "Terminal ends and internal genes",
+          "All nearby host DNA"
+        ],
+        "correct": 1,
+        "explanation": "TIRs lie inside element boundaries; TSDs lie outside."
+      },
+      "check": {
+        "question": "Two flanking direct host repeats demonstrate what?",
+        "options": [
+          "Two element copies",
+          "Target-site duplication"
+        ],
+        "correct": 1,
+        "explanation": "Count complete elements independently of the target repeats."
+      },
+      "check2": null
+    },
+    {
+      "id": "classification",
+      "variants": [
+        {
+          "label": "Ty: Class I",
+          "blocks": [
+            "DNA",
+            "RNA",
+            "reverse transcription",
+            "new DNA"
+          ],
+          "explanation": "Yeast Ty provides an experimentally supported RNA-intermediate example."
+        },
+        {
+          "label": "Tn5: Class II",
+          "blocks": [
+            "donor DNA",
+            "element relocation",
+            "target DNA"
+          ],
+          "explanation": "The selected conservative pathway relocates one element."
+        },
+        {
+          "label": "Tn3: Class II",
+          "blocks": [
+            "donor + target DNA",
+            "replication",
+            "cointegrate"
+          ],
+          "explanation": "A DNA-based pathway can increase element copy number."
+        }
+      ],
+      "exercise": {
+        "question": "An element uses RNA followed by reverse transcription. Classify it.",
+        "options": [
+          "Class II because its product is DNA",
+          "Class I",
+          "Cannot classify"
+        ],
+        "correct": 1,
+        "explanation": "The intermediate and reverse-transcription step identify Class I."
+      },
+      "check": {
+        "question": "Does DNA-based movement always require conservative excision?",
+        "options": [
+          "Yes",
+          "No, replicative pathways also exist"
+        ],
+        "correct": 1,
+        "explanation": "Tn3 is a counterexample to a universal cut-and-paste claim."
+      },
+      "check2": null
+    },
+    {
+      "id": "dna-diversity",
+      "variants": [
+        {
+          "label": "Tn5",
+          "blocks": [
+            "donor: 1",
+            "target: 0",
+            "after: target 1"
+          ],
+          "explanation": "One copy overall, with target-side 9 bp TSDs; donor repair is unresolved."
+        },
+        {
+          "label": "Tn3 cointegrate",
+          "blocks": [
+            "both backbones",
+            "one circle",
+            "Tn3 → / Tn3 →"
+          ],
+          "explanation": "Replication creates two directly oriented copies in one circle."
+        },
+        {
+          "label": "Tn3 resolution",
+          "blocks": [
+            "cointegrate: 2",
+            "res + TnpR",
+            "replicons: 1 + 1"
+          ],
+          "explanation": "Two copies remain; target-side 5 bp TSDs persist. Physical unlinking is not calculated."
+        }
+      ],
+      "exercise": {
+        "question": "One circle contains both backbones and two direct Tn3 copies. What occurred?",
+        "options": [
+          "Resolution removed a copy",
+          "Replicative cointegrate formation",
+          "Conservative Tn5 excision"
+        ],
+        "correct": 1,
+        "explanation": "The selected replicative transition joins backbones and increases copy number."
+      },
+      "check": {
+        "question": "How many Tn3 copies remain after resolution?",
+        "options": [
+          "Two overall",
+          "One overall"
+        ],
+        "correct": 0,
+        "explanation": "Resolution does not reverse replication."
+      },
+      "check2": null
+    },
+    {
+      "id": "insertion-sequences",
+      "variants": [
+        {
+          "label": "IS10",
+          "blocks": [
+            "terminal end",
+            "transposition gene →",
+            "terminal end"
+          ],
+          "explanation": "Simplified IS10 architecture; regulatory and possible overlapping coding details are omitted."
+        },
+        {
+          "label": "Composite comparison",
+          "blocks": [
+            "IS module",
+            "resistance cargo",
+            "IS module"
+          ],
+          "explanation": "Cargo bracketed by IS modules is a composite architecture, not a single simple IS."
+        },
+        {
+          "label": "Functional asymmetry",
+          "blocks": [
+            "IS10-L",
+            "cargo",
+            "IS10-R"
+          ],
+          "explanation": "Native Tn10 modules are not functionally equivalent: IS10-R supplies normal movement functions."
+        }
+      ],
+      "exercise": {
+        "question": "Which region directly supplies movement machinery?",
+        "options": [
+          "Transposition-related gene",
+          "Resistance cargo",
+          "Host TSD"
+        ],
+        "correct": 0,
+        "explanation": "Resistance cargo has a different function from transposition genes."
+      },
+      "check": {
+        "question": "Can one IS diagram establish every IS family’s mechanism?",
+        "options": [
+          "Yes",
+          "No, family-specific evidence is needed"
+        ],
+        "correct": 1,
+        "explanation": "Coding organization, ends and mechanisms vary."
+      },
+      "check2": null
+    },
+    {
+      "id": "composite",
+      "variants": [
+        {
+          "label": "Tn5",
+          "blocks": [
+            "IS50-L →",
+            "resistance cargo",
+            "← IS50-R"
+          ],
+          "explanation": "Inverted IS50 modules; this expands anatomy without changing the abstract engine."
+        },
+        {
+          "label": "Tn10",
+          "blocks": [
+            "IS10-L →",
+            "tetracycline cargo",
+            "← IS10-R"
+          ],
+          "explanation": "Inverted IS10 modules with unequal functional capacity."
+        },
+        {
+          "label": "Tn9",
+          "blocks": [
+            "IS1 →",
+            "chloramphenicol cargo",
+            "IS1 →"
+          ],
+          "explanation": "Direct IS1 repeats in classical Tn9; these are not host-derived TSDs."
+        }
+      ],
+      "exercise": {
+        "question": "Both Tn9 IS1 arrows point the same way. What follows?",
+        "options": [
+          "Direct IS modules, not host TSDs",
+          "They are short TIR motifs",
+          "Tn9 must use the Tn5 pathway"
+        ],
+        "correct": 0,
+        "explanation": "Whole IS modules flank cargo. Their orientation does not establish a transposition mechanism."
+      },
+      "check": {
+        "question": "Does resistance cargo itself encode the movement machinery in these examples?",
+        "options": [
+          "Yes",
+          "No, that role is associated with the IS modules"
+        ],
+        "correct": 1,
+        "explanation": "Cargo and transposition functions are distinct; intact ends and functional machinery still matter."
+      },
+      "check2": null
+    },
+    {
+      "id": "genomic-consequences",
+      "variants": [
+        {
+          "label": "Insertion",
+          "blocks": [
+            "donor TE",
+            "target DNA"
+          ],
+          "explanation": "Run the existing conservative Tn5 model. Donor repair stays unresolved.",
+          "outcome": "target insertion"
+        },
+        {
+          "label": "Direct-repeat recombination",
+          "blocks": [
+            "L",
+            "TE→",
+            "X→",
+            "TE→",
+            "R"
+          ],
+          "explanation": "Homology and direct orientation on one molecule are assumed. Retain the excised circle.",
+          "outcome": "deletion"
+        },
+        {
+          "label": "Inverted-repeat recombination",
+          "blocks": [
+            "L",
+            "TE→",
+            "X→",
+            "←TE",
+            "R"
+          ],
+          "explanation": "Homology and inverted orientation on one molecule are assumed.",
+          "outcome": "inversion"
+        },
+        {
+          "label": "Unequal crossover",
+          "blocks": [
+            "sister 1",
+            "misaligned homologous TEs",
+            "sister 2"
+          ],
+          "explanation": "Two sister substrates are required; inspect both reciprocal products.",
+          "outcome": "duplication"
+        }
+      ],
+      "exercise": {
+        "question": "Which event produces the modeled duplication?",
+        "options": [
+          "Generic insertion",
+          "Unequal crossover between misaligned sisters",
+          "Intramolecular inversion"
+        ],
+        "correct": 1,
+        "explanation": "Duplication requires the explicitly selected recombination substrates."
+      },
+      "check": {
+        "question": "Where is the excised interval after direct-repeat recombination?",
+        "options": [
+          "Destroyed automatically",
+          "In the modeled excised circle"
+        ],
+        "correct": 1,
+        "explanation": "A deletion from the retained molecule need not destroy the excised DNA."
+      },
+      "check2": {
+        "question": "Does inversion require a new transposition event here?",
+        "options": [
+          "Yes",
+          "No, pre-existing homologous repeats recombine"
+        ],
+        "correct": 1,
+        "explanation": "This model labels recombination separately."
+      }
+    },
+    {
+      "id": "phenotypes",
+      "variants": [
+        {
+          "label": "Coding insertion",
+          "blocks": [
+            "haploid bacterium",
+            "essential enzyme region interrupted",
+            "sole nutrient pathway"
+          ],
+          "explanation": "Assume loss of enzyme function, no backup and growth requiring that pathway: phenotype likely altered.",
+          "outcome": "likely altered"
+        },
+        {
+          "label": "Intergenic insertion",
+          "blocks": [
+            "intergenic site",
+            "no known regulatory overlap",
+            "condition tested"
+          ],
+          "explanation": "Assume no relevant function at this site under the selected condition: unchanged is plausible, not proven universally.",
+          "outcome": "likely unchanged"
+        },
+        {
+          "label": "Regulatory insertion",
+          "blocks": [
+            "promoter region",
+            "unknown alternative promoters",
+            "unknown environment"
+          ],
+          "explanation": "Without promoter function and assay context, phenotype cannot be inferred.",
+          "outcome": "undetermined"
+        },
+        {
+          "label": "Condition changed",
+          "blocks": [
+            "enzyme disrupted",
+            "nutrient supplied externally",
+            "growth assay"
+          ],
+          "explanation": "Assume supplementation bypasses the lost pathway: growth may be unchanged even though molecular loss of function remains.",
+          "outcome": "likely unchanged"
+        }
+      ],
+      "exercise": {
+        "question": "An insertion lies in a regulatory region, but the assay and promoter functions are unknown. Predict phenotype.",
+        "options": [
+          "Always loss of function",
+          "Undetermined",
+          "Always neutral"
+        ],
+        "correct": 1,
+        "explanation": "Position alone is insufficient."
+      },
+      "check": {
+        "question": "Can supplementation mask a biosynthetic defect?",
+        "options": [
+          "Yes, if the defined bypass assumptions hold",
+          "No"
+        ],
+        "correct": 0,
+        "explanation": "Phenotype can depend on environment."
+      },
+      "check2": {
+        "question": "Does a coding insertion prove every measured trait changes?",
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "correct": 1,
+        "explanation": "Molecular function and the assayed phenotype are separate levels."
+      }
+    },
+    {
+      "id": "expression",
+      "variants": [
+        {
+          "label": "Promoter disruption",
+          "blocks": [
+            "P interrupted by TE",
+            "gene A →"
+          ],
+          "explanation": "Assume P is the sole functional promoter and is disabled: transcription from P is reduced.",
+          "outcome": "reduced"
+        },
+        {
+          "label": "Outward promoter aligned",
+          "blocks": [
+            "TE promoter →",
+            "gene A →"
+          ],
+          "explanation": "Assume an active outward promoter faces an intact promoterless gene with no intervening terminator: transcription becomes possible. IS3 supplies a documented mobile-promoter example.",
+          "outcome": "permitted"
+        },
+        {
+          "label": "Outward promoter reversed",
+          "blocks": [
+            "← TE promoter",
+            "gene A →"
+          ],
+          "explanation": "The promoter cannot directly drive rightward A transcription; without other promoter information total expression is undetermined.",
+          "outcome": "undetermined"
+        },
+        {
+          "label": "Operon termination",
+          "blocks": [
+            "P →",
+            "A disrupted / TE terminator",
+            "B →"
+          ],
+          "explanation": "Assume a functional terminator before B and no internal B promoter: downstream transcription is reduced (bacterial polarity).",
+          "outcome": "reduced"
+        },
+        {
+          "label": "Read-through",
+          "blocks": [
+            "P →",
+            "TE: no effective terminator",
+            "B →"
+          ],
+          "explanation": "Assume P remains active, transcription passes through and B is intact: B transcription is permitted; protein abundance remains unknown.",
+          "outcome": "permitted"
+        }
+      ],
+      "exercise": {
+        "question": "A TE disrupts gene A but an independent promoter drives B. Must B transcription decrease?",
+        "options": [
+          "Yes",
+          "Undetermined from A disruption alone"
+        ],
+        "correct": 1,
+        "explanation": "Coding disruption is not the same as promoter loss or transcription termination."
+      },
+      "check": {
+        "question": "Can a reversed outward promoter directly transcribe a rightward gene?",
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "correct": 1,
+        "explanation": "Transcription direction matters."
+      },
+      "check2": {
+        "question": "What is needed to infer strong downstream transcriptional polarity here?",
+        "options": [
+          "Any insertion",
+          "Effective termination and no bypass promoter"
+        ],
+        "correct": 1,
+        "explanation": "Polarity depends on the specified bacterial context."
+      }
+    },
+    {
+      "id": "tsd",
+      "variants": [
+        {
+          "label": "Tn5 junction",
+          "blocks": [
+            "host TSD 9 bp",
+            "Tn5 with terminal ends",
+            "host TSD 9 bp"
+          ],
+          "explanation": "Inspect the existing Tn5 engine output and duplicated host interval.",
+          "outcome": "9 bp"
+        },
+        {
+          "label": "Tn3 junction",
+          "blocks": [
+            "host TSD 5 bp",
+            "cointegrate insertion block",
+            "host TSD 5 bp"
+          ],
+          "explanation": "Inspect the existing Tn3 cointegrate. Resolution is a separate operation.",
+          "outcome": "5 bp"
+        },
+        {
+          "label": "Non-universal outcome",
+          "blocks": [
+            "IS608",
+            "single-strand pathway",
+            "no TSD"
+          ],
+          "explanation": "IS608 is a documented exception. No new IS608 engine is implemented.",
+          "outcome": "no TSD"
+        }
+      ],
+      "exercise": {
+        "question": "Which features are host-derived?",
+        "options": [
+          "TIRs",
+          "TSDs",
+          "Transposase gene"
+        ],
+        "correct": 1,
+        "explanation": "The target interval is copied; the terminal recognition regions are element-derived."
+      },
+      "check": {
+        "question": "Do two TSDs imply two element copies?",
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "correct": 1,
+        "explanation": "Tn5 retains one element overall despite two target repeats."
+      },
+      "check2": {
+        "question": "Can Tn5’s 9 bp rule be assigned to every element?",
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "correct": 1,
+        "explanation": "Tn3 has 5 bp in the selected system and IS608 has no TSD."
+      }
+    },
+    {
+      "id": "regulation",
+      "variants": [
+        {
+          "label": "Maize: Ds without Ac",
+          "blocks": [
+            "compatible Ds ends",
+            "no transposase source"
+          ],
+          "explanation": "Assume no alternative compatible source: Ac-dependent transposition is not permitted.",
+          "outcome": "not permitted"
+        },
+        {
+          "label": "Maize: Ac supplied",
+          "blocks": [
+            "compatible Ds ends",
+            "active Ac protein supplied"
+          ],
+          "explanation": "Under permissive host assumptions, the selected mobility gate is satisfied; an insertion is not guaranteed.",
+          "outcome": "permitted"
+        },
+        {
+          "label": "Bacterial IS10: RNA-OUT",
+          "blocks": [
+            "pIN → transposase RNA",
+            "RNA-OUT pairing",
+            "ribosome access inhibited"
+          ],
+          "explanation": "Assume functional antisense pairing and no compensating protein supply: transposase production is reduced relative to the unpaired condition.",
+          "outcome": "reduced"
+        },
+        {
+          "label": "Bacterial IS10: promoter inactive",
+          "blocks": [
+            "pIN inactive",
+            "no other transcription source"
+          ],
+          "explanation": "Assume no residual protein or alternative source: transposase availability gate is not met.",
+          "outcome": "not permitted"
+        },
+        {
+          "label": "Arabidopsis CACTA1: silenced",
+          "blocks": [
+            "DDM1-associated chromatin",
+            "methylation-associated repression"
+          ],
+          "explanation": "Selected silenced CACTA1 context: mobility reduced relative to a released state. This is not bacterial regulation.",
+          "outcome": "reduced"
+        },
+        {
+          "label": "Arabidopsis: ddm1 context",
+          "blocks": [
+            "silencing constraint relaxed",
+            "other prerequisites unknown"
+          ],
+          "explanation": "CACTA1 mobilization is documented in ddm1 backgrounds, but a particular copy’s next event cannot be predicted from this condition alone.",
+          "outcome": "undetermined"
+        }
+      ],
+      "exercise": {
+        "question": "RNA-OUT pairing is functional in bacterial IS10. What is the supported qualitative direction?",
+        "options": [
+          "Guaranteed insertion",
+          "Reduced transposase production",
+          "All plant TEs silenced"
+        ],
+        "correct": 1,
+        "explanation": "Antisense pairing inhibits translation in this documented system."
+      },
+      "check": {
+        "question": "Does supplied Ac convert Ds into an autonomous element?",
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "correct": 1,
+        "explanation": "Protein supplied in trans does not change Ds coding capacity."
+      },
+      "check2": {
+        "question": "Does ddm1 guarantee movement of every Arabidopsis TE?",
+        "options": [
+          "Yes",
+          "No"
+        ],
+        "correct": 1,
+        "explanation": "Host silencing effects depend on family, copy and cellular context."
+      }
+    },
+    {
+      "id": "bacterial-hgt",
+      "variants": [
+        {
+          "label": "1 · Identify bacterial DNA",
+          "blocks": [
+            "donor chromosome: core genes",
+            "plasmid: replication + transfer functions",
+            "Tn5: terminal ends + transposase + cargo"
+          ],
+          "explanation": "The chromosome is a cellular replicon; the plasmid is a separate replicon. Tn5 is a DNA element carried on a replicon, not a cell or an independently transferring plasmid.",
+          "outcome": "replicons and embedded element",
+          "activity": "identify",
+          "stage": 0
+        },
+        {
+          "label": "2 · Within-cell movement",
+          "blocks": [
+            "donor cell: TE donor fragment",
+            "same cell: target plasmid",
+            "recipient cell: unchanged"
+          ],
+          "explanation": "The selected Tn5 event moves one element from a symbolic linear donor fragment to the circular target plasmid inside the donor cell. The fragment is not a simulated complete chromosome.",
+          "outcome": "transposition, not HGT",
+          "activity": "movement",
+          "stage": 1
+        },
+        {
+          "label": "2 · Between-cell transfer",
+          "blocks": [
+            "donor: loaded conjugative plasmid",
+            "contact + transfer machinery + oriT",
+            "compatible recipient"
+          ],
+          "explanation": "Model a completed transfer with DNA synthesis and establishment assumed. The donor retains its plasmid; the recipient acquires a plasmid copy. This is not another transposition event.",
+          "outcome": "conjugation / HGT",
+          "activity": "movement",
+          "stage": 2
+        },
+        {
+          "label": "2 · Nonconjugative plasmid",
+          "blocks": [
+            "plasmid lacks transfer machinery",
+            "no helper supplied",
+            "no other HGT route modeled"
+          ],
+          "explanation": "This plasmid cannot self-transfer under these assumptions. Some nonconjugative plasmids are mobilizable with compatible helper functions; that is not modeled here.",
+          "outcome": "transfer gate fails",
+          "activity": "blocked"
+        },
+        {
+          "label": "3 · Resistance: starting state",
+          "blocks": [
+            "Tn5-associated resistance cargo",
+            "linear donor fragment inside donor cell",
+            "target plasmid initially lacks Tn5"
+          ],
+          "explanation": "Classical Tn5 is a resistance-associated example. This curated symbolic fragment and conjugative target are not named experimental plasmids. Gene presence alone does not establish a resistance phenotype.",
+          "outcome": "donor cargo only",
+          "activity": "resistance",
+          "stage": 0
+        },
+        {
+          "label": "3 · Resistance: plasmid loading",
+          "blocks": [
+            "Tn5 transposase available",
+            "donor fragment → target plasmid",
+            "recipient unchanged"
+          ],
+          "explanation": "Calculate the existing Tn5 conservative insertion first. Transposition makes the target plasmid cargo-bearing without moving DNA between cells. Donor repair remains unresolved.",
+          "outcome": "loaded plasmid in donor",
+          "activity": "resistance",
+          "stage": 1
+        },
+        {
+          "label": "3 · Resistance: recipient acquisition",
+          "blocks": [
+            "loaded donor plasmid",
+            "separate conjugation operation",
+            "recipient plasmid copy"
+          ],
+          "explanation": "After the separate transfer event, recipient DNA includes the determinant. Expression, host context and assay conditions remain unknown. Selection is not simulated; no treatment outcome is predicted.",
+          "outcome": "recipient acquires determinant; phenotype undetermined",
+          "activity": "resistance",
+          "stage": 2
+        },
+        {
+          "label": "4 · Tn7: glmS context",
+          "blocks": [
+            "E. coli attTn7 region near glmS",
+            "TnsABC machinery assumed available",
+            "TnsD target selector available"
+          ],
+          "explanation": "Native Tn7 TnsD (a TnsD/TniQ-family targeting factor) recognizes the glmS-associated context and recruits TnsC, which coordinates with TnsAB. This is the selected site-specific route; it is not TnsE recognition of replication structures.",
+          "outcome": "TnsD route compatible",
+          "activity": "tnsd"
+        },
+        {
+          "label": "4 · Tn7: transfer-related replication",
+          "blocks": [
+            "bacterial replication / transfer-related DNA",
+            "TnsABC machinery assumed available",
+            "TnsE available"
+          ],
+          "explanation": "TnsE targets replication-associated structures, including conjugation-related DNA contexts. The context alone does not prove the attTn7 recognition route. It is not limited exclusively to plasmids.",
+          "outcome": "TnsE route compatible",
+          "activity": "tnse"
+        },
+        {
+          "label": "4 · Tn7: mismatched route",
+          "blocks": [
+            "glmS-associated target selected",
+            "TnsE only",
+            "no replication context specified"
+          ],
+          "explanation": "The supplied evidence supports TnsD recognition, not the selected TnsE route. Incompatible here means unsupported by this bounded context, not impossible in every biological circumstance.",
+          "outcome": "selected route unsupported",
+          "activity": "mismatch"
+        },
+        {
+          "label": "5 · Integron cassette capture",
+          "blocks": [
+            "intI integrase",
+            "attI + cassette-associated attC",
+            "Pc promoter → cassette array"
+          ],
+          "explanation": "Compatible integrase and sites permit cassette capture by site-specific recombination. This is an explanatory diagram, not a computed recombination product; expression still depends on promoter and cassette context.",
+          "outcome": "integron site-specific recombination",
+          "activity": "integron"
+        },
+        {
+          "label": "5 · Nested mobile DNA",
+          "blocks": [
+            "plasmid replicon",
+            "transposon carrying integron",
+            "integron cassette array"
+          ],
+          "explanation": "An IS primarily supplies transposition functions, a transposon may carry cargo, a plasmid is a replicon, and an integron captures/expresses cassettes. Nesting does not make these categories equivalent or make the plasmid conjugative.",
+          "outcome": "distinct nested genetic systems",
+          "activity": "classification"
+        }
+      ],
+      "exercise": {
+        "question": "Tn5 enters a plasmid, then the plasmid is conjugated into another cell. Which step is HGT?",
+        "options": [
+          "Both are the same process",
+          "Plasmid transfer between cells",
+          "Tn5 movement inside the donor alone"
+        ],
+        "correct": 1,
+        "explanation": "Molecular relocation and cellular dissemination are separate events."
+      },
+      "check": {
+        "question": "Which target selector supports the established E. coli glmS-associated Tn7 route?",
+        "options": [
+          "TnsE as an interchangeable substitute",
+          "TnsD/TniQ-family factor with TnsC and TnsAB",
+          "Integron integrase"
+        ],
+        "correct": 1,
+        "explanation": "TnsD directs attTn7 targeting; TnsE selects replication-associated contexts."
+      },
+      "check2": {
+        "question": "An integron carrying a resistance cassette is on a plasmid. What follows?",
+        "options": [
+          "It is itself a conjugative transposon",
+          "Capture is integrase-mediated; transfer and phenotype require separate evidence",
+          "Every cell must become resistant"
+        ],
+        "correct": 1,
+        "explanation": "Cassette recombination, transposition, plasmid transfer and phenotypic selection are distinct."
+      }
+    }
+  ],
+  "questions": [
+    {
+      "question": "Ds moves when Ac protein is supplied. What is Ds?",
+      "options": [
+        "Autonomous now",
+        "Non-autonomous, complemented in trans",
+        "An RNA element"
+      ],
+      "correct": 1,
+      "explanation": "Supplying protein changes mobility conditions, not the genetic capacity encoded by Ds.",
+      "id": "introduction-primary",
+      "topicId": "introduction",
+      "references": [
+        "acds"
+      ]
+    },
+    {
+      "question": "Remove Ac and every other compatible transposase source. Predict Ds mobility.",
+      "options": [
+        "Ds self-mobilizes",
+        "Ac-dependent movement is unsupported",
+        "Ds becomes Class I"
+      ],
+      "correct": 1,
+      "explanation": "The selected Ds cannot encode functional transposase.",
+      "id": "discovery-primary",
+      "topicId": "discovery",
+      "references": [
+        "mcclintock1950",
+        "acds"
+      ]
+    },
+    {
+      "question": "Which regions move as part of this element?",
+      "options": [
+        "Host TSDs",
+        "Terminal ends and internal genes",
+        "All nearby host DNA"
+      ],
+      "correct": 1,
+      "explanation": "TIRs lie inside element boundaries; TSDs lie outside.",
+      "id": "anatomy-primary",
+      "topicId": "anatomy",
+      "references": [
+        "tn5-ends",
+        "tn5-tsd"
+      ]
+    },
+    {
+      "question": "Two flanking direct host repeats demonstrate what?",
+      "options": [
+        "Two element copies",
+        "Target-site duplication"
+      ],
+      "correct": 1,
+      "explanation": "Count complete elements independently of the target repeats.",
+      "id": "anatomy-evidence",
+      "topicId": "anatomy",
+      "references": [
+        "tn5-ends",
+        "tn5-tsd"
+      ]
+    },
+    {
+      "question": "An element uses RNA followed by reverse transcription. Classify it.",
+      "options": [
+        "Class II because its product is DNA",
+        "Class I",
+        "Cannot classify"
+      ],
+      "correct": 1,
+      "explanation": "The intermediate and reverse-transcription step identify Class I.",
+      "id": "classification-primary",
+      "topicId": "classification",
+      "references": [
+        "ty",
+        "tn5-conservative",
+        "kitts1982"
+      ]
+    },
+    {
+      "question": "One circle contains both backbones and two direct Tn3 copies. What occurred?",
+      "options": [
+        "Resolution removed a copy",
+        "Replicative cointegrate formation",
+        "Conservative Tn5 excision"
+      ],
+      "correct": 1,
+      "explanation": "The selected replicative transition joins backbones and increases copy number.",
+      "id": "dna-diversity-primary",
+      "topicId": "dna-diversity",
+      "references": [
+        "tn5-conservative",
+        "kitts1982",
+        "bennett1983",
+        "kostriken1981"
+      ]
+    },
+    {
+      "question": "After conservative Tn5 transposition, how many element copies remain overall?",
+      "options": [
+        "One — the element moves from donor to target.",
+        "Two — a new copy is made while the donor copy remains.",
+        "Zero — the element is consumed."
+      ],
+      "correct": 0,
+      "explanation": "Conservative movement relocates the original element. The two new flanking repeats are host-derived TSDs; they are not additional element copies.",
+      "id": "conservative-primary",
+      "topicId": "conservative",
+      "references": [
+        "tn5-conservative",
+        "tn5-tsd"
+      ]
+    },
+    {
+      "question": "What distinguishes the completed Tn3 cointegrate from the initial replicons?",
+      "options": [
+        "Two separate circles with one copy overall.",
+        "One circle containing both backbones and two directly oriented Tn3 copies.",
+        "One circle with one Tn3 and no donor backbone."
+      ],
+      "correct": 1,
+      "explanation": "Replicative transposition adds a second Tn3 copy and joins donor and target into one circular cointegrate.",
+      "id": "replicative-primary",
+      "topicId": "replicative",
+      "references": [
+        "kitts1982",
+        "kostriken1981"
+      ]
+    },
+    {
+      "question": "What should TnpR-mediated resolution do to the two Tn3 copies?",
+      "options": [
+        "Remove one copy to restore a total of one.",
+        "Cut out both elements.",
+        "Separate the replicon structures while preserving two copies overall."
+      ],
+      "correct": 2,
+      "explanation": "Recombination at the internal res sites partitions the cointegrate into two replicon products. Each retains one recombinant Tn3. Physical decatenation is not modeled.",
+      "id": "replicative-resolution",
+      "topicId": "replicative",
+      "references": [
+        "kitts1982",
+        "kostriken1981"
+      ]
+    },
+    {
+      "question": "Which region directly supplies movement machinery?",
+      "options": [
+        "Transposition-related gene",
+        "Resistance cargo",
+        "Host TSD"
+      ],
+      "correct": 0,
+      "explanation": "Resistance cargo has a different function from transposition genes.",
+      "id": "insertion-sequences-primary",
+      "topicId": "insertion-sequences",
+      "references": [
+        "is10-primary",
+        "tn5-ends"
+      ]
+    },
+    {
+      "question": "Both Tn9 IS1 arrows point the same way. What follows?",
+      "options": [
+        "Direct IS modules, not host TSDs",
+        "They are short TIR motifs",
+        "Tn9 must use the Tn5 pathway"
+      ],
+      "correct": 0,
+      "explanation": "Whole IS modules flank cargo. Their orientation does not establish a transposition mechanism.",
+      "id": "composite-primary",
+      "topicId": "composite",
+      "references": [
+        "tn5-ends",
+        "is10-primary",
+        "tn9-primary"
+      ]
+    },
+    {
+      "question": "Which event produces the modeled duplication?",
+      "options": [
+        "Generic insertion",
+        "Unequal crossover between misaligned sisters",
+        "Intramolecular inversion"
+      ],
+      "correct": 1,
+      "explanation": "Duplication requires the explicitly selected recombination substrates.",
+      "id": "genomic-consequences-primary",
+      "topicId": "genomic-consequences",
+      "references": [
+        "rearrangements",
+        "tn5-conservative"
+      ]
+    },
+    {
+      "question": "Does inversion require a new transposition event here?",
+      "options": [
+        "Yes",
+        "No, pre-existing homologous repeats recombine"
+      ],
+      "correct": 1,
+      "explanation": "This model labels recombination separately.",
+      "id": "genomic-consequences-additional",
+      "topicId": "genomic-consequences",
+      "references": [
+        "rearrangements",
+        "tn5-conservative"
+      ]
+    },
+    {
+      "question": "An insertion lies in a regulatory region, but the assay and promoter functions are unknown. Predict phenotype.",
+      "options": [
+        "Always loss of function",
+        "Undetermined",
+        "Always neutral"
+      ],
+      "correct": 1,
+      "explanation": "Position alone is insufficient.",
+      "id": "phenotypes-primary",
+      "topicId": "phenotypes",
+      "references": [
+        "is2-expression",
+        "mcclintock1950"
+      ]
+    },
+    {
+      "question": "Does a coding insertion prove every measured trait changes?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "correct": 1,
+      "explanation": "Molecular function and the assayed phenotype are separate levels.",
+      "id": "phenotypes-additional",
+      "topicId": "phenotypes",
+      "references": [
+        "is2-expression",
+        "mcclintock1950"
+      ]
+    },
+    {
+      "question": "A TE disrupts gene A but an independent promoter drives B. Must B transcription decrease?",
+      "options": [
+        "Yes",
+        "Undetermined from A disruption alone"
+      ],
+      "correct": 1,
+      "explanation": "Coding disruption is not the same as promoter loss or transcription termination.",
+      "id": "expression-primary",
+      "topicId": "expression",
+      "references": [
+        "is3-promoter",
+        "is2-expression"
+      ]
+    },
+    {
+      "question": "What is needed to infer strong downstream transcriptional polarity here?",
+      "options": [
+        "Any insertion",
+        "Effective termination and no bypass promoter"
+      ],
+      "correct": 1,
+      "explanation": "Polarity depends on the specified bacterial context.",
+      "id": "expression-additional",
+      "topicId": "expression",
+      "references": [
+        "is3-promoter",
+        "is2-expression"
+      ]
+    },
+    {
+      "question": "Which features are host-derived?",
+      "options": [
+        "TIRs",
+        "TSDs",
+        "Transposase gene"
+      ],
+      "correct": 1,
+      "explanation": "The target interval is copied; the terminal recognition regions are element-derived.",
+      "id": "tsd-primary",
+      "topicId": "tsd",
+      "references": [
+        "tn5-tsd",
+        "takeya1979",
+        "is608"
+      ]
+    },
+    {
+      "question": "Can Tn5’s 9 bp rule be assigned to every element?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "correct": 1,
+      "explanation": "Tn3 has 5 bp in the selected system and IS608 has no TSD.",
+      "id": "tsd-additional",
+      "topicId": "tsd",
+      "references": [
+        "tn5-tsd",
+        "takeya1979",
+        "is608"
+      ]
+    },
+    {
+      "question": "Do two TSDs imply two element copies?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "correct": 1,
+      "explanation": "Tn5 retains one element overall despite two target repeats.",
+      "id": "tsd-evidence",
+      "topicId": "tsd",
+      "references": [
+        "tn5-tsd",
+        "takeya1979",
+        "is608"
+      ]
+    },
+    {
+      "question": "RNA-OUT pairing is functional in bacterial IS10. What is the supported qualitative direction?",
+      "options": [
+        "Guaranteed insertion",
+        "Reduced transposase production",
+        "All plant TEs silenced"
+      ],
+      "correct": 1,
+      "explanation": "Antisense pairing inhibits translation in this documented system.",
+      "id": "regulation-primary",
+      "topicId": "regulation",
+      "references": [
+        "acds",
+        "is10-antisense",
+        "is10-promoters",
+        "ddm1"
+      ]
+    },
+    {
+      "question": "Does ddm1 guarantee movement of every Arabidopsis TE?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "correct": 1,
+      "explanation": "Host silencing effects depend on family, copy and cellular context.",
+      "id": "regulation-additional",
+      "topicId": "regulation",
+      "references": [
+        "acds",
+        "is10-antisense",
+        "is10-promoters",
+        "ddm1"
+      ]
+    },
+    {
+      "question": "Tn5 enters a plasmid, then the plasmid is conjugated into another cell. Which step is HGT?",
+      "options": [
+        "Both are the same process",
+        "Plasmid transfer between cells",
+        "Tn5 movement inside the donor alone"
+      ],
+      "correct": 1,
+      "explanation": "Molecular relocation and cellular dissemination are separate events.",
+      "id": "bacterial-hgt-primary",
+      "topicId": "bacterial-hgt",
+      "references": [
+        "tn7d",
+        "tn7-glms",
+        "tn7e",
+        "tn7-assembly",
+        "rp4-transfer",
+        "cassette-capture",
+        "tn5-ends"
+      ]
+    },
+    {
+      "question": "An integron carrying a resistance cassette is on a plasmid. What follows?",
+      "options": [
+        "It is itself a conjugative transposon",
+        "Capture is integrase-mediated; transfer and phenotype require separate evidence",
+        "Every cell must become resistant"
+      ],
+      "correct": 1,
+      "explanation": "Cassette recombination, transposition, plasmid transfer and phenotypic selection are distinct.",
+      "id": "bacterial-hgt-additional",
+      "topicId": "bacterial-hgt",
+      "references": [
+        "tn7d",
+        "tn7-glms",
+        "tn7e",
+        "tn7-assembly",
+        "rp4-transfer",
+        "cassette-capture",
+        "tn5-ends"
+      ]
+    },
+    {
+      "question": "Which target selector supports the established E. coli glmS-associated Tn7 route?",
+      "options": [
+        "TnsE as an interchangeable substitute",
+        "TnsD/TniQ-family factor with TnsC and TnsAB",
+        "Integron integrase"
+      ],
+      "correct": 1,
+      "explanation": "TnsD directs attTn7 targeting; TnsE selects replication-associated contexts.",
+      "id": "bacterial-hgt-evidence",
+      "topicId": "bacterial-hgt",
+      "references": [
+        "tn7d",
+        "tn7-glms",
+        "tn7e",
+        "tn7-assembly",
+        "rp4-transfer",
+        "cassette-capture",
+        "tn5-ends"
+      ]
+    }
+  ],
+  "engine_sha256": "4020c786c78ac56e3a9fc7933c57710df241d94505945f7038a7fef9afcac2a5",
+  "sha256": "9d0ced693bfd5c859ff4816224e1ab66f6286fa3cc6b2cd42e7fcdbe346264a6"
+}

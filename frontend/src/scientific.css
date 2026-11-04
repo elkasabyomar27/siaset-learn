@@ -1,0 +1,23 @@
+/* Scientific category colors are independent of brand and action colors. */
+:root {
+ --scientific-donor: #66b7b0;
+ --scientific-target: #6d9ed0;
+ --scientific-element: #d3b775;
+ --scientific-tsd: #c79cda;
+ --scientific-res: #eb936d;
+ --scientific-tir: #f2da99;
+ --scientific-gene: #8ea1a9;
+}
+.legend .donor { background: var(--scientific-donor); }
+.legend .target { background: var(--scientific-target); }
+.legend .element { background: var(--scientific-element); }
+.legend .tsd { background: var(--scientific-tsd); }
+.legend .res { background: var(--scientific-res); }
+.feature-pill.element { color: var(--scientific-element); border-color: color-mix(in srgb, var(--scientific-element) 27%, transparent); background: color-mix(in srgb, var(--scientific-element) 7%, transparent); }
+.feature-pill.tsd { color: var(--scientific-tsd); border-color: color-mix(in srgb, var(--scientific-tsd) 27%, transparent); background: color-mix(in srgb, var(--scientific-tsd) 7%, transparent); }
+.feature-pill.res { color: var(--scientific-res); border-color: color-mix(in srgb, var(--scientific-res) 27%, transparent); background: color-mix(in srgb, var(--scientific-res) 7%, transparent); }
+.feature-pill.tir { color: var(--scientific-tir); border-color: color-mix(in srgb, var(--scientific-tir) 27%, transparent); background: color-mix(in srgb, var(--scientific-tir) 7%, transparent); }
+.feature-pill.gene { color: var(--scientific-gene); border-color: color-mix(in srgb, var(--scientific-gene) 27%, transparent); background: color-mix(in srgb, var(--scientific-gene) 7%, transparent); }
+ .molecule-card .feature-pill[aria-pressed=true] { outline-color: var(--scientific-element); }
+.molecule-static .molecular-feature { cursor: default; }
+.molecule-static .molecular-feature:hover { filter: none; }

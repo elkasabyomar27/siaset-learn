@@ -1,0 +1,18 @@
+{
+  "name": "siaset-learn",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:db2": "node scripts/build-db2.mjs",
+    "test:db2": "node --test tests/db2/*.test.mjs",
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "lint": "npm --prefix frontend run lint",
+    "test": "node --test frontend/src/features/transposable-elements/tests/*.test.js",
+    "test:phase1": "node --test frontend/src/features/transposable-elements/tests/contracts.test.js"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.15",
+    "supabase": "3.0.0"
+  }
+}

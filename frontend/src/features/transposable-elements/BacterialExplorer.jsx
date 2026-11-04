@@ -1,0 +1,26 @@
+import {useState} from 'react';
+import {resistanceExample, bacterialTransition, targetingCompatible, predictionFeedback} from './engine/bacterial.js';
+function Cells({state}) {
+  return <div className="scientific-diagram" tabIndex={0} role="region" aria-label="Scrollable symbolic diagram"><svg className="lesson-svg" viewBox="0 0 600 360" role="img" aria-label={`Donor retains chromosome and plasmid. Recipient ${state.recipientPlasmid?'has acquired a cargo-bearing plasmid':'has chromosome, no acquired plasmid'}.`}><title>Symbolic cell ownership map — not sequence or physical scale</title>{state.cells.map((cell,i)=><g key={cell.id}><rect x={15+i*295} y="30" width="280" height="290" rx="60" fill="#112429" stroke="var(--scientific-donor)"/><text x={155+i*295} y="60" fill="#eee" textAnchor="middle" fontSize="15">{i?'Recipient cell':'Donor cell'}</text><ellipse cx={105+i*295} cy="145" rx="60" ry="45" fill="none" stroke="var(--scientific-target)" strokeWidth="4"/><text x={155+i*295} y="215" textAnchor="middle" fill="#b9d1e8" fontSize="14">{cell.chromosome}</text>{cell.plasmids.length>0&&<><circle cx={225+i*295} cy="145" r="30" fill="none" stroke="var(--scientific-element)" strokeWidth="5"/><text x={155+i*295} y="245" textAnchor="middle" fill="#ead8af" fontSize="13">{i?'recipient-target copy':'target plasmid'}</text><text x={155+i*295} y="270" textAnchor="middle" fill="#ead8af" fontSize="13">{state.phase==='initial'?'plasmid lacks Tn5':'plasmid contains Tn5 cargo'}</text></>}{!i&&state.phase==='initial'&&<text x="155" y="290" textAnchor="middle" fill="#ddd" fontSize="12">Separate donor fragment contains Tn5</text>}</g>)}</svg></div>;
+}
+export default function BacterialExplorer({lesson,inspected=[],onInspect}) {
+  const [index,setIndex]=useState(0);
+  const [prediction,setPrediction]=useState('');
+  const [result,setResult]=useState(null);
+  const variant=lesson.variants[index];
+  function investigate(){
+    let model=null, note='Explanatory classification only; no molecular transition calculated.';
+    if(Number.isInteger(variant.stage)){model=resistanceExample(variant.stage);note=variant.stage===0?'Calculated initial symbolic state.':'Calculated bounded states: Tn5 insertion and conjugation remain separate operations.';}
+    if(variant.activity==='blocked'){
+      const s=resistanceExample(1).state;s.transfer.conjugative=false;
+      try{bacterialTransition(s,'conjugate');}catch(e){note=`Calculated gate rejection: ${e.message}. State unchanged.`;model={state:s,events:[]};}
+    }
+    if(['tnsd','tnse','mismatch'].includes(variant.activity)){
+      const compatible=targetingCompatible(variant.activity==='tnsd'?'tnsd':'tnse',variant.activity==='tnse'?'replication-transfer':'attTn7-glmS');
+      note=`Context compatibility: ${compatible?'supported':'unsupported'}. No insertion state, coordinate or probability calculated.`;
+    }
+    const feedback=predictionFeedback(variant.outcome,prediction,variant.explanation);
+    setResult({model,note,...feedback});if(feedback.correct)onInspect(index);
+  }
+  return <section className="lesson-section"><p className="eyebrow">03 / BACTERIAL DNA AND TRANSFER EXPLORER</p><h2>Inspect the system, then predict</h2><div className="exploration-tabs" role="group" aria-label="Bacterial scientific scenarios">{lesson.variants.map((v,i)=><button key={v.label} className="outline-button" aria-pressed={i===index} onClick={()=>{setIndex(i);setPrediction('');setResult(null);}}>{v.label}{inspected.includes(i)?' ✓':''}</button>)}</div>{Number.isInteger(variant.stage)&&<Cells state={resistanceExample(Math.max(0,variant.stage-1)).state}/>}<div className="scientific-diagram" tabIndex={0} role="region" aria-label="Scrollable symbolic diagram"><svg className="lesson-svg" viewBox={`0 0 600 ${variant.blocks.length*65+40}`} role="img" aria-label={variant.blocks.join('; ')}><title>Explanatory context: {variant.label}</title>{variant.blocks.map((block,i)=><g key={block}><rect x="10" y={15+i*65} width="580" height="50" rx="7" fill="#29291f" stroke="var(--scientific-element)"/><text x="300" y={45+i*65} textAnchor="middle" fill="#eee3c8" fontSize="15">{block}</text></g>)}</svg></div><p><b>Defined context:</b> {variant.explanation}</p><label>Predict or classify this scenario<select value={prediction} onChange={e=>{setPrediction(e.target.value);setResult(null);}}><option value="">Choose a supported interpretation</option>{[...new Set(lesson.variants.map(v=>v.outcome))].map(o=><option key={o}>{o}</option>)}</select></label><button className="primary-button" disabled={!prediction} onClick={investigate}>Test reasoning</button>{result&&<><p role="status" className={`feedback ${result.correct?'good':''}`}>{result.text}</p><p>{result.note}</p>{result.model&&<><h3>Calculated cell ownership</h3><Cells state={result.model.state}/><ol>{result.model.events.map((e,i)=><li key={i}>{e.type}: {e.from} → {e.to}; {e.scope}</li>)}</ol><p className="quiet">Chromosomes are retained symbolic identity markers, not simulated whole bacterial genomes. Completed conjugation copies the plasmid into the recipient while retaining the donor copy. Gene acquisition does not establish phenotypic resistance.</p></>}</>}<p className="quiet">Correctly classify every context, then answer the applied question and both checks. No clinical outcome or transfer efficiency is predicted.</p></section>;
+}

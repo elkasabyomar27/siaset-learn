@@ -1,0 +1,95 @@
+[
+  {
+    "id": "tn5-move",
+    "scenario": "tn5",
+    "initial": {
+      "donorLength": 1000,
+      "targetLength": 900,
+      "copies": 1,
+      "elementLength": 300
+    },
+    "action": {
+      "type": "tn5.transpose",
+      "targetBoundary": 200
+    },
+    "expected": {
+      "phase": "inserted",
+      "copies": 1,
+      "molecules": 3,
+      "totalLength": 1909,
+      "targetLength": 1209,
+      "tsdBp": 9,
+      "donorRepair": "unresolved"
+    },
+    "invariants": [
+      "Element and TIR identities preserved",
+      "One overall element copy",
+      "Unrepaired donor fragments",
+      "Host-derived external TSD pair"
+    ],
+    "limitations": [
+      "No repair product",
+      "Symbolic coordinates"
+    ]
+  },
+  {
+    "id": "tn3-cointegrate",
+    "scenario": "tn3",
+    "initial": {
+      "donorLength": 1000,
+      "targetLength": 900,
+      "copies": 1,
+      "elementLength": 300
+    },
+    "action": {
+      "type": "tn3.replicate",
+      "targetBoundary": 200
+    },
+    "expected": {
+      "phase": "cointegrate",
+      "copies": 2,
+      "molecules": 1,
+      "totalLength": 2205,
+      "resCount": 2,
+      "tsdBp": 5
+    },
+    "invariants": [
+      "Directly oriented element copies",
+      "Donor and target backbone ancestry",
+      "One circular cointegrate"
+    ],
+    "limitations": [
+      "Selected pathway only",
+      "No strand-level intermediates"
+    ]
+  },
+  {
+    "id": "tn3-resolution",
+    "scenario": "tn3",
+    "initial": {
+      "fixture": "tn3-cointegrate"
+    },
+    "action": {
+      "type": "tn3.resolve"
+    },
+    "expected": {
+      "phase": "resolved",
+      "copies": 2,
+      "molecules": 2,
+      "totalLength": 2205,
+      "targetLength": 1205,
+      "donorLength": 1000,
+      "tsdBp": 5
+    },
+    "invariants": [
+      "One copy per product",
+      "Two total copies",
+      "TSD pair remains target-side",
+      "Backbone identity preserved"
+    ],
+    "limitations": [
+      "Possible catenation",
+      "No decatenation"
+    ]
+  }
+]

@@ -1,0 +1,240 @@
+[
+  {
+    "id": "tn5-conservative",
+    "citation": "Goryshin & Reznikoff (1998). Tn5 in vitro transposition. J Biol Chem.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/9516433/",
+    "support": "Conservative excision and insertion in an in vitro system using hyperactive transposase.",
+    "verification": "abstract verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "tn5-tsd",
+    "citation": "Berg et al. (1983). Specificity of Transposon Tn5 Insertion. Genetics.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1202227/",
+    "support": "9 bp target duplication; target biases exist but are not modeled.",
+    "verification": "abstract verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "heffron1979",
+    "citation": "Heffron et al. (1979). DNA sequence analysis of the transposon Tn3: three genes and three sites involved in transposition of Tn3. Cell.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/391406/",
+    "support": "Tn3 functional anatomy.",
+    "verification": "bibliography verified via PMC319721; PubMed content unavailable",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "kitts1982",
+    "citation": "Kitts, Lamond & Sherratt (1982). Inter-replicon transposition of Tn1/3 occurs in two sequential genetically separable steps. Nature.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/6276779/",
+    "support": "Genetic separation of transposition and resolution.",
+    "verification": "bibliographic record verified; publisher full text inaccessible",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "kostriken1981",
+    "citation": "Kostriken, Morita & Heffron (1981). Transposon Tn3 encodes a site-specific recombination system. PNAS.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC319721/",
+    "support": "tnpR-dependent site-specific recombination.",
+    "verification": "abstract verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "kitts1983",
+    "citation": "Kitts et al. (1983). Transposon-encoded site-specific recombination: nature of the Tn3 DNA sequences which constitute the recombination site res. EMBO J.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC555234/",
+    "support": "Internal res region and resolvase-dependent cointegrate resolution.",
+    "verification": "abstract verified through PMID 6313351; supplied Wiley URL inaccessible",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "takeya1979",
+    "citation": "Takeya et al. (1979). DNA sequences of the integration sites and inverted repeated structure of transposon Tn3. Nucleic Acids Res.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/377233/",
+    "support": "Five-nucleotide direct target repeats at Tn3 integration sites.",
+    "verification": "abstract verified through search",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "bennett1983",
+    "citation": "Bennett, de la Cruz & Grinsted (1983). Cointegrates are not obligatory intermediates in transposition of Tn3 and Tn21. Nature.",
+    "url": "https://www.nature.com/articles/305743a0",
+    "support": "Cointegrate pathway, directly repeated res, and evidence for alternative routes.",
+    "verification": "publisher abstract verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "mcclintock1950",
+    "citation": "McClintock (1950). The origin and behavior of mutable loci in maize. PNAS.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1063197/",
+    "support": "Discovery context.",
+    "verification": "bibliographic record verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "acds",
+    "citation": "Excision and reinsertion of Ac macrotransposons in maize (2022). Genetics.",
+    "url": "https://academic.oup.com/genetics/article/221/4/iyac067/6574355",
+    "support": "Ac/Ds autonomous and nonautonomous context.",
+    "verification": "primary paper introduction verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "ty",
+    "citation": "Boeke et al. (1985). Ty elements transpose through an RNA intermediate. Cell.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/2982495/",
+    "support": "Ty-specific RNA intermediate; not a universal retroelement mechanism.",
+    "verification": "abstract verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "tn7e",
+    "citation": "Peters & Craig (2001). Tn7 recognizes transposition target structures associated with DNA replication using the DNA-binding protein TnsE. Genes Dev.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/11274058/",
+    "support": "TnsE replication-associated targeting.",
+    "verification": "bibliographic record verified",
+    "verifiedOn": "2026-11-02",
+    "evidenceStatus": "primary research",
+    "limitations": "Selected Tn7 targeting context; no target coordinates, universal TniQ behavior or quantitative probability inferred."
+  },
+  {
+    "id": "tn7d",
+    "citation": "Waddell & Craig (1989). Tn7 transposition: recognition of the attTn7 target sequence. PNAS.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/2542960/",
+    "support": "TnsD-dependent attTn7 recognition, distinct from TnsE.",
+    "verification": "abstract verified",
+    "verifiedOn": "2026-11-02",
+    "evidenceStatus": "primary research",
+    "limitations": "Selected Tn7 targeting context; no target coordinates, universal TniQ behavior or quantitative probability inferred."
+  },
+  {
+    "id": "tn7-glms",
+    "citation": "Gringauz et al. (1988). Recognition of Escherichia coli attTn7 by transposon Tn7: lack of specific sequence requirements at the point of Tn7 insertion. J Bacteriol.",
+    "url": "https://doi.org/10.1128/jb.170.6.2832-2840.1988",
+    "support": "attTn7 placement in the glmS transcriptional terminator.",
+    "verification": "primary abstract verified through institutional record",
+    "verifiedOn": "2026-11-02",
+    "evidenceStatus": "primary research",
+    "limitations": "Selected Tn7 targeting context; no target coordinates, universal TniQ behavior or quantitative probability inferred."
+  },
+  {
+    "id": "tn3-topology",
+    "citation": "Krasnow & Cozzarelli (1983). Site-specific relaxation and recombination by the Tn3 resolvase: recognition of the DNA path between oriented res sites. Cell.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/6301692/",
+    "support": "Directly repeated res on supercoiled substrates and catenated resolution products.",
+    "verification": "abstract verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "tn5-ends",
+    "citation": "Berg et al. (1982). Inverted repeats of Tn5 are transposable elements. PNAS.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC346254/",
+    "support": "Distinguishes flanking IS50 elements, terminal sequence motifs and nine-base host repeats.",
+    "verification": "abstract verified",
+    "verifiedOn": "2026-11-02",
+    "evidenceStatus": "primary research",
+    "limitations": "Supports classical resistance-associated Tn5 anatomy; not every transposon has resistance cargo."
+  },
+  {
+    "id": "is10-primary",
+    "citation": "Halling et al. (1982). DNA sequence organization of IS10-right of Tn10 and comparison with IS10-left. PNAS.",
+    "url": "https://klecknerlab.hsites.harvard.edu/publications/dna-sequence-organization-is10-right-tn10-and-comparison-is10-left",
+    "support": "IS10 inverted modules, unequal functions, terminal and coding regions.",
+    "verification": "Primary abstract verified on author institutional page",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "tn9-primary",
+    "citation": "Alton & Vapnek (1979). Nucleotide sequence analysis of the chloramphenicol resistance transposon Tn9. Nature 282, 864–869.",
+    "url": "https://www.nature.com/articles/282864a0",
+    "support": "Direct IS1 repeats around chloramphenicol resistance region.",
+    "verification": "Publisher primary abstract verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "rearrangements",
+    "citation": "Hu et al. (1991). Mechanisms of tandem duplication in the Duchenne muscular dystrophy gene include both homologous and nonhomologous intrachromosomal recombination.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/1868831/",
+    "support": "Primary Alu-mediated duplication evidence; generic symbolic crossover algebra is explicitly a teaching abstraction.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "is2-expression",
+    "citation": "Specific in vitro transcription of the insertion sequence IS2 (1983).",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/6194305/",
+    "support": "Insertion-dependent block or activation of downstream transcription in bacterial gal contexts.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "is3-promoter",
+    "citation": "IS3 can function as a mobile promoter in E. coli.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC320941/",
+    "support": "Outward IS3 promoter and adjacent argE transcription.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "is10-antisense",
+    "citation": "Ma & Simons. The IS10 antisense RNA blocks ribosome binding at the transposase translation initiation site.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/1691097/",
+    "support": "RNA-OUT inhibits transposase translation.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "is10-promoters",
+    "citation": "Three promoters near the termini of IS10: pIN, pOUT, and pIII (1983).",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/6311437/",
+    "support": "Element-specific transcriptional organization.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "ddm1",
+    "citation": "Epigenetic control of CACTA transposon mobility in Arabidopsis thaliana (2004).",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/15514067/",
+    "support": "CACTA1 silencing and mobilization in ddm1 context.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "is608",
+    "citation": "Mechanism of IS200/IS605 family DNA transposases: activation and transposon-directed target site selection (2008).",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2680152/",
+    "support": "IS608 transposition without target-site duplication.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02"
+  },
+  {
+    "id": "tn7-assembly",
+    "citation": "Assembly of the Tn7 targeting complex by a regulated stepwise process (2024).",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/38834067/",
+    "support": "TnsD/TniQ-mediated target complex assembly and TnsC recruitment.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02",
+    "evidenceStatus": "primary research",
+    "limitations": "Selected prototypical targeting context; not every TniQ homolog."
+  },
+  {
+    "id": "rp4-transfer",
+    "citation": "Relaxase (TraI) of IncP alpha plasmid RP4 catalyzes a site-specific cleaving-joining reaction of single-stranded DNA (1993).",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/8385350/",
+    "support": "oriT processing and conjugative transfer machinery.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02",
+    "evidenceStatus": "primary research",
+    "limitations": "RP4 evidence motivates qualitative transfer prerequisites; symbolic plasmid is not RP4. No efficiency or full transfer cycle calculated."
+  },
+  {
+    "id": "cassette-capture",
+    "citation": "Collis et al. (1993). Site-specific insertion of gene cassettes into integrons. Molecular Microbiology 9, 41–52.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/8412670/",
+    "support": "Primary demonstration of cassette integration by site-specific recombination.",
+    "verification": "Primary abstract or indexed primary text verified",
+    "verifiedOn": "2026-11-02",
+    "evidenceStatus": "primary research",
+    "limitations": "Does not establish self-transmissibility or universal cassette expression."
+  }
+]

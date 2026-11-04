@@ -1,0 +1,23 @@
+import { studentLabels } from '../engine/contracts.js';
+const colors={donor:'var(--scientific-donor)',target:'var(--scientific-target)',element:'var(--scientific-element)',tsd:'var(--scientific-tsd)',res:'var(--scientific-res)',TIR:'var(--scientific-tir)',gene:'var(--scientific-gene)'};
+function point(cx,cy,r,angle){const a=(angle-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+function arc(start,end,r=69){const [x,y]=point(120,100,r,start);const [xx,yy]=point(120,100,r,end);return `M ${x} ${y} A ${r} ${r} 0 ${end-start>180?1:0} 1 ${xx} ${yy}`;}
+export default function MoleculeView({molecule:m,onSelect,selected,compact=false}) {
+  const circular=m.topology==='circular';
+  const choose=f=>onSelect({moleculeId:m.id,featureId:f.id});
+  const interactive=f=>typeof onSelect !== 'function' ? {} : ({role:'button',tabIndex:0,'aria-label':`${f.label}, ${studentLabels(f.segments)}, schematic units`,onClick:()=>choose(f),onKeyDown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(f);}}});
+  const featureColor=f=>f.kind==='backbone'?colors[m.blocks.find(b=>b.id===f.id)?.sourceId]:colors[f.kind]||colors.gene;
+  return <section className={`molecule-card ${compact?'compact':''} ${onSelect?'':'molecule-static'}`}><div className="molecule-card-title"><h4>{m.name}</h4><span>{m.topology==='circular'?'CIRCULAR':'LINEAR'}</span></div><svg className="molecule-svg" viewBox="0 0 240 205" role="img" aria-label={`${m.name}; ${m.length} symbolic units; ${m.blocks.filter(b=>b.kind==='element').length} element copies`}>
+    {circular?<circle cx="120" cy="100" r="69" fill="none" stroke="#293039" strokeWidth="8"/>:<><line x1="18" y1="100" x2="222" y2="100" stroke="#293039" strokeWidth="7"/><path d="M18 90v20 M222 90v20" stroke="#77828c"/></>}
+    {m.features.filter(f=>!f.parentId).map(f=><g key={f.id} {...interactive(f)} className={`molecular-feature ${selected===f.id?'selected':''}`}><title>{`${f.label} · ${studentLabels(f.segments)} symbolic units`}</title>{f.segments.map(([a,z],i)=>{const start=a/m.length*359.5;const end=z/m.length*359.5;return circular?<path key={i} d={arc(start,Math.max(start+1.4,end))} fill="none" stroke={featureColor(f)} strokeWidth={f.kind==='element'?13:7}/>:<line key={i} x1={18+a/m.length*204} x2={18+z/m.length*204} y1="100" y2="100" stroke={featureColor(f)} strokeWidth={f.kind==='element'?15:7}/>;})}</g>)}
+    {m.features.filter(f=>f.kind==='res'||f.kind==='TIR').map(f=>{const [a,z]=f.segments[0];const angle=(a+z)/2/m.length*359.5;const [x,y]=circular?point(120,100,69,angle):[18+(a+z)/2/m.length*204,100];return <g key={f.id} {...interactive(f)} className="molecular-feature"><title>{`${f.label} · ${studentLabels(f.segments)} symbolic units`}</title><circle cx={x} cy={y} r={f.kind==='res'?4:2.5} fill={colors[f.kind]} stroke="#0b0e11" strokeWidth="1"/></g>;})}
+    {m.features.filter(f=>f.kind==='element').map(f=>{const [a,z]=f.segments[0];const angle=(a+z)/2/m.length*359.5;const [x,y]=circular?point(120,100,69,angle):[18+(a+z)/2/m.length*204,100];return <polygon key={`direction-${f.id}`} points="-3,-4 4,0 -3,4" transform={`translate(${x},${y}) rotate(${(circular?angle:0)+(f.orientation===1?0:180)})`} fill="#342c1c" pointerEvents="none"><title>{`Element orientation ${f.orientation===1?'forward':'reverse'}`}</title></polygon>;})}
+    {circular&&<><text x="120" y="96" textAnchor="middle" fill="#e9e9e4" fontSize="18">{m.id==='cointegrate'?'D + T':m.backboneIds.join(' + ').toUpperCase()}</text><text x="120" y="113" textAnchor="middle" fill="#8f999f" fontSize="9">{m.length.toLocaleString()} MODEL UNITS</text><text x="120" y="133" textAnchor="middle" fill="var(--scientific-element)" fontSize="11">{m.blocks.filter(b=>b.kind==='element').length} element {m.blocks.filter(b=>b.kind==='element').length===1?'copy':'copies'}</text></>}
+    {!circular&&<text x="120" y="133" textAnchor="middle" fill="#8f999f" fontSize="11">{m.length} symbolic units · {m.endStatus==='unrepaired'?'unrepaired ends':'schematic donor'}</text>}
+    <text x="120" y="194" textAnchor="middle" fill="#7e8a91" fontSize="9">SCHEMATIC · NOT TO SCALE</text>
+  </svg><div className="feature-pills">{m.features.filter(f=>f.kind!=='backbone').map(f=><FeatureLabel key={f.id} onSelect={onSelect ? ()=>choose(f) : undefined} selected={selected===f.id} className={`feature-pill ${f.kind.toLowerCase()}`} title={`${studentLabels(f.segments)} symbolic units`}>{f.label}{f.kind==='element'?` ${f.orientation===1?'→':'←'}`:f.kind==='TIR'?` ${f.orientation===1?'→':'←'}`:''}</FeatureLabel>)}</div></section>;
+}
+
+function FeatureLabel({onSelect,selected,children,...props}) {
+ return onSelect ? <button {...props} onClick={onSelect} aria-pressed={selected}>{children}</button> : <span {...props}>{children}</span>;
+}

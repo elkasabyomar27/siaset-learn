@@ -1,0 +1,31 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+!**/.env.example
+supabase/.temp/
+*.log
+artifacts/
+
+# Local provider state and private agent settings
+.vercel/
+.codex/
+.agents/
+.aws/
+.mcp.json
+
+# Local evidence can contain browser state, machine paths and source snapshots.
+verification/
+
+# Credential material and local data exports
+*.pem
+*.key
+*.p12
+*.pfx
+signing_keys.json
+credentials.json
+*.har
+*.sqlite
+*.sqlite3
+*.db

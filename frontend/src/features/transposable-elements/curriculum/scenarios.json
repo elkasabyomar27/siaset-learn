@@ -1,0 +1,102 @@
+[
+  {
+    "id": "tn5-guided",
+    "topicId": "conservative",
+    "profileIds": [
+      "tn5"
+    ],
+    "status": "implemented-awaiting-browser-validation",
+    "actions": [
+      "tn5.transpose"
+    ],
+    "initial": {
+      "donorTopology": "linear",
+      "targetTopology": "circular",
+      "elementCopies": 1
+    }
+  },
+  {
+    "id": "tn3-guided",
+    "topicId": "replicative",
+    "profileIds": [
+      "tn3",
+      "tn3-resolution"
+    ],
+    "status": "implemented-awaiting-browser-validation",
+    "actions": [
+      "tn3.replicate",
+      "tn3.resolve"
+    ],
+    "initial": {
+      "donorTopology": "circular",
+      "targetTopology": "circular",
+      "elementCopies": 1
+    }
+  },
+  {
+    "id": "tn3-resolution-guided",
+    "topicId": "replicative",
+    "profileIds": [
+      "tn3-resolution"
+    ],
+    "status": "implemented-awaiting-browser-validation",
+    "entry": "cointegrate in tn3-guided",
+    "actions": [
+      "tn3.resolve"
+    ]
+  },
+  {
+    "id": "acds-planned",
+    "topicId": "discovery",
+    "profileIds": [
+      "acds"
+    ],
+    "status": "planned",
+    "actions": []
+  },
+  {
+    "id": "class-i-ty-planned",
+    "topicId": "classification",
+    "profileIds": [
+      "class-i-ty"
+    ],
+    "status": "planned",
+    "actions": []
+  },
+  {
+    "id": "tn7-tnsd-planned",
+    "topicId": "dna-diversity",
+    "profileIds": [
+      "tn7-tnsd"
+    ],
+    "status": "planned",
+    "actions": []
+  },
+  {
+    "id": "tn7-tnse-planned",
+    "topicId": "dna-diversity",
+    "profileIds": [
+      "tn7-tnse"
+    ],
+    "status": "planned",
+    "actions": []
+  },
+  {
+    "id": "insertion-sequence-planned",
+    "topicId": "insertion-sequences",
+    "profileIds": [
+      "insertion-sequence"
+    ],
+    "status": "planned",
+    "actions": []
+  },
+  {
+    "id": "composite-planned",
+    "topicId": "composite",
+    "profileIds": [
+      "composite"
+    ],
+    "status": "planned",
+    "actions": []
+  }
+]
