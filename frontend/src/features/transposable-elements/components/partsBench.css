@@ -331,3 +331,36 @@
   .hg-bridge { transform:rotate(90deg); justify-self:center; }
 }
 @media (prefers-reduced-motion:reduce) { .rl-molecule, .rl-products .rl-molecule, .hg-plasmid.is-new { animation:none; } }
+
+/* Anatomy dissection lab (topic 3) */
+.al-cases { display:flex; flex-wrap:wrap; gap:6px; margin:16px 0; }
+.al-cases button { min-height:40px; }
+.al-strip { display:flex; align-items:center; justify-content:safe center; padding:28px 8px; overflow-x:auto; }
+.al-unit { display:flex; align-items:center; flex:0 0 auto; }
+.al-gap { position:relative; width:16px; height:64px; border:0; background:none; cursor:pointer; padding:0; color:#e4c8f0; font-size:30px; line-height:1; }
+.al-gap::before { content:''; position:absolute; left:50%; top:16px; bottom:16px; width:2px; transform:translateX(-50%); background:#3b4d58; }
+.al-gap:hover::before, .al-gap:focus-visible::before { background:#8edfc9; top:6px; bottom:6px; }
+.al-gap.is-marker::before { background:#e4c8f0; width:4px; top:-6px; bottom:-6px; box-shadow:0 0 8px #e4c8f0; }
+.al-gap span { position:relative; }
+.al-seg { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; height:48px; padding:0 6px; border:1px solid #3b4d58; background:#1d2a33; color:#dfe8ec; font:inherit; cursor:pointer; transition:background .25s, box-shadow .25s; }
+.al-shape-host { width:44px; border-radius:4px; background:repeating-linear-gradient(90deg,#24333d 0 6px,#1d2a33 6px 12px); }
+.al-shape-tsd { width:52px; border-radius:6px; }
+.al-shape-tir { width:42px; border-radius:3px; }
+.al-shape-gene { width:84px; border-radius:6px; }
+.al-seg-arrow { font-size:16px; line-height:1; }
+.al-seg-name { font-size:11px; font-weight:700; letter-spacing:.02em; }
+.al-seg-mark { position:absolute; top:-18px; font-size:13px; font-weight:800; }
+.al-seg.is-inside { box-shadow:inset 0 0 0 999px rgba(228,200,240,.12); border-color:#b49ac6; }
+.al-seg.is-selected { outline:2px solid #8edfc9; outline-offset:2px; }
+.al-named-host { background:#2c4a66; } .al-named-tsd { background:#5d3f72; } .al-named-tir { background:#6b5321; }
+.al-named-transposase { background:#7a6430; } .al-named-cargo { background:#2f6b4a; }
+.al-seg.is-right .al-seg-mark { color:#9fe2c0; } .al-seg.is-wrong .al-seg-mark { color:#ffb597; }
+.al-seg.is-wrong { border-color:#e3876a; }
+.al-inspector { margin-top:14px; padding:14px 16px; border-radius:10px; border:1px solid #dfe7d6; background:#fbfcf8; min-height:64px; }
+.al-inspector .eyebrow { margin:0 0 4px; }
+.al-clue { margin:0 0 10px; font-size:14px; color:#3f5236; line-height:1.6; }
+.al-labels { display:flex; flex-wrap:wrap; gap:6px; }
+.al-labels button { min-height:40px; font-size:12px; }
+.al-direction { margin-top:14px; }
+.al-feedback { margin:6px 0 0; padding-left:18px; }
+@media (max-width:640px) { .al-shape-gene { width:76px; } .al-shape-host { width:36px; } }

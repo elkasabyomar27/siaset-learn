@@ -1,134 +1,90 @@
 import LabEvidence from './components/LabEvidence.jsx';
-import topics from './curriculum/topics.json' with { type: 'json' };
 import { progressRepository } from './progressRepository.js';
 import PersistenceStatus from './PersistenceStatus.jsx';
 import { experimentFromParams, selectExperiment } from './experimentRouting.js';
 import FeatureNav from './FeatureNav.jsx';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import Curriculum from './Curriculum.jsx';
 import references from './profiles/references.json';
 import profiles from './profiles/mechanisms.json';
-import { newHistory, execute, seek, reset, replay } from './engine/index.js';
 import { copies } from './engine/model.js';
-import LabInspector from './components/LabInspector.jsx';
-import { guidedStages, stageForCursor, canAdvance, actionForStep } from './learning.js';
-import ExperimentBench, { EnzymeDock, EventScrubber, WhatChanged } from '../../ui/ExperimentBench.jsx';
-import { describeChange, friendlyError } from './labInsights.js';
+import { guidedStages } from './learning.js';
 import Checkpoint from './components/Checkpoint.jsx';
+import MoleculeView from './components/MoleculeView.jsx';
+import { WhatChanged } from '../../ui/ExperimentBench.jsx';
+import { Tn5Scene, Tn3Scene } from './components/StoryScenes.jsx';
+import { STORY, newStory, storyAction, boundaryFromAngle, isComplete } from './storyLab.js';
+import './components/storyLab.css';
+
+// Topics 6 and 7: hands-on story labs. Molecular changes come from the engine; progress maps onto
+// the original guided stages, so recorded completion evidence keeps the same contract.
 export default function Laboratory() {
   const [params, setParams] = useSearchParams();
   const scenario = experimentFromParams(params);
   function changeScenario(value) {
     if (value !== scenario) setParams(current => selectExperiment(current, value));
   }
-  return <LaboratorySession key={scenario} scenario={scenario} changeScenario={changeScenario} />;
+  return <StoryLab key={scenario} scenario={scenario} changeScenario={changeScenario} />;
 }
-function LaboratorySession({
-  scenario,
-  changeScenario
-}) {
-  const [history, setHistory] = useState(() => newHistory(scenario));
-  const [stage, setStage] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [selection, setSelection] = useState(null);
-  const [compare, setCompare] = useState(false);
-  const [showCurriculum, setShowCurriculum] = useState(false);
-  const [targetBoundary, setTargetBoundary] = useState(200);
-  const [resolvase, setResolvase] = useState(true);
-  const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
-  const [lastChange, setLastChange] = useState(null);
-  const steps = guidedStages[scenario];
-  const step = steps[stage];
-  const state = history.state;
-  const selectedMolecule = state.molecules.find(m => m.id === selection?.moleculeId);
-  const selectedFeature = selectedMolecule?.features.find(f => f.id === selection?.featureId);
+
+function StoryLab({ scenario, changeScenario }) {
+  const [s, setS] = useState(() => newStory(scenario));
+  const [site, setSite] = useState(80);
+  const [saved, setSaved] = useState(null);
+  const steps = STORY[scenario], step = steps[s.stage], guided = guidedStages[scenario][s.stage];
   const activeProfile = profiles.find(p => p.id === scenario);
   const referenceIds = scenario === 'tn3' ? [...activeProfile.references, ...profiles.find(p => p.id === 'tn3-resolution').references] : activeProfile.references;
   const activeRefs = references.filter(r => referenceIds.includes(r.id));
-  function advance() {
-    try {
-      if (!canAdvance(scenario, stage, answers)) return;
-      let action = actionForStep(scenario, stage, targetBoundary);
-      if (action?.type === 'tn3.resolve') action = {
-        ...action,
-        resolvaseAvailable: resolvase
-      };
-      if (action) {
-        const next = execute(history, action);
-        setHistory(next);
-        setLastChange(describeChange(history.state, next.state));
-      }
-      setStage(stage + 1);
-      setError('');
-      setSelection(null);
-      setNotice('');
-    } catch (e) {
-      setError(friendlyError(e));
-    }
+  const dispatch = action => setS(prev => storyAction(prev, action.angle === undefined ? action : {...action, boundary: boundaryFromAngle(action.angle)}));
+  const state = s.history.state;
+  const free = scenario === 'tn5' && s.cut.length === 2 && s.stage === 1;
+
+  function save() {
+    setSaved(progressRepository.recordLab(s.history, s.stage, s.answers)
+      ? {ok: true, text: 'Lab saved in this browser. It now counts towards your progress.'}
+      : {ok: false, text: 'Not saved to browser storage. Your result stays on this page until you leave or reload.'});
   }
-  function moveHistory(delta) {
-    try {
-      const h = seek(history, history.cursor + delta);
-      setHistory(h);
-      setStage(stageForCursor(scenario, h.cursor));
-      setSelection(null);
-      setLastChange(null);
-      setError('');
-    } catch (e) {
-      setError(e.message);
-    }
-  }
-  function startOver() {
-    setHistory(reset(history));
-    setStage(0);
-    setAnswers({});
-    setSelection(null);
-    setResolvase(true);
-    setLastChange(null);
-    setError('');
-    setNotice('Experiment reset to its initial molecular state.');
-  }
-  function verifyReplay() {
-    try {
-      const result = replay(history.initial, history.events.slice(0, history.cursor));
-      setHistory({
-        ...history,
-        state: result
-      });
-      setNotice(`Replayed ${history.cursor} molecular event(s). State reconstruction matches the recorded result.`);
-    } catch (e) {
-      setError(e.message);
-    }
-  }
-  const checkpointId = step.checkpoint;
-  return <main className="laboratory hands-on-lab"><FeatureNav />
-    <header className="bench-header"><div><p className="eyebrow">SIASET / GUIDED EXPERIMENT {scenario==='tn5'?'01':'02'}</p><h1>{scenario==='tn5'?'Move a transposon.':'Build a cointegrate.'}</h1><p>Touch the model. Follow the evidence. Understand the mechanism.</p></div><div className="bench-mode"><span>GUIDED WORKBENCH</span><button className="outline-button" onClick={()=>setShowCurriculum(!showCurriculum)} aria-expanded={showCurriculum}>Curriculum · {topics.length}</button></div></header>
-    <div className="bench-switcher" role="group" aria-label="Choose experiment"><button aria-pressed={scenario==='tn5'} onClick={()=>changeScenario('tn5')}><span>01</span><b>Tn5</b><small>Conservative / move one copy</small></button><button aria-pressed={scenario==='tn3'} onClick={()=>changeScenario('tn3')}><span>02</span><b>Tn3</b><small>Replicative / follow two copies</small></button><Link to="/lab/transposable-elements/sandbox">Free exploration ↗</Link></div>
-    <PersistenceStatus />{showCurriculum&&<Curriculum collapsible={false}/>}
-    <div className="bench-layout">
-      <aside className="mission-panel" aria-label="Guided experiment task">
-        <div className="mission-count"><span>YOUR EXPERIMENT</span><b>{String(stage+1).padStart(2,'0')}<small> / {steps.length}</small></b></div>
-        <progress aria-label="Teaching stage progress" value={stage+1} max={steps.length}/>
-        <nav className="mission-steps" aria-label="Guided experiment steps">{steps.map((item,i)=><div key={item.id} className={i===stage?'current':i<stage?'done':''} aria-current={i===stage?'step':undefined}><span>{i<stage?'✓':i+1}</span><b>{item.title}</b></div>)}</nav>
-        <section className="mission-task" key={step.id}><p className="eyebrow">{step.explanatory?'EXPLANATORY · NO MOLECULAR CHANGE':checkpointId?'MAKE YOUR PREDICTION':'OBSERVE & INVESTIGATE'}</p><h2>{step.title}</h2><p>{step.note}</p></section>
-        {checkpointId&&<Checkpoint id={checkpointId} answer={answers[checkpointId]} onAnswer={value=>setAnswers({...answers,[checkpointId]:value})}/>}
-        {step.enzymeGate&&<EnzymeDock available={resolvase} onChange={setResolvase}/>}
-        {step.boundaryControl&&<div className="gesture-hint"><span>⌖</span><p><b>Your first move</b>Drag the glowing outer ring around the target DNA. The boundary readout updates as you move.</p></div>}
-        <WhatChanged change={lastChange} onDismiss={()=>setLastChange(null)}/>{error&&<p role="alert" className="error">{error}</p>}{notice&&<p role="status" className="notice">{notice}</p>}
-        {step.final?<div className="explicit-completion"><p>Review complete. Save your evidence explicitly.</p><button className="primary-button" onClick={()=>setNotice(progressRepository.recordLab(history,stage,answers)?'Guided review saved in this browser.':'Review not saved to browser storage. Valid evidence remains temporary while the page is loaded; reloading or closing can lose it.')}>Record completed guided review</button></div>:<><button className="primary-button mission-advance" disabled={!canAdvance(scenario,stage,answers)} onClick={advance}>{step.actionLabel||'Continue investigation'} <span>→</span></button>{checkpointId&&!canAdvance(scenario,stage,answers)&&<p className="advance-hint">Make a correct prediction to unlock the next step.</p>}</>}
-      </aside>
-      <div className="bench-center">
-        <section className="bench-vitals" aria-label="Molecular state summary"><div><span>ELEMENT COPIES</span><strong>{String(copies(state).length).padStart(2,'0')}</strong><small>{scenario==='tn5'?'conserved overall':'total across structures'}</small></div><div><span>MOLECULAR STATE</span><strong>{state.phase==='initial'?'Separate DNA':state.phase==='cointegrate'?'Cointegrate':state.phase==='resolved'?'Resolved products':'Target insertion'}</strong></div><div><span>HOST-DERIVED TSD</span><strong>{scenario==='tn5'?9:5}<small> bp</small></strong><small>{state.phase==='initial'?'expected after insertion':'target-site duplication'}</small></div></section>
-        <ExperimentBench state={state} initial={history.initial} compare={compare} onCompare={setCompare} selection={selection} onSelect={setSelection} targetBoundary={targetBoundary} onBoundaryChange={step.boundaryControl?setTargetBoundary:undefined} highlight={lastChange?.highlight}/>
-        {state.phase==='resolved'&&<p className="topology-warning">{state.topologyNote}</p>}
-        <EventScrubber history={history} onSeek={cursor=>moveHistory(cursor-history.cursor)}/>
-        <div className="bench-history-actions"><button disabled={history.cursor===0} onClick={()=>moveHistory(-1)} aria-label="Undo molecular event">↶ Undo</button><button disabled={history.cursor===history.events.length} onClick={()=>moveHistory(1)} aria-label="Redo molecular event">↷ Redo</button><button onClick={verifyReplay}>↻ Replay recorded events</button><button onClick={startOver}>Reset experiment</button></div>
-        <LabInspector selectedFeature={selectedFeature} selectedMolecule={selectedMolecule} history={history} scenario={scenario}/>
+
+  return <main className="laboratory hands-on-lab story-lab"><FeatureNav />
+    <header className="bench-header"><div><p className="eyebrow">SIASET / HANDS-ON LAB · TOPIC {scenario === 'tn5' ? '06' : '07'}</p><h1>{scenario === 'tn5' ? 'Cut and paste a transposon.' : 'Copy, join, then separate.'}</h1><p>{scenario === 'tn5' ? 'Do each step yourself: hold the ends, cut, carry and insert Tn5.' : 'Join two circles through Tn3, copy it, then separate the circles with TnpR.'}</p></div></header>
+    <div className="bench-switcher" role="group" aria-label="Choose experiment"><button aria-pressed={scenario === 'tn5'} onClick={() => changeScenario('tn5')}><span>06</span><b>Tn5</b><small>Conservative / cut and paste</small></button><button aria-pressed={scenario === 'tn3'} onClick={() => changeScenario('tn3')}><span>07</span><b>Tn3</b><small>Replicative / copy and join</small></button><Link to="/lab/transposable-elements/sandbox">Free exploration ↗</Link></div>
+    <PersistenceStatus />
+
+    <ol className="sl-steps" aria-label="Lab steps">{steps.map((x, i) => <li key={x.title} className={i === s.stage ? 'current' : i < s.stage ? 'done' : ''} aria-current={i === s.stage ? 'step' : undefined}><span>{i < s.stage ? '✓' : i + 1}</span>{x.title}</li>)}</ol>
+
+    <section className="sl-stage-wrap" aria-label="Hands-on scene">
+      <div className="sl-vitals"><span>ELEMENT COPIES <b>{copies(state).length}</b></span><span>DNA MOLECULES <b>{state.molecules.length}</b></span><span>STATE <b>{state.phase === 'initial' ? 'Separate DNA' : state.phase === 'inserted' ? 'Inserted' : state.phase === 'cointegrate' ? 'Cointegrate' : 'Resolved'}</b></span></div>
+      {scenario === 'tn5' ? <Tn5Scene s={s} dispatch={dispatch} /> : <Tn3Scene s={s} dispatch={dispatch} />}
+      <p className="sl-scene-note">Schematic scene: not to scale, no sequence. Molecular results are calculated by the lab engine.</p>
+    </section>
+
+    <section className="sl-task" aria-live="polite">
+      <p className="eyebrow">STEP {s.stage + 1} OF {steps.length}{guided.explanatory ? ' · EXPLANATORY' : ''}</p>
+      <h2>{step.title}</h2><p>{step.task}</p>
+      {guided.checkpoint && !(guided.checkpoint === 'tn3' && s.stage > 1) && <Checkpoint id={guided.checkpoint} answer={s.answers[guided.checkpoint]} onAnswer={value => dispatch({type: 'answer', checkpoint: guided.checkpoint, value})} />}
+      <div className="sl-actions">
+        {scenario === 'tn5' && s.stage === 0 && ['left', 'right'].map(end => <button key={end} type="button" className="outline-button" disabled={s.bound.includes(end)} onClick={() => dispatch({type: 'bind', end})}>{s.bound.includes(end) ? `✓ ${end} end bound` : `Bind ${end} end`}</button>)}
+        {scenario === 'tn5' && s.stage === 1 && !free && ['left', 'right'].map(end => <button key={end} type="button" className="outline-button" disabled={s.cut.includes(end) || s.answers.tn5 !== 0} onClick={() => dispatch({type: 'cut', end})}>{s.cut.includes(end) ? `✓ ${end} end cut` : `✂ Cut ${end} end`}</button>)}
+        {((scenario === 'tn5' && free) || (scenario === 'tn3' && s.stage === 0)) && <><label className="sl-site">Ring position <input type="range" min="0" max="359" value={site} onChange={e => setSite(Number(e.target.value))} /><b>{boundaryFromAngle(site)}</b></label>
+          <button type="button" className="primary-button" onClick={() => dispatch({type: scenario === 'tn5' ? 'insert' : 'dock-target', angle: site})}>{scenario === 'tn5' ? 'Insert Tn5 here' : 'Join target here'} →</button><small className="sl-or">or tap the ring in the scene</small></>}
+        {scenario === 'tn5' && s.stage === 2 && <button type="button" className="primary-button" onClick={() => dispatch({type: 'continue'})}>Inspect the insertion →</button>}
+        {scenario === 'tn5' && s.stage === 3 && ['target-tsd-left', 'target-tsd-right'].map(id => <button key={id} type="button" className="outline-button" disabled={s.inspected.includes(id)} onClick={() => dispatch({type: 'inspect', feature: id})}>{s.inspected.includes(id) ? '✓ ' : ''}{id.endsWith('left') ? 'Left' : 'Right'} repeat</button>)}
+        {scenario === 'tn3' && s.stage === 2 && <button type="button" className="primary-button" onClick={() => dispatch({type: 'replicate'})}>Start replication →</button>}
+        {scenario === 'tn3' && s.stage === 3 && ['copy-1', 'copy-2'].map(id => <button key={id} type="button" className="outline-button" disabled={s.inspected.includes(id)} onClick={() => dispatch({type: 'inspect', feature: id})}>{s.inspected.includes(id) ? '✓ ' : ''}Tn3 {id === 'copy-1' ? 'copy 1' : 'copy 2'}</button>)}
+        {scenario === 'tn3' && s.stage === 4 && <><button type="button" className="outline-button" aria-pressed={s.tnpR} onClick={() => dispatch({type: 'enzyme', available: !s.tnpR})}>{s.tnpR ? '✓ TnpR docked on res' : 'Dock TnpR on res'}</button><button type="button" className="primary-button" onClick={() => dispatch({type: 'resolve'})}>Resolve →</button></>}
+        {isComplete(s) && <button type="button" className="primary-button" onClick={save}>Save completed lab</button>}
+        <button type="button" className="account-text-button sl-restart" onClick={() => { setS(newStory(scenario)); setSaved(null); }}>Restart lab</button>
       </div>
-    </div>
-    {step.final&&<section className="panel lesson-section learning-transitions" aria-label="Continue learning"><h2>Continue your learning pathway</h2><p>Use “Record completed guided review” above to record this review before moving on. Following a link does not record completion.</p><div className="feature-actions"><Link className="outline-button" to={scenario==='tn5'?'/lab/transposable-elements?experiment=tn3':'/learn/transposable-elements/insertion-sequences'}>{scenario==='tn5'?'Next: Tn3 replicative laboratory':'Next: Insertion Sequences'}</Link><Link className="outline-button" to="/learn/transposable-elements/progress">Review your progress</Link></div></section>}
-    <LabEvidence scenario={scenario} activeProfile={activeProfile} activeRefs={activeRefs}/><Link className="foundations-link" to="/learn/transposable-elements">Study the foundational lessons ↗</Link><footer className="lab-footer"><span>SIASET LEARN / TRANSPOSABLE ELEMENTS</span><span>SCIENTIFIC MODEL v1 · PHASES 1–3</span></footer>
+      {s.message && <div className={`sl-message${s.message.ok ? ' is-good' : ''}`} role="status">{s.message.text}</div>}
+      {saved && <div className={`sl-message${saved.ok ? ' is-good' : ''}`} role="status">{saved.text}</div>}
+      <WhatChanged change={s.change} onDismiss={() => setS(prev => ({...prev, change: null}))} />
+    </section>
+
+    <details className="sl-engine" open={s.history.events.length > 0}><summary>Engine view: the calculated molecules</summary>
+      <div className="molecule-grid bench-molecules">{state.molecules.map(m => <MoleculeView key={`${m.id}-${state.revision}`} molecule={m} compact highlight={s.change?.highlight?.[m.id]} />)}</div>
+    </details>
+
+    {isComplete(s) && <section className="panel lesson-section learning-transitions" aria-label="Continue learning"><h2>Continue your learning pathway</h2><p>Save the lab above to record it. Following a link does not record completion.</p><div className="feature-actions"><Link className="outline-button" to={scenario === 'tn5' ? '/lab/transposable-elements?experiment=tn3' : '/learn/transposable-elements/insertion-sequences'}>{scenario === 'tn5' ? 'Next: Tn3 copy-and-join lab' : 'Next: Insertion Sequences'}</Link><Link className="outline-button" to="/learn/transposable-elements/progress">Review your progress</Link></div></section>}
+    <LabEvidence scenario={scenario} activeProfile={activeProfile} activeRefs={activeRefs} /><Link className="foundations-link" to="/learn/transposable-elements">Study the foundational lessons ↗</Link>
   </main>;
 }
