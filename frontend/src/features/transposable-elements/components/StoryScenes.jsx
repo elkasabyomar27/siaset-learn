@@ -24,18 +24,19 @@ function RingTrack({ cx, cy, r, label, onPick }) {
 /* ---------------- Tn5: cut and paste ---------------- */
 const D_Y = 120, EL = [180, 300], RING5 = [590, 185, 92];
 
-export function Tn5Scene({ s, dispatch }) {
+// free: sandbox mode, where ends and scissors stay tappable and the bench explains what is not possible.
+export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
   const {stage, bound, cut} = s, free = cut.length === 2, inserted = stage >= 2;
   const tsdBlock = inserted ? s.history.state.molecules.find(m => m.id === 'target')?.blocks.find(b => b.kind === 'tsd') : null;
   // Same mapping as the engine view: boundary / 900 units of the ring.
   const tsdAngle = inserted ? (s.boundary ?? 200) / 900 * 360 : null;
   const end = (side) => {
     const x = side === 'left' ? EL[0] : EL[1], isBound = bound.includes(side), isCut = cut.includes(side);
-    const canBind = stage === 0 && !isBound, canCut = stage === 1 && !isCut && s.answers.tn5 === 0;
+    const canBind = (freeMode ? !inserted : stage === 0) && !isBound, canCut = freeMode ? !inserted && !isCut : stage === 1 && !isCut && s.answers.tn5 === 0;
     return <g key={side}>
       <rect className={`sl-tir${canBind ? ' is-target' : ''}`} x={side === 'left' ? x : x - 14} y={D_Y - 13} width="14" height="26" rx="3" {...(canBind ? press(() => dispatch({type: 'bind', end: side})) : {})} aria-label={canBind ? `Bind transposase to the ${side} end` : undefined} />
       {isBound && !inserted && <g className="sl-tnp" style={{transform: `translate(${side === 'left' ? x + 7 : x - 7}px, ${D_Y - 30}px)`}}><circle r="13" /><text y="4" textAnchor="middle">T</text></g>}
-      {stage === 1 && <g className={`sl-scissors${canCut ? ' is-target' : ''}${isCut ? ' is-done' : ''}`} style={{transform: `translate(${x}px, ${D_Y + 34}px)`}} {...(canCut ? press(() => dispatch({type: 'cut', end: side})) : {})} aria-label={canCut ? `Cut at the ${side} end of Tn5` : undefined}><circle r="15" /><text y="5" textAnchor="middle">✂</text></g>}
+      {(freeMode ? !inserted : stage === 1) && <g className={`sl-scissors${canCut ? ' is-target' : ''}${isCut ? ' is-done' : ''}`} style={{transform: `translate(${x}px, ${D_Y + 34}px)`}} {...(canCut ? press(() => dispatch({type: 'cut', end: side})) : {})} aria-label={canCut ? `Cut at the ${side} end of Tn5` : undefined}><circle r="15" /><text y="5" textAnchor="middle">✂</text></g>}
     </g>;
   };
   return <svg className="sl-scene" viewBox="0 0 760 340" aria-label={inserted ? 'Tn5 now sits in the target ring between two purple host repeats. The donor is two separate broken pieces.' : free ? 'Tn5 has been cut free and is held by transposase above the broken donor. The target ring is ready.' : 'A linear donor DNA carries the gold Tn5 element between two ends. A circular target has no Tn5.'}>
