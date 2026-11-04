@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {publicAuthConfig, safeDestination} from '../../frontend/src/auth/config.js';
 import {startAuthFlow, finishAuthFlow, restartAuthFlow} from '../../frontend/src/auth/flows.js';
+import {authRequestError} from '../../frontend/src/auth/errors.js';
 const memory = () => { const map = new Map(); return {getItem: key => map.get(key) ?? null, setItem: (key, value) => map.set(key, value), removeItem: key => map.delete(key), map}; };
 const locks = {request: async (_name, action) => action()};
 const history = {state: {key: 1}, replaceState(_state, _unused, path) { this.path = path; }};
@@ -52,4 +53,33 @@ test('account routes preserve learning integration and never import or write bro
   for (const sdk of ['signInWithPassword', 'signUp', 'resetPasswordForEmail', 'updateUser', 'signInWithOAuth', 'signOut']) assert.ok(source.includes(sdk));
   const main = await readFile('frontend/src/main.jsx', 'utf8');
   for (const path of ['/account', '/auth/callback', '/auth/recovery']) assert.ok(main.indexOf(`path="${path}"`) < main.indexOf('path="*"'));
+});
+
+test('explicit new signup/recovery requests supersede old email leases without blocking the SDK', async()=>{
+  const storage=memory();let calls=0,sequence=0;
+  const options={locks,storage,now:()=>1000,makeId:()=>`request-${++sequence}`,replacePending:true};
+  for(const kind of ['signup','signup','recovery'])await startAuthFlow(kind,async()=>{calls++;return {data:{session:null}};},options);
+  assert.equal(calls,3);assert.equal(JSON.parse(storage.getItem('siaset-auth-flow-v1')).kind,'recovery');
+  storage.setItem('siaset-auth-flow-v1','malformed json');
+  await startAuthFlow('signup',async()=>({data:{session:null}}),options);
+  assert.equal(JSON.parse(storage.getItem('siaset-auth-flow-v1')).kind,'signup');
+  await assert.rejects(startAuthFlow('signup',async()=>({error:{code:'over_email_send_rate_limit'}}),options),/wait a few minutes/);
+  assert.equal(storage.map.size,0);
+  await startAuthFlow('signup',async()=>({data:{session:{user:{id:'verified'}}}}),options);
+  assert.equal(storage.map.size,0);
+});
+test('sign-in errors explain confirmation, invalid credentials and rate limits without raw diagnostics',()=>{
+  assert.match(authRequestError({code:'email_not_confirmed'}).message,/Confirm your email/);
+  assert.match(authRequestError({code:'invalid_credentials'}).message,/email or password is incorrect/);
+  assert.match(authRequestError({status:429}).message,/wait a few minutes/);
+  assert.doesNotMatch(authRequestError({message:'sensitive server diagnostic'}).message,/sensitive/);
+});
+test('callback exchange holds the same cross-tab lock and rejects malformed leases',async()=>{
+  const storage=memory(),names=[],options={storage,history,now:()=>1000,locks:{request:async(name,action)=>{names.push(name);return action();}}};
+  const client={auth:{exchangeCodeForSession:async()=>({data:{session:{user:{id:'owner'}}}}),getUser:async()=>({data:{user:{id:'owner'}}})}};
+  storage.setItem('siaset-auth-flow-v1',JSON.stringify({kind:'signup'}));
+  await assert.rejects(finishAuthFlow(client,'https://app.example/auth/callback?code=malformed-lease',options),/expired/);
+  await startAuthFlow('signup',async()=>({data:{}}),{...options,makeId:()=> 'fresh'});
+  assert.equal((await finishAuthFlow(client,'https://app.example/auth/callback?code=fresh-locked-callback',options)).owner,'owner');
+  assert.deepEqual(names,['siaset-auth-flow','siaset-auth-flow','siaset-auth-flow']);
 });

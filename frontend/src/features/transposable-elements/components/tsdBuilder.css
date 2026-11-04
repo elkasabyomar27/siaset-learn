@@ -1,0 +1,95 @@
+/* Build-the-repeats activity: light lesson chrome around a dark molecular specimen panel. */
+.tsd-builder { --tsd-ease: cubic-bezier(.4, 0, .2, 1); }
+.tsd-builder .tsd-goal { max-width: 68ch; }
+
+.tsd-controls { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: flex-end; margin: 18px 0; }
+.tsd-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.tsd-presets button { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 44px; padding: 8px 14px; }
+.tsd-presets button small { font-size: 11px; opacity: .75; }
+.tsd-presets button[aria-pressed=true] { border-color: #6f9a55; background: #eaf3df; color: #3f6a2e; box-shadow: inset 3px 0 #6f9a55; }
+.tsd-slider { display: grid; gap: 6px; font-size: 13px; min-width: 200px; flex: 1 1 200px; max-width: 320px; }
+.tsd-slider b { font-size: 15px; margin-left: 6px; }
+.tsd-slider input { width: 100%; min-height: 32px; accent-color: #6f9a55; }
+.tsd-mystery { margin: 0; padding: 10px 14px; border: 1px dashed #b49ac6; border-radius: 8px; background: #f8f2fb; color: #5d3f72; font-size: 13px; }
+.tsd-mystery b { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; background: #c79cda; color: #2a1836; }
+
+.tsd-stage-figure { margin: 0; border-radius: 12px; overflow: hidden; background: var(--color-molecular-background, #0e1419); color: var(--color-molecular-text, #dfe8ec); border: 1px solid #22313b; }
+.tsd-steps { list-style: none; margin: 0; padding: 12px 14px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; border-bottom: 1px solid #22313b; }
+.tsd-steps li { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #8399a5; min-width: 0; }
+.tsd-steps li span { flex-shrink: 0; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #3b4d58; font-size: 11px; }
+.tsd-steps li.current { color: #f3f7f9; font-weight: 600; }
+.tsd-steps li.current span { background: #c79cda; border-color: #c79cda; color: #1d1226; }
+.tsd-steps li.done span { border-color: #6fbf98; color: #9fe2c0; }
+
+.tsd-canvas { padding: 8px 6px 0; }
+.tsd-canvas svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tsd-world { transition: transform .8s var(--tsd-ease); }
+.tsd-strand-labels text { fill: #6f8592; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+
+.tsd-cell { transition: transform .8s var(--tsd-ease); }
+.tsd-cell rect:first-child { fill: var(--scientific-target); stroke: #0e1419; stroke-width: 1; }
+.tsd-cell--tsd rect:first-child { fill: var(--scientific-tsd); }
+.tsd-cell--new { animation: tsd-fill-in .7s var(--tsd-ease) both; }
+.tsd-pos { fill: #6f8592; font-size: 9px; font-variant-numeric: tabular-nums; }
+.tsd-pos--interval { fill: #e4c8f0; font-weight: 700; }
+.tsd-gap { fill: none; stroke: #c79cda; stroke-width: 1.4; stroke-dasharray: 3 3; opacity: .85; }
+
+.tsd-element { transition: transform .8s var(--tsd-ease); animation: tsd-drop-in .8s var(--tsd-ease) both; }
+.tsd-element rect { fill: var(--scientific-element); }
+.tsd-element .tsd-tir { fill: none; stroke: #6b5321; stroke-width: 2.4; stroke-linejoin: round; }
+.tsd-element text { fill: #2c220d; font-size: 13px; font-weight: 700; letter-spacing: .04em; }
+
+.tsd-nick line { stroke: #ff9f7a; stroke-width: 2.5; stroke-linecap: round; }
+.tsd-nick text { fill: #ffb597; font-size: 14px; }
+.tsd-stagger-bracket line { stroke: #e4c8f0; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.tsd-stagger-bracket text, .tsd-repeat text { fill: #e4c8f0; font-size: 12px; font-weight: 600; }
+.tsd-repeat path { fill: none; stroke: #e4c8f0; stroke-width: 1.6; }
+.tsd-repeat { animation: tsd-fade .6s .4s both; }
+
+.tsd-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 14px 12px; font-size: 11px; color: #a8bac3; border-top: 1px solid #22313b; }
+.tsd-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.tsd-legend i { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
+.tsd-legend .sw-host { background: var(--scientific-target); }
+.tsd-legend .sw-tsd { background: var(--scientific-tsd); }
+.tsd-legend .sw-new { background: repeating-linear-gradient(45deg, var(--scientific-tsd) 0 3px, #6d5279 3px 5px); }
+.tsd-legend .sw-element { background: var(--scientific-element); }
+.tsd-legend .sw-gap { border: 1.4px dashed var(--scientific-tsd); }
+
+.tsd-narration { margin: 16px 0 0; padding: 14px 18px; border-left: 3px solid #c79cda; background: #f8f2fb; border-radius: 0 8px 8px 0; color: #4d3560; font-size: 14px; line-height: 1.7; min-height: 3.4em; }
+.tsd-predict { margin: 16px 0 0; padding: 0; border: 0; min-width: 0; }
+.tsd-predict legend { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+.tsd-predict > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.tsd-predict button { min-width: 56px; min-height: 44px; font-size: 16px; font-variant-numeric: tabular-nums; }
+.tsd-predict button.chosen { border-color: #8a5aa3; background: #f1e6f7; color: #5d3374; box-shadow: inset 0 -3px #8a5aa3; }
+.tsd-predict small { display: block; margin-top: 8px; color: #6b7c66; }
+.tsd-predict .feedback { margin-top: 12px; }
+
+.tsd-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 18px; }
+.tsd-actions button { min-height: 44px; }
+.tsd-actions-spacer { flex: 1; }
+.tsd-text { margin-top: 14px; font-size: 13px; }
+.tsd-exit { font-size: 13px; }
+.tsd-text summary { cursor: pointer; }
+
+@keyframes tsd-fill-in { from { opacity: .45; } to { opacity: 1; } }
+@keyframes tsd-drop-in { from { opacity: .45; } to { opacity: 1; } }
+@keyframes tsd-fade { from { opacity: .45; } to { opacity: 1; } }
+
+@media (max-width: 640px) {
+  .tsd-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tsd-pos:not(.tsd-pos--interval) { display: none; }
+  .tsd-pos--interval { font-size: 11px; }
+  .tsd-stagger-bracket text, .tsd-repeat text { font-size: 13px; }
+  .tsd-strand-labels { display: none; }
+  .tsd-slider { max-width: none; }
+  .tsd-actions-spacer { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tsd-world, .tsd-cell, .tsd-element { transition: none; }
+  .tsd-cell--new, .tsd-element, .tsd-repeat { animation: none; }
+}
+@media (forced-colors: active) {
+  .tsd-cell rect:first-child { fill: CanvasText; }
+  .tsd-cell--tsd rect:first-child { fill: Highlight; }
+  .tsd-predict button.chosen { outline: 2px solid Highlight; }
+}
