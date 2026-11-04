@@ -114,7 +114,7 @@ export default function TsdBuilder() {
       </figcaption>
     </figure>
 
-    <p className="tsd-narration" role="status" aria-live="polite"><b>{stage + 1}. {layout.stage.title}.</b> {layout.stage.note}</p>
+    <div className="tsd-narration" role="status" aria-live="polite"><b>{stage + 1}. {layout.stage.title}.</b> {layout.stage.note}</div>
 
     {stage >= PREDICT_STAGE && <fieldset className="tsd-predict">
       <legend>Predict: after filling, how many positions long is <em>each</em> repeat?</legend>

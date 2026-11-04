@@ -272,7 +272,7 @@
 .feature-pill.is-new { box-shadow:0 0 0 2px #8edfc9; }
 .feature-pill.is-new::after { content:' · new'; font-size:10px; opacity:.8; }
 @keyframes feature-glow { 0%,100% { filter:none; } 50% { filter:drop-shadow(0 0 5px #fff6c8) brightness(1.35); } }
-@keyframes what-changed-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes what-changed-in { from { opacity:.45; transform:translateY(6px); } to { opacity:1; transform:none; } }
 
 /* Sandbox predict-then-run. */
 .prediction-locked { margin:10px 0 0; padding:10px 12px; border-radius:7px; border:1px dashed #5d7c8c; color:#bcd3df; font-size:12px; }
