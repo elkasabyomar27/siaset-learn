@@ -1,0 +1,118 @@
+.workspace-shell[data-page=lesson] { --color-page-background:#f7f8f2; --color-surface:#fffefa; --color-surface-subtle:#eef3e9; --color-surface-selected:#eaf3e5; --color-text:#2b4434; --color-text-secondary:#566e5c; --color-text-muted:#687d68; --color-border:#d6e1d0; --color-brand-secondary:#3e7654; --color-action:#3e7654; --color-action-hover:#2e5c40; --color-on-action:#fff; --color-link:#447853; --color-focus:#3d7956; background:#f7f8f2; }
+.topic-workspace { max-width:1440px; margin:auto; padding:20px 38px 42px; }
+.topic-navigation { display:flex; justify-content:space-between; gap:18px; align-items:center; flex-wrap:wrap; padding:0 0 18px; border-bottom:1px solid #d7e1d0; }
+.topic-path { display:flex; gap:12px; align-items:center; font-size:10px; line-height:1.7; color:#768a6d; }
+.topic-path a { color:#456d48; min-height:38px; display:inline-flex; align-items:center; white-space:nowrap; }
+.topic-navigation-controls { display:flex; gap:12px; align-items:center; min-width:0; flex-wrap:wrap; }
+.topic-evidence-state { display:inline-flex; align-items:center; gap:6px; font-size:9px; color:#77866e; }
+.topic-evidence-state i { height:5px; width:5px; border:1px solid #8aa07d; border-radius:50%; }
+.topic-evidence-state.is-completed { color:#3f754b; }.topic-evidence-state.is-completed i { background:#538a5f; border-color:#538a5f; }
+.topic-navigation-controls select { max-width:260px; min-height:42px; padding:10px 30px 10px 12px; border:1px solid #c9d8c0; background:#fffefa; border-radius:7px; color:#526e4f; font-size:11px; }
+.topic-arrows { display:flex; gap:5px; }
+.topic-arrows > :is(a,span) { display:grid; place-items:center; width:40px; height:42px; border:1px solid #cddbc4; border-radius:7px; background:#fffefa; font-size:17px; color:#68835e; }
+.topic-arrows > a:hover { background:#eaf2e0; border-color:#93ac82; }
+.topic-arrows > span { color:#acb9a4; border-color:#e0e7d9; background:transparent; }
+.topic-edition { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin:22px 0 10px; color:#7a8f6d; font-size:8px; letter-spacing:1.3px; }
+.topic-edition > span:first-child { display:inline-flex; gap:8px; align-items:center; color:#456d45; font-size:11px; letter-spacing:.8px; }
+.topic-edition i { color:#91a185; font-size:10px; font-style:normal; }
+.topic-edition b { font-weight:500; }
+.workspace-shell[data-page=lesson] .topic-workspace .laboratory.lessons { max-width:none; padding:0; }
+.topic-workspace .lessons > .feature-nav { padding:8px 0 14px; margin:14px 0 26px; border-color:#d9e2d1; gap:5px; }
+.topic-workspace .lessons > .feature-nav a { font-size:10px; color:#6c8262; }
+.workspace-shell .topic-workspace .lessons .lab-heading { margin:18px 0 28px; align-items:flex-start; gap:26px; padding-bottom:28px; border-bottom:1px solid #d5dfcb; }
+.workspace-shell .topic-workspace .lessons .lab-heading .eyebrow { font-size:8px; color:#799366; letter-spacing:1.7px; }
+.workspace-shell .topic-workspace .lessons .lab-heading h1 { font-size:clamp(32px,3.8vw,52px); line-height:1.16; letter-spacing:-1.8px; color:#36563b; max-width:23ch; margin:16px 0 18px; }
+.topic-workspace .lessons .lab-heading h1 > span { color:#91a87b; }
+.workspace-shell .topic-workspace .lessons .lab-heading .intro { font-size:14px; line-height:1.8; color:#77886b; max-width:54ch; margin:0; }
+.workspace-shell .topic-workspace .lessons .outline-button { display:inline-flex; align-items:center; min-height:44px; padding:11px 14px; border:1px solid #c7d6bc; border-radius:7px; background:#fffefa; color:#5b7d4e; font-size:11px; white-space:normal; line-height:1.7; }
+.workspace-shell .topic-workspace .lessons .outline-button:hover { background:#edf4e3; border-color:#91aa7d; }
+.topic-workspace .lessons > div:has(> p[role=status]) { margin-bottom:20px; }
+.topic-workspace .lessons > div > p[role=status] { color:#7e8c73; font-size:10px; }
+.workspace-shell .topic-workspace .journey-disclosure { border:1px solid #d0dfc5; border-radius:10px; background:#edf3e4; margin:0 0 30px; }
+.workspace-shell .topic-workspace .journey-disclosure > summary { display:list-item; min-height:52px; padding:16px 20px; color:#638058; font-size:11px; font-weight:500; }
+.workspace-shell .topic-workspace .journey-disclosure[open] { background:#fffefa; }
+.workspace-shell .topic-workspace .lesson-body { max-width:1040px; margin:0 auto; border:0; box-shadow:none; overflow:visible; background:transparent; }
+.workspace-shell .topic-workspace .lesson-body > .lesson-section { margin:18px 0; border:1px solid #d5e0cb; border-radius:14px; background:#fffefa; padding:30px 34px; box-shadow:0 4px 14px #3b582a03; }
+.workspace-shell .topic-workspace .lesson-body > .lesson-section:first-child { border-top:3px solid #9db68a; background:linear-gradient(125deg,#eff5e7,#fffefa 65%); }
+.workspace-shell .topic-workspace .lesson-section > .eyebrow { display:inline-block; padding:6px 9px; margin:0 0 18px; border:1px solid #d5e1ca; border-radius:5px; background:#f2f6eb; color:#718a60; font-size:8px; letter-spacing:1.3px; }
+.workspace-shell .topic-workspace .lesson-section h2 { color:#405e40; font-size:26px; line-height:1.4; letter-spacing:-.7px; margin:4px 0 20px; }
+.workspace-shell .topic-workspace .lesson-section h3 { color:#506d4c; font-size:18px; line-height:1.6; }
+.workspace-shell .topic-workspace .lesson-section > p { font-size:14px; line-height:1.9; color:#61775a; max-width:80ch; }
+.workspace-shell .topic-workspace .lesson-section > .quiet { font-size:11px; color:#7d8b72; line-height:1.85; padding-top:12px; border-top:1px solid #e1e8d8; }
+.topic-workspace .lesson-section > ul { padding:0; margin:20px 0 30px; list-style:none; display:grid; gap:10px; }
+.topic-workspace .lesson-section > ul li { padding:12px 16px; border:1px solid #d6e3c9; border-radius:8px; background:#f9fbf3; color:#637b58; font-size:13px; line-height:1.8; }
+.topic-workspace .lesson-section > ul li::before { content:'↗'; display:inline-block; margin-right:10px; color:#89a372; }
+.topic-workspace .lesson-section > .tags { margin-top:20px; gap:8px; }
+.workspace-shell .topic-workspace .tags span { background:#eaf1df; border:1px solid #cadab9; color:#6a8753; font-size:11px; padding:8px 12px; border-radius:20px; }
+.topic-workspace .exploration-tabs { display:flex; flex-wrap:wrap; padding:12px; border:1px solid #cfdec2; background:#f1f6e8; border-radius:10px; gap:8px; margin:22px 0; }
+.workspace-shell .topic-workspace .exploration-tabs button { min-height:46px; padding:12px 16px; color:#6b8558; font-size:12px; border-radius:7px; }
+.workspace-shell .topic-workspace .exploration-tabs button[aria-pressed=true] { color:#3b6b3b; border-color:#80a664; background:#e1efce; box-shadow:inset 0 -3px #88aa6f; }
+.topic-workspace .scientific-diagram { position:relative; margin:24px 0; border:1px solid #3c5361; border-radius:12px; background:radial-gradient(#758b9b25 1px,transparent 1px),#11212b; background-size:20px 20px; padding:16px; scrollbar-width:thin; scrollbar-color:#6d8691 #14232b; }
+.topic-workspace .scientific-diagram .lesson-svg { background:transparent; border:0; min-width:560px; max-height:none; width:100%; }
+.topic-workspace .lesson-section > p[role=status]:not(.feedback) { padding:16px 20px; background:#edf4e4; border:1px solid #c9dcb9; border-left:3px solid #8ba96d; border-radius:8px; color:#5a784a; font-size:13px; }
+.workspace-shell .topic-workspace .lesson-section:has(> .lesson-question) { background:#fffefa; border-top:3px solid #a7b991; }
+.topic-workspace .lesson-question { border:0; margin:0; padding:0; display:grid; gap:10px; min-width:0; }
+.workspace-shell .topic-workspace .lesson-question legend { font-size:19px; line-height:1.7; color:#45633e; max-width:70ch; margin-bottom:22px; }
+.workspace-shell .topic-workspace .lesson-question label { display:flex; align-items:flex-start; gap:12px; margin:0; min-height:58px; padding:15px 18px; border:1px solid #d5e0c9; background:#fafcf6; border-radius:8px; color:#68805a; font-size:13px; line-height:1.8; cursor:pointer; transition:border-color .15s,background .15s; }
+.workspace-shell .topic-workspace .lesson-question label:hover { background:#f0f6e6; border-color:#a3ba8b; }
+.workspace-shell .topic-workspace .lesson-question label:has(input:checked) { background:#eaf3df; border-color:#90af71; color:#4d753b; box-shadow:inset 3px 0 #90af71; }
+.workspace-shell .topic-workspace .lesson-question label.answer-correct:has(input:checked) { background:#eaf3df; border-color:#6f9a55; color:#3f6a2e; box-shadow:inset 4px 0 #6f9a55; }
+.workspace-shell .topic-workspace .lesson-question label.answer-incorrect:has(input:checked) { background:#fdf0ec; border-color:#c97a62; color:#8a3f2b; box-shadow:inset 4px 0 #c97a62; }
+.topic-workspace .lesson-question .answer-text { flex:1; min-width:0; }
+.topic-workspace .lesson-question .answer-verdict { flex-shrink:0; font-size:12px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
+.topic-workspace .lesson-question input { margin:4px 0 0; width:17px; height:17px; flex-shrink:0; accent-color:#769d5a; }
+.workspace-shell .topic-workspace .lesson-section .feedback { padding:17px 20px; margin:20px 0 0; border:1px solid #e3ccab; border-left:3px solid #c19763; background:#fcf5ea; color:#88673d; border-radius:8px; font-size:13px; line-height:1.9; }
+.workspace-shell .topic-workspace .lesson-section .feedback.good { background:#eff7e9; border-color:#b8d2a7; border-left-color:#80a965; color:#527d3f; }
+.workspace-shell .topic-workspace .lessons .primary-button { min-height:46px; padding:12px 18px; font-size:12px; border:1px solid #5c834b; background:#638b51; color:#fff; border-radius:7px; }
+.workspace-shell .topic-workspace .lessons .primary-button:disabled { color:#89967d; border-color:#d6dfcd; background:#edf1e6; opacity:1; cursor:not-allowed; }
+.topic-workspace .lesson-section > label { display:grid; gap:10px; color:#657d56; font-size:12px; margin-block:20px 12px; }
+.topic-workspace .lesson-section > label select { width:100%; min-height:48px; padding:12px; border:1px solid #bdcfac; border-radius:8px; background:#f8fbf2; color:#5a774a; font-size:12px; }
+.topic-workspace .learning-transitions { margin-top:26px; padding:22px; border:1px solid #cbdcbb; background:#edf4e4; border-radius:10px; }
+.topic-workspace .learning-transitions p { color:#6b845b; font-size:12px; }
+.topic-workspace .lesson-section .reference-list { display:grid; gap:12px; margin-top:24px; }
+.topic-workspace .lesson-section .reference-list a { border:1px solid #d8e3cf; padding:15px 18px; background:#f9fbf4; border-radius:8px; font-size:11px; color:#6a815a; line-height:1.8; }
+.topic-workspace .lesson-section .reference-list small { font-size:10px; color:#8b997a; margin-top:6px; }
+/* Topic 06/07 remain their original dark interactive benches; only the shared topic navigator is new. */
+.topic-workspace--lab { max-width:1800px; padding:18px 28px 0; }
+.topic-workspace--lab .topic-navigation { border-color:#2d455f; }
+.topic-workspace--lab .topic-path { color:#88a2bc; }.topic-workspace--lab .topic-path a { color:#b1d3e9; }
+.topic-workspace--lab .topic-evidence-state { color:#9ab1c7; }.topic-workspace--lab .topic-evidence-state i { border-color:#7599ad; }
+.topic-workspace--lab .topic-navigation-controls select { background:#111f31; border-color:#3e5b76; color:#bed5e8; }
+.topic-workspace--lab .topic-arrows > :is(a,span) { background:#13243a; border-color:#3b5673; color:#b1cde4; }
+.topic-workspace--lab .topic-edition { color:#8fabc2; }.topic-workspace--lab .topic-edition > span:first-child { color:#a1ddcf; }
+.workspace-shell .topic-workspace--lab .laboratory.hands-on-lab { padding-inline:0; }
+@media(max-width:980px) { .topic-workspace { padding-inline:24px; } .topic-navigation-controls { width:100%; justify-content:space-between; } }
+@media(max-width:760px) {
+  .topic-workspace { padding:16px 14px 28px; }
+  .topic-path { flex-wrap:wrap; gap:8px; }
+  .topic-navigation-controls { gap:8px; }
+  .topic-evidence-state { flex-basis:100%; }
+  .topic-navigation-controls > label { flex:1; min-width:0; }
+  .topic-navigation-controls select { width:100%; max-width:100%; font-size:10px; padding-right:16px; }
+  .topic-arrows { flex-shrink:0; }
+  .topic-edition { font-size:7px; gap:10px; }
+  .topic-edition > span:last-child { display:none; }
+  .workspace-shell .topic-workspace .lessons .lab-heading { flex-direction:column; gap:16px; margin-bottom:20px; }
+  .workspace-shell .topic-workspace .lessons .lab-heading h1 { font-size:35px; letter-spacing:-1.2px; }
+  .workspace-shell .topic-workspace .lesson-body > .lesson-section { padding:24px 18px; }
+  .workspace-shell .topic-workspace .lesson-section h2 { font-size:23px; }
+  .workspace-shell .topic-workspace .lesson-section > p { font-size:13px; }
+  .workspace-shell .topic-workspace .lesson-question legend { font-size:17px; }
+  .workspace-shell .topic-workspace .lesson-question label { padding:14px; }
+  .topic-workspace .exploration-tabs { padding:9px; gap:6px; }
+  .workspace-shell .topic-workspace .exploration-tabs button { flex:1 1 40%; font-size:11px; padding:10px; }
+  .topic-workspace .scientific-diagram { padding:10px; }
+  .topic-workspace .learning-transitions { padding:16px; }
+  .workspace-shell .topic-workspace--lab .laboratory.hands-on-lab { padding-inline:0; }
+}
+@media(prefers-reduced-motion:reduce) { .topic-workspace * { transition:none!important; animation:none!important; } }
+@media(forced-colors:active) { .topic-workspace .lesson-question label:has(input:checked) { outline:2px solid Highlight; } }
+
+/* Model notes: shared caveats and sources gathered in one disclosure instead of repeated under every activity. */
+.topic-workspace .model-notes > summary { cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px; }
+.topic-workspace .model-notes > summary::-webkit-details-marker { display:none; }
+.topic-workspace .model-notes > summary::before { content:'+'; display:inline-grid; place-items:center; width:22px; height:22px; border:1px solid #c9dcb9; border-radius:50%; color:#5a784a; font-size:14px; flex-shrink:0; }
+.topic-workspace .model-notes[open] > summary::before { content:'−'; }
+.topic-workspace .model-notes > summary h2 { margin:0; }
+.topic-workspace .model-notes-list { margin:14px 0; padding-left:20px; color:#5f7457; font-size:13px; line-height:1.8; }
+.topic-workspace .model-notes > summary:focus-visible { outline:2px solid #6f9a55; outline-offset:4px; border-radius:4px; }

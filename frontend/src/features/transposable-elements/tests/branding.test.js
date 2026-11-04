@@ -21,7 +21,7 @@ test('theme declares official tokens and uses local typography without changing 
  for(const color of ['#10283F','#176D80','#68D9D1','#F5B75E','#F5F8FC'])assert.ok(css.includes(color));
  for(const semantic of ['--color-text','--color-border','--color-focus','--color-success','--color-error','--color-disabled','--color-molecular-background'])assert.ok(css.includes(semantic));
  assert.ok(!read('src/styles.css').includes('fonts.googleapis.com'));
- const source=read('src/main.jsx');assert.ok(source.includes('<Brand tone="dark"/>')&&source.includes('aria-label="SiaSet home"'));
+ const sidebar=read('src/ui/WorkspaceSidebar.jsx');assert.ok(sidebar.includes('<Brand tone="dark"/>')&&sidebar.includes('aria-label="SIASET Learn overview"'));
  const molecule=read('src/features/transposable-elements/components/MoleculeView.jsx');
  assert.ok(molecule.includes("donor:'var(--scientific-donor)'")&&molecule.includes("tsd:'var(--scientific-tsd)'"));
 });
