@@ -77,3 +77,9 @@
   .sl-donor-left, .sl-donor-right, .sl-element-group, .sl-slide, .sl-tnp { transition:none; }
   .sl-hint, .sl-tnp.is-idle circle, .sl-ring-glow, .sl-tir.is-target, .sl-res.is-target, .sl-scissors.is-target circle, .sl-element-arc.is-target, .sl-tsd.is-target, .sl-pop { animation:none; }
 }
+
+/* Free sandbox layout */
+.sb-tools .sl-site { margin-left:6px; }
+.sb-columns { display:grid; grid-template-columns:minmax(240px,1fr) 2fr; gap:14px; margin-top:14px; align-items:start; }
+.sb-columns .investigations, .sb-columns .sl-engine { margin-top:0; }
+@media (max-width:760px) { .sb-columns { grid-template-columns:1fr; } }
