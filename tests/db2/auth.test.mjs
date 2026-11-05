@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {publicAuthConfig, safeDestination} from '../../frontend/src/auth/config.js';
+import {authOriginAllowed, publicAuthConfig, safeDestination} from '../../frontend/src/auth/config.js';
 import {startAuthFlow, finishAuthFlow, restartAuthFlow} from '../../frontend/src/auth/flows.js';
 import {authRequestError} from '../../frontend/src/auth/errors.js';
 const memory = () => { const map = new Map(); return {getItem: key => map.get(key) ?? null, setItem: (key, value) => map.set(key, value), removeItem: key => map.delete(key), map}; };
@@ -14,6 +14,13 @@ test('browser config fails closed for privileged/legacy keys and unsafe redirect
   for (const url of ['http://example.com', 'https://a:b@example.com', 'https://example.com/auth', 'https://example.com?token=x']) assert.throws(() => publicAuthConfig({VITE_SUPABASE_URL: url, VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_synthetic'}));
   for (const next of ['https://evil.example', '//evil.example', '/\\evil.example', '/%2f%2fevil', '/account?next=evil', null]) assert.equal(safeDestination(next), '/account');
   assert.equal(safeDestination('/learn/transposable-elements'), '/learn/transposable-elements');
+});
+test('accounts are offered only on local dev origins and explicitly allowlisted https origins', () => {
+  for (const origin of ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://[::1]:5173']) assert.equal(authOriginAllowed({}, origin), true);
+  for (const origin of ['https://siaset-learn.vercel.app', 'https://siaset-learn-git-staging-x.vercel.app', undefined, '', 'not a url']) assert.equal(authOriginAllowed({}, origin), false);
+  const env = {VITE_AUTH_ALLOWED_ORIGINS: ' https://siaset-learn.vercel.app/ , http://insecure.example, https://evil.example/path'};
+  assert.equal(authOriginAllowed(env, 'https://siaset-learn.vercel.app'), true);
+  for (const origin of ['https://siaset-learn-git-staging-x.vercel.app', 'http://insecure.example', 'https://evil.example', 'http://siaset-learn.vercel.app']) assert.equal(authOriginAllowed(env, origin), false);
 });
 test('auth initiation has a cross-tab lease, rejects unavailable storage/locks, and releases failed requests', async () => {
   const storage = memory(), options = {locks, storage, now: () => 1000, makeId: () => 'flow'};

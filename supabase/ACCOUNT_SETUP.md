@@ -24,6 +24,21 @@ Implemented 4 November 2026 against the existing **siaset-staging** project, `vt
 
 `20261104161232_profile_avatars.sql` was generated with the installed CLI and applied to the connected staging project through the Supabase connector. Existing learning tables, functions, evidence, RLS and contracts were not modified. `README.md` describes the earlier DB-2 foundation boundary; the account-specific changes above supersede its statement that no frontend project is configured.
 
+## Deployed origins — accounts are off until allowlisted
+
+`main` now deploys automatically to production (`https://siaset-learn.vercel.app`), and Vercel preview and production both carry the staging Supabase URL and key. Supabase only honours `redirectTo` values in its Auth redirect allowlist. For any other origin, it sends email links to the fallback Site URL. To prevent broken signup and recovery emails, the frontend now offers accounts only on `localhost` / `127.0.0.1` and on https origins listed in `VITE_AUTH_ALLOWED_ORIGINS`. Every other deployment, including all preview URLs, runs in guest mode and shows "Accounts are not configured in this environment".
+
+To turn accounts on in production, do both steps, in this order:
+
+1. In Supabase → **siaset-staging** → Authentication → URL Configuration, add these exact redirect URLs (no wildcards):
+   - `https://siaset-learn.vercel.app/auth/callback`
+   - `https://siaset-learn.vercel.app/auth/recovery`
+
+   Also set the Site URL to `https://siaset-learn.vercel.app` so any fallback lands on the live site.
+2. In Vercel → **siaset-learn** → Environment Variables, add `VITE_AUTH_ALLOWED_ORIGINS=https://siaset-learn.vercel.app` for **Production** only, then redeploy. (It's a build-time Vite variable.)
+
+Before opening signup to the public, also configure custom SMTP. Supabase's built-in email sender has a very low hourly rate limit. And decide whether production users should live in the staging project at all.
+
 ## Google sign-in — configuration still required
 
 The staging public Auth settings report email enabled, signup enabled, confirmation emails required, and **Google disabled**. The frontend detects this and disables its Google action with a truthful explanation.
