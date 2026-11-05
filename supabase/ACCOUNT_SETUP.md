@@ -17,8 +17,8 @@ Implemented 4 November 2026 against the existing **siaset-staging** project, `vt
 - Names and built-in avatar IDs are stored in Auth user metadata, exclusively for display. Metadata is never used for authorization.
 - The former sidebar course card now links to account settings and shows the signed-in user's name, email and avatar. Guests see a sign-in invitation; no account is inferred before a verified session.
 - Eight bundled vector avatars can be selected during signup or edited afterward.
-- Signed-in users can choose a PNG/JPEG/WebP image up to 5 MB. The browser prepares a centered 256×256 WebP, removing the original image metadata. Upload happens only on Save profile.
-- Photos are stored under `<authenticated-user-id>/<random-id>.webp` in the private `profile-avatars` bucket. The bucket only accepts WebP up to 256 KiB. Owner-scoped read/insert/delete policies exclude anonymous Auth users. There is no public bucket or public image URL. The browser downloads through the authenticated Storage API and revokes local object URLs when replaced/unmounted.
+- Signed-in users can choose a JPG/PNG/WebP/HEIC image up to 5 MB (HEIC where the browser can decode it, e.g. Safari). The browser prepares a centered 256×256 WebP, or JPEG on Safari, which cannot encode WebP, removing the original image metadata. Upload happens only on Save profile.
+- Photos are stored under `<authenticated-user-id>/<random-id>.webp` (or `.jpg`) in the private `profile-avatars` bucket. The bucket only accepts WebP or JPEG up to 256 KiB. Owner-scoped read/insert/delete policies exclude anonymous Auth users. There is no public bucket or public image URL. The browser downloads through the authenticated Storage API and revokes local object URLs when replaced/unmounted.
 - Upload paths are immutable (`upsert:false`), so no Storage UPDATE policy is needed. Prior photos are removed after the new profile is saved; cleanup failures do not falsely report a successful save as failed.
 - Preset choices and photo edits are drafts until Save profile. Photo upload is offered after sign-in, not before email verification.
 
