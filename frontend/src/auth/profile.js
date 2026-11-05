@@ -1,4 +1,8 @@
 export const AVATAR_BUCKET='profile-avatars';
+export const PHOTO_TYPES=['image/png','image/jpeg','image/webp','image/heic','image/heif'];
+// Stored formats, in order of preference, with the file extension each is saved under.
+export const AVATAR_TYPES=['image/webp','image/jpeg'];
+const EXTENSIONS={'image/webp':'webp','image/jpeg':'jpg'};
 export const AVATARS=[
   {id:'helix',name:'Helix',color:'#a0e5d0',background:'#174438'},
   {id:'orbit',name:'Orbit',color:'#b3d5ff',background:'#243e65'},
@@ -15,10 +19,11 @@ export function profileDetails(user){
   return {name:typeof data.display_name==='string'?data.display_name.slice(0,100):typeof data.full_name==='string'?data.full_name.slice(0,100):'',preset,path:ownedAvatarPath(user,data.siaset_avatar_path)};
 }
 export function ownedAvatarPath(user,value){
-  return user?.id&&typeof value==='string'&&value.startsWith(`${user.id}/`)&&/^[a-f0-9-]{36}\/[a-f0-9-]{36}\.webp$/.test(value)?value:null;
+  return user?.id&&typeof value==='string'&&value.startsWith(`${user.id}/`)&&/^[a-f0-9-]{36}\/[a-f0-9-]{36}\.(webp|jpg)$/.test(value)?value:null;
 }
 export async function prepareAvatar(file){
-  if(!file||!['image/png','image/jpeg','image/webp'].includes(file.type))throw Error('Choose a PNG, JPG or WebP image.');
+  // Some Android pickers report an empty type; HEIC/HEIF decode where the browser supports it (e.g. Safari).
+  if(!file||(file.type&&!PHOTO_TYPES.includes(file.type)))throw Error('Choose a JPG, PNG, WebP or HEIC image.');
   if(file.size>5*1024*1024)throw Error('Choose an image smaller than 5 MB.');
   let image;
   try{image=await createImageBitmap(file);}catch{throw Error('This image could not be opened. Choose another photo.');}
@@ -28,9 +33,12 @@ export async function prepareAvatar(file){
     const context=canvas.getContext('2d');if(!context)throw Error('Image processing is unavailable in this browser.');
     const side=Math.min(image.width,image.height);
     context.drawImage(image,(image.width-side)/2,(image.height-side)/2,side,side,0,0,256,256);
-    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',0.86));
-    if(!blob||blob.type!=='image/webp'||blob.size>262144)throw Error('The photo could not be resized. Choose another image.');
-    return blob;
+    // Safari cannot encode WebP and silently returns PNG instead, so fall back to JPEG there.
+    for(const type of AVATAR_TYPES){
+      const blob=await new Promise(resolve=>canvas.toBlob(resolve,type,0.86));
+      if(blob?.type===type&&blob.size<=262144)return blob;
+    }
+    throw Error('The photo could not be resized. Choose another image.');
   }finally{image.close();}
 }
 export async function saveProfile(client,expectedUser,{name,preset,photo,keepPhoto=false}){
@@ -42,8 +50,9 @@ export async function saveProfile(client,expectedUser,{name,preset,photo,keepPho
   const oldPath=profileDetails(verified.data.user).path;
   let path=keepPhoto?oldPath:null,uploaded=null;
   if(photo){
-    path=`${expectedUser.id}/${crypto.randomUUID()}.webp`;
-    const result=await client.storage.from(AVATAR_BUCKET).upload(path,photo,{contentType:'image/webp',upsert:false});
+    if(!EXTENSIONS[photo.type])throw Error('Choose another photo.');
+    path=`${expectedUser.id}/${crypto.randomUUID()}.${EXTENSIONS[photo.type]}`;
+    const result=await client.storage.from(AVATAR_BUCKET).upload(path,photo,{contentType:photo.type,upsert:false});
     if(result.error)throw Error('Photo upload failed. Your previous profile is unchanged. Please try again.');
     uploaded=path;
   }
