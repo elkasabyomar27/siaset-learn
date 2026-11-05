@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import WorkspaceSidebar from './WorkspaceSidebar.jsx';
+import topics from '../features/transposable-elements/curriculum/topics.json' with { type: 'json' };
 
 export default function WorkspaceShell({ children }) {
   const { pathname, search } = useLocation();
@@ -11,7 +12,7 @@ export default function WorkspaceShell({ children }) {
   const surface = immersive ? 'immersive' : 'academic';
   const page = pathname.includes('/assessment') ? 'assessment' : pathname.includes('/progress') ? 'progress' : pathname.startsWith('/account') || pathname.startsWith('/auth/') ? 'account' : pathname.startsWith('/lab/') ? 'lab' : pathname === '/learn/transposable-elements' ? 'curriculum' : pathname.startsWith('/learn/') ? 'lesson' : 'overview';
   const experiment = new URLSearchParams(search).get('experiment') === 'tn3' ? 'Tn3' : 'Tn5';
-  const label = page === 'lab' ? pathname.endsWith('/sandbox') ? 'Molecular sandbox' : `${experiment} guided laboratory` : page === 'lesson' ? 'Curriculum / Lesson' : page.charAt(0).toUpperCase() + page.slice(1);
+  const label = page === 'lab' ? pathname.endsWith('/sandbox') ? 'Molecular sandbox' : `${experiment} guided laboratory` : page === 'lesson' ? topics.find(topic => pathname === `/learn/transposable-elements/${topic.id}`)?.title || 'Lesson' : page.charAt(0).toUpperCase() + page.slice(1);
 
   useEffect(() => {
     if (!menuOpen) return;
