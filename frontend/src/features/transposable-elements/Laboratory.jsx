@@ -41,7 +41,7 @@ function StoryLab({ scenario, changeScenario }) {
 
   function save() {
     setSaved(progressRepository.recordLab(s.history, s.stage, s.answers)
-      ? {ok: true, text: 'Lab saved in this browser. It now counts towards your progress.'}
+      ? {ok: true, text: 'Lab saved. It now counts towards your progress.'}
       : {ok: false, text: 'Not saved to browser storage. Your result stays on this page until you leave or reload.'});
   }
 

@@ -44,7 +44,10 @@ test('real PostgreSQL grants/RLS deny anonymous, cross-owner access, direct writ
       assert.ok((await asRole(db, 'authenticated', ownerA, `select * from public.${table}`)).rows.every(r => r.user_id === ownerA));
       await assert.rejects(asRole(db, 'authenticated', ownerA, `delete from public.${table}`), /permission denied/);
       await assert.rejects(asRole(db, 'authenticated', ownerA, `update public.${table} set user_id=$1`, [ownerB]), /permission denied/);
-      await assert.rejects(asRole(db, 'authenticated', ownerA, `insert into public.${table}(user_id) values($1)`, [ownerA]), /permission denied/);
+      // progress_ops is the one browser-writable table: owners may append to their own sync log only
+      // (full coverage in progressOps.test.mjs). Every other table stays service-write-only.
+      if (table === 'progress_ops') await assert.rejects(asRole(db, 'authenticated', ownerA, `insert into public.${table}(user_id,op_id,op) values($1,'x','{"id":"x","version":1,"clock":1,"type":"resetAttempts"}')`, [ownerB]), /row-level security/);
+      else await assert.rejects(asRole(db, 'authenticated', ownerA, `insert into public.${table}(user_id) values($1)`, [ownerA]), /permission denied/);
     }
     for (const role of ['anon', 'authenticated']) {
       await assert.rejects(asRole(db, role, ownerA, 'select public.commit_learner_batch($1,$2)', [ownerB, '[]']), /permission denied/);

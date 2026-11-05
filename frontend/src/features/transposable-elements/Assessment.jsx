@@ -22,7 +22,7 @@ export default function Assessment() {
     const date = new Date().toISOString();
     const saved = progressRepository.appendAttempt(answers, date);
     setSubmitted(true);
-    setNotice(saved ? 'Attempt saved in this browser.' : 'Attempt kept temporarily while this page remains loaded, including internal navigation. Reloading or closing can lose it.');
+    setNotice(saved ? 'Attempt saved.' : 'Attempt kept temporarily while this page remains loaded, including internal navigation. Reloading or closing can lose it.');
   }
   return <main className="laboratory"><FeatureNav /><h1>Cumulative assessment</h1><PersistenceStatus /><p>Local practice, not a formal qualification. {questions.length} deterministic questions cover all {topics.length} topics. Each correct answer earns one point; no negative marking. Lesson completion is separate.</p>{latest && <p>Latest saved/in-session attempt: {scoreAssessment(latest.answers).correct}/{questions.length} · {latest.date}. Attempts: {attempts.length}.</p>}<p role="status">Answered {score.answered} of {score.total}.</p><form onSubmit={submit}>{questions.map((q, i) => <AssessmentQuestion key={q.id} q={q} i={i} answer={answers[q.id]} submitted={submitted} onAnswer={value => setAnswers(current => ({
         ...current,

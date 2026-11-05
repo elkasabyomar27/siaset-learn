@@ -1,4 +1,5 @@
 import { AuthProvider } from './auth/AuthProvider.jsx';
+import ProgressSync from './auth/ProgressSync.jsx';
 import RouteExperience from './RouteExperience.jsx';
 import WorkspaceShell from './ui/WorkspaceShell.jsx';
 import LearningOverview from './ui/LearningOverview.jsx';
@@ -31,4 +32,4 @@ const RouteLoading = () => <main className="dashboard route-loading" aria-busy="
 function App() {
   return <BrowserRouter><RouteExperience/><a className="skip-link" href="#main-content">Skip to content</a><WorkspaceShell><Suspense fallback={<RouteLoading/>}><Routes><Route path="/account" element={<Account key="account"/>}/><Route path="/auth/callback" element={<Account key="callback"/>}/><Route path="/auth/recovery" element={<Account key="recovery"/>}/><Route path="/lab/transposable-elements/sandbox" element={<Sandbox/>}/><Route path="/learn/transposable-elements/assessment" element={<ReviewWorkspace><Assessment/></ReviewWorkspace>}/><Route path="/learn/transposable-elements/progress" element={<ReviewWorkspace><ProgressDashboard/></ReviewWorkspace>}/><Route path="/learn/transposable-elements" element={<CurriculumOverview/>}/><Route path="/learn/transposable-elements/:topicId" element={<TopicWorkspace><Lessons/></TopicWorkspace>}/><Route path="/" element={<LearningOverview/>}/><Route path="/lab/transposable-elements" element={<TopicWorkspace><Laboratory/></TopicWorkspace>}/><Route path="*" element={<main className="dashboard"><h1>Page not found</h1><Link to="/">Return to overview</Link></main>}/></Routes></Suspense></WorkspaceShell></BrowserRouter>;
 }
-createRoot(document.getElementById('root')).render(<React.StrictMode><AuthProvider><App/></AuthProvider></React.StrictMode>);
+createRoot(document.getElementById('root')).render(<React.StrictMode><AuthProvider><ProgressSync/><App/></AuthProvider></React.StrictMode>);
