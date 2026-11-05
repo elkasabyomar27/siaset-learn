@@ -1,11 +1,9 @@
 import { useLayoutEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import Curriculum from '../features/transposable-elements/Curriculum.jsx';
-import FeatureNav from '../features/transposable-elements/FeatureNav.jsx';
 import PersistenceStatus from '../features/transposable-elements/PersistenceStatus.jsx';
 import { useProgress } from '../features/transposable-elements/useProgress.js';
 import { journeyStops, journeyGroups, focusJourneyTarget } from '../features/transposable-elements/journey.js';
-import SectionSwitcher from './SectionSwitcher.jsx';
 
 export function LearningCompass({stops}) {
   const completed=stops.filter(stop=>stop.completed).length;
@@ -34,7 +32,7 @@ export default function CurriculumOverview(){
   const term=query.trim().toLocaleLowerCase();
   const filtering=!!term||kind!=='all';
   const matches=stops.filter(stop=>(kind==='all'||stop.learning.kind===kind)&&(!term||[stop.title,...stop.learningObjectives,...stop.essentialTerminology].join(' ').toLocaleLowerCase().includes(term)));
-  return <main className="laboratory curriculum-overview"><FeatureNav/><SectionSwitcher/>
+  return <main className="laboratory curriculum-overview">
     <header className="curriculum-hero"><div className="curriculum-hero-copy"><p className="eyebrow">THE SIASET FIELD GUIDE / MOLECULAR GENETICS</p><h1>Big ideas.<br/><em>Moving DNA.</em></h1><p className="curriculum-lede">From the first evidence of mobile DNA to the mechanisms that reshape genomes. Build your understanding, one connected idea at a time.</p><div className="curriculum-hero-actions"><Link className="primary-button" to={next.href}>{completed===0?'Start learning':completed===stops.length?'Revisit the curriculum':'Continue learning'} <span aria-hidden="true">↗</span></Link><a href="#journey-all" onClick={focusJourneyTarget}>Explore all topics <span aria-hidden="true">↓</span></a></div><div className="course-facts"><span><b>{stops.length}</b> topics</span><span><b>{journeyGroups.length}</b> connected chapters</span><span><b>{stops.filter(stop=>stop.learning.kind==='laboratory').length}</b> guided labs</span><span>Every topic is open</span></div></div><aside className="curriculum-progress-card"><LearningCompass stops={stops}/><div className="course-next"><span>{completed===stops.length?'REVISIT AT YOUR OWN PACE':'A PLACE TO BEGIN'}</span><Link to={next.href}><b>{String(next.order).padStart(2,'0')}</b>{next.title}<span aria-hidden="true">→</span></Link></div><p>Completion comes from learning evidence, not page visits.</p></aside></header>
     <PersistenceStatus/>
     <section className="curriculum-finder" aria-labelledby="curriculum-finder-title"><div><p className="eyebrow">FOLLOW A QUESTION</p><h2 id="curriculum-finder-title">What would you like to explore?</h2></div><div className="curriculum-search-controls"><label className="curriculum-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><span className="sr-only">Search curriculum topics</span><input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="Try Tn5, regulation, or target-site duplication…"/></label><label><span className="sr-only">Topic type</span><select value={kind} onChange={event=>setKind(event.target.value)}><option value="all">All topics</option><option value="lesson">Interactive lessons</option><option value="laboratory">Guided laboratories</option></select></label></div>

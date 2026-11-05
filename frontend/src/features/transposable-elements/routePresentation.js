@@ -15,7 +15,7 @@ export function routePresentation(pathname, search = '') {
     '/auth/callback': ['Verify sign-in', null],
     '/auth/recovery': ['Password recovery', null],
     [learn]: ['Transposable elements curriculum', 'curriculum'],
-    [`${lab}/sandbox`]: ['Molecular sandbox', 'sandbox'],
+    [`${lab}/sandbox`]: ['Sandbox', 'sandbox'],
     [`${learn}/assessment`]: ['Cumulative assessment', 'assessment'],
     [`${learn}/progress`]: ['Your learning progress', 'progress'],
   };

@@ -19,5 +19,5 @@ export default function ProgressSync() {
 
 /** {status: off | syncing | synced | error, lastSynced} for the current browser. */
 export function useSyncStatus() {
-  return useSyncExternalStore(progressSync.subscribe, progressSync.getSnapshot);
+  return useSyncExternalStore(progressSync.subscribe, progressSync.getSnapshot, progressSync.getSnapshot);
 }

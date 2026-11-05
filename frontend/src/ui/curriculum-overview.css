@@ -119,3 +119,9 @@
 @media(max-width:380px) { .curriculum-progress-card { grid-template-columns:110px minmax(0,1fr); gap:10px; } .course-facts { gap:12px; } .course-facts > span:last-child { padding:0; border:0; } }
 @media(prefers-reduced-motion:reduce) { .curriculum-overview * { transition:none!important; } }
 @media(forced-colors:active) { .curriculum-overview .journey-stop { border:1px solid CanvasText; } }
+
+/* Overview hero: one clear next step, named, with a single secondary way in */
+.overview-next { margin-top:26px; }
+.overview-next-label { display:block; font-size:11px; font-weight:650; letter-spacing:1.2px; text-transform:uppercase; color:#4f7a62; }
+.overview-next .curriculum-hero-actions { margin-top:10px; }
+.workspace-shell .overview-next .primary-button { max-width:100%; text-align:left; line-height:1.35; }

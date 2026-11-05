@@ -29,20 +29,22 @@ test('route titles and navigation distinguish lessons, tools, fallback routes an
   assert.equal(routePresentation('/learn/transposable-elements/missing').section, null);
 });
 
-test('shared navigation renders exactly one current destination for each learning route', async () => {
-
-    const {default: FeatureNav} = await server.ssrLoadModule('/src/features/transposable-elements/FeatureNav.jsx');
-    for (const [path, label] of [
-      ['/learn/transposable-elements', 'Curriculum'],
-      ['/learn/transposable-elements/introduction', 'Curriculum'],
-      ['/lab/transposable-elements?experiment=tn3', 'Guided labs'],
-      ['/lab/transposable-elements/sandbox', 'Molecular sandbox'],
-      ['/learn/transposable-elements/assessment', 'Cumulative assessment'],
-      ['/learn/transposable-elements/progress', 'Your progress'],
-    ]) {
-      const html = renderToStaticMarkup(createElement(MemoryRouter, {initialEntries: [path]}, createElement(FeatureNav)));
-      assert.equal((html.match(/aria-current="page"/g) || []).length, 1, path);
-      assert.match(html, new RegExp(`aria-current="page"[^>]*>${label}</a>`));
-    }
-
+test('the sidebar is the single navigation and marks exactly one current destination per route', async () => {
+  const {default: WorkspaceShell} = await server.ssrLoadModule('/src/ui/WorkspaceShell.jsx');
+  const {AuthProvider} = await server.ssrLoadModule('/src/auth/AuthProvider.jsx');
+  for (const [path, label] of [
+    ['/', 'Overview'],
+    ['/learn/transposable-elements', 'Curriculum'],
+    ['/learn/transposable-elements/introduction', 'Curriculum'],
+    ['/lab/transposable-elements?experiment=tn3', 'Guided labs'],
+    ['/lab/transposable-elements/sandbox', 'Sandbox'],
+    ['/learn/transposable-elements/assessment', 'Assessment'],
+    ['/learn/transposable-elements/progress', 'Progress'],
+  ]) {
+    const html = renderToStaticMarkup(createElement(MemoryRouter, {initialEntries: [path]}, createElement(AuthProvider, null, createElement(WorkspaceShell, null, 'page'))));
+    const current = html.match(/<a[^>]*aria-current="page"[^>]*>/g) || [];
+    assert.equal(current.length, 1, path);
+    assert.match(current[0], new RegExp(`aria-label="${label}"`), path);
+    assert.equal(/class="feature-nav"|class="section-switcher/.test(html), false, path);
+  }
 });

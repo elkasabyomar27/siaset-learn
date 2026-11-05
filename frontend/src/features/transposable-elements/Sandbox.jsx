@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router';
-import FeatureNav from './FeatureNav.jsx';
 import MoleculeView from './components/MoleculeView.jsx';
 import { WhatChanged } from '../../ui/ExperimentBench.jsx';
 import { copies } from './engine/model.js';
@@ -36,7 +35,7 @@ export default function Sandbox() {
     ? {...bench, inspected, answers: {}, stage: phase === 'inserted' ? 3 : bench.bound.length === 2 ? 1 : 0}
     : {...bench, inspected, answers: {}, stage: phase === 'resolved' ? 5 : phase === 'cointegrate' ? 4 : bench.joined ? 2 : 0};
 
-  return <main className="laboratory hands-on-lab story-lab sandbox-bench"><FeatureNav />
+  return <main className="laboratory hands-on-lab story-lab sandbox-bench">
     <header className="bench-header"><div><p className="eyebrow">SIASET / FREE EXPLORATION</p><h1>Your DNA playground.</h1><p>No script. Try any step in any order, even the wrong ones, and see what the engine allows.</p></div><div className="bench-mode"><span>MOLECULAR SANDBOX</span><small>Session only · never records progress</small></div></header>
     <div className="bench-switcher" role="group" aria-label="Choose an element"><button aria-pressed={scenario === 'tn5'} onClick={() => scenario !== 'tn5' && restart('tn5')}><span>01</span><b>Tn5</b><small>Conservative / cut and paste</small></button><button aria-pressed={scenario === 'tn3'} onClick={() => scenario !== 'tn3' && restart('tn3')}><span>02</span><b>Tn3</b><small>Replicative / copy and join</small></button><Link to="/lab/transposable-elements">Guided labs ↗</Link></div>
 

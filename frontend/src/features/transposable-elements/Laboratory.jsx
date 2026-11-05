@@ -2,7 +2,6 @@ import LabEvidence from './components/LabEvidence.jsx';
 import { progressRepository } from './progressRepository.js';
 import PersistenceStatus from './PersistenceStatus.jsx';
 import { experimentFromParams, selectExperiment } from './experimentRouting.js';
-import FeatureNav from './FeatureNav.jsx';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import references from './profiles/references.json';
@@ -45,9 +44,9 @@ function StoryLab({ scenario, changeScenario }) {
       : {ok: false, text: 'Not saved to browser storage. Your result stays on this page until you leave or reload.'});
   }
 
-  return <main className="laboratory hands-on-lab story-lab"><FeatureNav />
+  return <main className="laboratory hands-on-lab story-lab">
     <header className="bench-header"><div><p className="eyebrow">SIASET / HANDS-ON LAB · TOPIC {scenario === 'tn5' ? '06' : '07'}</p><h1>{scenario === 'tn5' ? 'Cut and paste a transposon.' : 'Copy, join, then separate.'}</h1><p>{scenario === 'tn5' ? 'Do each step yourself: hold the ends, cut, carry and insert Tn5.' : 'Join two circles through Tn3, copy it, then separate the circles with TnpR.'}</p></div></header>
-    <div className="bench-switcher" role="group" aria-label="Choose experiment"><button aria-pressed={scenario === 'tn5'} onClick={() => changeScenario('tn5')}><span>06</span><b>Tn5</b><small>Conservative / cut and paste</small></button><button aria-pressed={scenario === 'tn3'} onClick={() => changeScenario('tn3')}><span>07</span><b>Tn3</b><small>Replicative / copy and join</small></button><Link to="/lab/transposable-elements/sandbox">Free exploration ↗</Link></div>
+    <div className="bench-switcher" role="group" aria-label="Choose experiment"><button aria-pressed={scenario === 'tn5'} onClick={() => changeScenario('tn5')}><span>06</span><b>Tn5</b><small>Conservative / cut and paste</small></button><button aria-pressed={scenario === 'tn3'} onClick={() => changeScenario('tn3')}><span>07</span><b>Tn3</b><small>Replicative / copy and join</small></button><Link to="/lab/transposable-elements/sandbox">Open the sandbox →</Link></div>
     <PersistenceStatus />
 
     <ol className="sl-steps" aria-label="Lab steps">{steps.map((x, i) => <li key={x.title} className={i === s.stage ? 'current' : i < s.stage ? 'done' : ''} aria-current={i === s.stage ? 'step' : undefined}><span>{i < s.stage ? '✓' : i + 1}</span>{x.title}</li>)}</ol>
