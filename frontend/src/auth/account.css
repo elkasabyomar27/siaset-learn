@@ -141,3 +141,7 @@
 .workspace-shell .account-studio input[aria-invalid=true] { border-color:#c2413a; }
 @media (prefers-reduced-motion: reduce) { .password-meter span { transition:none; } }
 @media(max-width:380px) { .password-meter { flex-basis:96px; } }
+.password-strength .password-next { color:#8a4a44; }
+.password-checks li.is-missing { color:#9c2f29; font-weight:550; }
+.password-checks li.is-missing > span[aria-hidden] { color:#c2413a; font-weight:700; }
+.password-checks .password-fix { display:block; margin-top:2px; font-size:11px; font-weight:400; color:#8a4a44; }

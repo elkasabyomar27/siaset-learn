@@ -33,3 +33,16 @@ test('strength rises with character variety and length', () => {
   assert.equal(passwordStrength('Quiet harbour 7 lamp!').level.id, 'strong');
   assert.deepEqual(unmet('quietharbourlamp'), ['upper', 'number', 'symbol']);
 });
+
+test('the failing part of a predictable password is named so the learner knows what to change', () => {
+  const result = passwordStrength('Mariem123456_');
+  assert.equal(result.level.id, 'weak');
+  assert.deepEqual(unmet('Mariem123456_'), ['pattern']);
+  assert.match(result.fixes[0], /“123456”/);
+  assert.match(passwordStrength('Harbour98765!lamp').fixes[0], /“98765”/);
+  assert.match(passwordStrength('Harbourzzzz!7lamp').fixes[0], /“zzzz”/);
+  assert.match(passwordStrength('Kovac-river-7!Tide', {name: 'Marina Kovac'}).fixes[0], /“kovac”/);
+  assert.match(passwordStrength('Short1!').fixes[0], /Add 5 more characters/);
+  assert.deepEqual(passwordStrength('Mariem-harbour-7!').fixes, []);
+  assert.equal(passwordStrength('Mariem-harbour-7!').level.id, 'strong');
+});

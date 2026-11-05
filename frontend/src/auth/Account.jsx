@@ -34,7 +34,7 @@ export default function Account() {
    if(intent==='login'&&!password)throw Error('Enter your password.');
    if(['signup','update'].includes(intent)){
     const strength=passwordStrength(password,{email,name:displayName});
-    if(!strength.acceptable)throw Error(`Choose a stronger password: ${strength.checks.filter(check=>check.required&&!check.met).map(check=>check.label.toLowerCase()).join('; ')}.`);
+    if(!strength.acceptable)throw Error(`Choose a stronger password. ${strength.fixes.join('. ')}.`);
     if(password!==confirmPassword)throw Error('The two passwords don’t match. Type the same password in both fields.');
    }
    if(intent==='signup'&&(!displayName||displayName.length>100))throw Error('Enter a display name of up to 100 characters.');

@@ -43,20 +43,24 @@ export function NewPasswordFields({label = 'Password', disabled = false}) {
     sync(); form.addEventListener('input', sync);
     return () => form.removeEventListener('input', sync);
   }, []);
-  const {level, checks} = passwordStrength(password, context);
+  const {level, checks, fixes} = passwordStrength(password, context);
   const mismatch = confirm.length > 0 && confirm !== password;
   return <>
     <input ref={anchor} type="hidden"/>
     <PasswordInput label={label} name="password" value={password} onChange={event => setPassword(event.target.value)} required minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" disabled={disabled} describedBy={`${ids}-strength ${ids}-checks`}>
       <div className={`password-strength is-${level.id}`}>
         <div className="password-meter" aria-hidden="true">{[1, 2, 3, 4].map(bar => <span key={bar} className={bar <= level.bars ? 'is-on' : ''}/>)}</div>
-        <p id={`${ids}-strength`} aria-live="polite">{password ? <>Strength: <b>{level.label}</b></> : 'Use a long phrase with a mix of character types.'}</p>
+        <p id={`${ids}-strength`} aria-live="polite">{password ? <>Strength: <b>{level.label}</b>{fixes.length > 0 && <span className="password-next"> · {fixes.length === 1 ? 'fix the item marked ✗' : `fix the ${fixes.length} items marked ✗`}</span>}</> : 'Use a long phrase with a mix of character types.'}</p>
       </div>
       <ul id={`${ids}-checks`} className="password-checks" aria-label="Password requirements">
-        {checks.map(check => <li key={check.id} className={check.met ? 'is-met' : ''}>
-          <span aria-hidden="true">{check.met ? '✓' : check.required ? '•' : '+'}</span>{check.label}{!check.required && <em> (recommended)</em>}
-          <span className="sr-only">{check.met ? ' — done' : ' — not yet'}</span>
-        </li>)}
+        {checks.map(check => {
+          const missing = !!password && check.required && !check.met;
+          return <li key={check.id} className={check.met ? 'is-met' : missing ? 'is-missing' : ''}>
+            <span aria-hidden="true">{check.met ? '✓' : missing ? '✗' : check.required ? '•' : '+'}</span>
+            <span>{check.label}{!check.required && <em> (recommended)</em>}{missing && check.fix && <small className="password-fix">{check.fix}</small>}</span>
+            <span className="sr-only">{check.met ? ' — done' : missing ? ' — needs fixing' : ' — not yet'}</span>
+          </li>;
+        })}
       </ul>
     </PasswordInput>
     <PasswordInput label="Confirm password" name="confirmPassword" value={confirm} onChange={event => setConfirm(event.target.value)} required autoComplete="new-password" disabled={disabled} aria-invalid={mismatch || undefined} describedBy={`${ids}-match`}>
