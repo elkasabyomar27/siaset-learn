@@ -30,11 +30,16 @@ export function NewPasswordFields({label = 'Password', disabled = false}) {
   const [password, setPassword] = useState(''), [confirm, setConfirm] = useState('');
   const [context, setContext] = useState({email: '', name: ''});
   const anchor = useRef(null), ids = useId();
-  // Re-read email and name whenever the surrounding form changes, so the "personal" check stays current.
+  // Re-read email and name when those fields change, so the "personal" check stays current. Keystrokes
+  // in the password fields themselves must not trigger this: a state update from a native listener in
+  // the middle of React's handling of the same keystroke makes React revert the controlled input.
   useEffect(() => {
     const form = anchor.current?.form;
     if (!form) return;
-    const sync = () => setContext({email: form.elements.email?.value || '', name: form.elements.displayName?.value || ''});
+    const sync = event => {
+      if (event && !['email', 'displayName'].includes(event.target?.name)) return;
+      setContext({email: form.elements.email?.value || '', name: form.elements.displayName?.value || ''});
+    };
     sync(); form.addEventListener('input', sync);
     return () => form.removeEventListener('input', sync);
   }, []);
