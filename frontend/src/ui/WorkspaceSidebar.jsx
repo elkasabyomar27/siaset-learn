@@ -3,6 +3,9 @@ import Brand from '../Brand.jsx';
 import { useAuth } from '../auth/AuthProvider.jsx';
 import Avatar from '../auth/Avatar.jsx';
 import { profileDetails } from '../auth/profile.js';
+import { useSyncStatus } from '../auth/ProgressSync.jsx';
+
+const SYNC_NOTES = {off: 'Saved in this browser', syncing: 'Syncing to your account…', synced: 'Synced across your devices', error: 'Saved here · sync will retry'};
 // Sidebar profile card and avatar styles live with the account page; load them eagerly because /account is lazy.
 import '../auth/account.css';
 
@@ -26,7 +29,7 @@ function NavIcon({name}) {
 
 export default function WorkspaceSidebar({page,menuOpen,setMenuOpen,menuButton,collapsed,setCollapsed}) {
   const {user,ready}=useAuth();
-  const profile=profileDetails(user);
+  const profile=profileDetails(user), {status:syncStatus}=useSyncStatus();
   function destination(title,to,icon) {
     return <NavLink key={to} to={to} end={!(title==='Curriculum'&&page==='lesson')} aria-label={title} title={collapsed?title:undefined} onClick={()=>setMenuOpen(false)}><span className="sidebar-nav-icon"><NavIcon name={icon}/></span><span className="sidebar-link-label">{title}</span><span className="sidebar-active-indicator" aria-hidden="true"/></NavLink>;
   }
@@ -35,7 +38,7 @@ export default function WorkspaceSidebar({page,menuOpen,setMenuOpen,menuButton,c
     <Link className="sidebar-course sidebar-account" to="/account" aria-label={user?'Manage your account profile':'Sign in or create an account'} onClick={()=>setMenuOpen(false)} title={collapsed?(user?profile.name||user.email:'Your account'):undefined}><Avatar user={user}/><div className="sidebar-profile-text"><span>{!ready?'CHECKING ACCOUNT':user?'YOUR ACCOUNT':'YOUR LEARNING SPACE'}</span><b>{!ready?'Please wait…':user?profile.name||'Your profile':'Make yourself at home'}</b><small>{user?user.email:'Sign in or create an account'}</small></div><span className="profile-card-arrow" aria-hidden="true">↗</span></Link>
     <nav id="workspace-navigation" className={`workspace-navigation studio-navigation${menuOpen?' is-open':''}`} aria-label="Workspace">
       {groups.map(group=><div className="sidebar-nav-group" key={group.label}><p className="sidebar-group-label">{group.label}</p>{group.items.map(([title,to,icon])=>destination(title,to,icon))}</div>)}
-      <div className="sidebar-personal">{destination('Account','/account','user')}<div className="sidebar-bottom-note"><span className="local-evidence-dot"/><div><b>Your learning, your pace.</b><span>Evidence saved in this browser</span></div></div></div>
+      <div className="sidebar-personal">{destination('Account','/account','user')}<div className="sidebar-bottom-note"><span className={`local-evidence-dot is-${syncStatus}`}/><div><b>Your learning, your pace.</b><span role="status">{SYNC_NOTES[syncStatus]}</span></div></div></div>
     </nav>
   </aside>;
 }

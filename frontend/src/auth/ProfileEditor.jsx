@@ -19,7 +19,7 @@ export default function ProfileEditor({client,user,busy,run,onMessage}){
       <label>Display name<input value={name} onChange={event=>setName(event.target.value)} maxLength={100} required autoComplete="nickname" disabled={busy}/></label>
       <fieldset disabled={busy||processing}><legend>Choose a custom avatar</legend><AvatarChoices value={!photo&&!keepPhoto?preset:null} onChange={value=>{setPreset(value);setPhoto(null);setPreview(null);setKeepPhoto(false);}} disabled={busy||processing}/>
         <div className="avatar-upload"><span>Or use your own photo</span><label className="avatar-upload-button">{processing?'Preparing image…':'Upload a photo'}<input aria-label="Upload profile photo" type="file" accept="image/png,image/jpeg,image/webp" onChange={choosePhoto} disabled={busy||processing}/></label><small>JPG, PNG or WebP · up to 5 MB. A square crop is prepared before you save.</small></div>
-      </fieldset><button className="primary-button" disabled={busy||processing}>{busy?'Saving…':'Save profile'}</button><p className="profile-save-note">Your name and avatar are saved to your account. Learning evidence stays in this browser.</p>
+      </fieldset><button className="primary-button" disabled={busy||processing}>{busy?'Saving…':'Save profile'}</button><p className="profile-save-note">Your name and avatar are saved to your account. Learning progress syncs across your signed-in devices.</p>
     </form>
   </section>;
 }

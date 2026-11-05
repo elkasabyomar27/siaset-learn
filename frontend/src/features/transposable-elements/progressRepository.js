@@ -21,7 +21,7 @@ function validAttempt(attempt) {
   } catch { return false; }
 }
 
-function validOperation(op) {
+export function validOperation(op) {
   if (!op || op.version !== 1 || typeof op.id !== 'string' || !op.id ||
       !Number.isSafeInteger(op.clock) || op.clock < 1) return false;
   switch (op.type) {
