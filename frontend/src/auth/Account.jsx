@@ -5,6 +5,8 @@ import {finishAuthFlow, restartAuthFlow, startAuthFlow} from './flows.js';
 import {authRequestError} from './errors.js';
 import ProfileEditor from './ProfileEditor.jsx';
 import {PresetAvatar, AvatarChoices} from './Avatar.jsx';
+import {NewPasswordFields, PasswordInput} from './PasswordFields.jsx';
+import {passwordStrength} from './passwordStrength.js';
 import './account.css';
 
 export default function Account() {
@@ -26,8 +28,14 @@ export default function Account() {
  async function submit(event){
   event.preventDefault();const form=event.currentTarget,values=new FormData(form),intent=event.nativeEvent.submitter?.value||mode;
   const email=String(values.get('email')||'').trim(),password=String(values.get('password')||''),displayName=String(values.get('displayName')||'').trim();
+  const confirmPassword=String(values.get('confirmPassword')||'');
   await run(async()=>{
-   if(['login','signup','update'].includes(intent)&&password.length<(intent==='login'?1:12))throw Error('Enter a password. New passwords need at least 12 characters.');
+   if(intent==='login'&&!password)throw Error('Enter your password.');
+   if(['signup','update'].includes(intent)){
+    const strength=passwordStrength(password,{email,name:displayName});
+    if(!strength.acceptable)throw Error(`Choose a stronger password: ${strength.checks.filter(check=>check.required&&!check.met).map(check=>check.label.toLowerCase()).join('; ')}.`);
+    if(password!==confirmPassword)throw Error('The two passwords don’t match. Type the same password in both fields.');
+   }
    if(intent==='signup'&&(!displayName||displayName.length>100))throw Error('Enter a display name of up to 100 characters.');
    if(intent==='update'){
     const verified=await client.auth.getUser();if(!recoveryOwner||verified.error||verified.data.user?.id!==recoveryOwner)throw Error('Request a new recovery link.');
@@ -50,13 +58,14 @@ export default function Account() {
  {!client?<p role="status">Accounts are not configured in this environment. You can continue learning without signing in.</p>:<>
  <p role="status" aria-live="polite" className={`account-status${message?' has-message':''}`}>{message||(!ready?'Checking account…':user?`Signed in as ${user.email||'verified account'}.`:'Sign in to your account, or create one below.')}</p>
  {!user&&confirmationEmail&&!callbackRoute&&<section className="confirmation-help"><b>Confirm your email to finish signing up</b><p>Use the newest confirmation email sent to {confirmationEmail}. Once confirmed, return here to sign in.</p><button disabled={busy} onClick={()=>run(async()=>{await startAuthFlow('signup',()=>client.auth.resend({type:'signup',email:confirmationEmail,options:{emailRedirectTo:`${window.location.origin}/auth/callback`}}),{replacePending:true});setMessage('If eligible, a new confirmation email has been sent. Check your inbox and spam folder.');})}>Resend confirmation email</button><button disabled={busy} onClick={()=>{setConfirmationEmail('');setMessage('');setMode('signup');}}>Use a different email</button></section>}
- {recoveryOwner?<><h2>Choose a new password</h2><form onSubmit={submit}><label>New password<input name="password" type="password" minLength={12} required autoComplete="new-password"/></label><button className="primary-button" value="update" disabled={busy}>Update password</button></form></>:callbackRoute?<Link to="/account">Return to account sign-in</Link>:user?<><ProfileEditor key={user.id} client={client} user={user} busy={busy} run={run} onMessage={setMessage}/><div className="account-session"><span>Signed in on this device</span><button className="account-text-button" disabled={busy} onClick={()=>run(async()=>{const result=await client.auth.signOut({scope:'local'});if(result.error)throw Error('Sign-out could not be confirmed. Please try again.');setRecoveryOwner(null);setMessage('Signed out on this device. Browser learning is still available.');})}>Sign out</button></div></>:<>
+ {recoveryOwner?<><h2>Choose a new password</h2><form onSubmit={submit}><NewPasswordFields label="New password" disabled={busy}/><button className="primary-button" value="update" disabled={busy}>Update password</button></form></>:callbackRoute?<Link to="/account">Return to account sign-in</Link>:user?<><ProfileEditor key={user.id} client={client} user={user} busy={busy} run={run} onMessage={setMessage}/><div className="account-session"><span>Signed in on this device</span><button className="account-text-button" disabled={busy} onClick={()=>run(async()=>{const result=await client.auth.signOut({scope:'local'});if(result.error)throw Error('Sign-out could not be confirmed. Please try again.');setRecoveryOwner(null);setMessage('Signed out on this device. Browser learning is still available.');})}>Sign out</button></div></>:<>
  <div className="account-mode-tabs" role="group" aria-label="Account action"><button aria-pressed={mode==='login'} disabled={busy} onClick={()=>{setMode('login');setMessage('');}}>Sign in</button><button aria-pressed={mode==='signup'} disabled={busy||providers?.signup===false} onClick={()=>{setMode('signup');setMessage('');}}>Create account</button></div>
  <form onSubmit={submit} key={mode}>
  {mode==='recover'&&<><h2>Reset your password</h2><p>We’ll send a recovery link to your email.</p></>}
  {mode==='signup'&&<label>Display name<input name="displayName" required maxLength={100} autoComplete="nickname" placeholder="What should we call you?" disabled={busy}/></label>}
  <label>Email address<input name="email" type="email" required autoComplete="email" maxLength={254} placeholder="you@example.com" disabled={busy}/></label>
- {mode!=='recover'&&<label>Password<input name="password" type="password" required minLength={mode==='signup'?12:1} autoComplete={mode==='signup'?'new-password':'current-password'} disabled={busy}/>{mode==='signup'&&<small>At least 12 characters.</small>}</label>}
+ {mode==='login'&&<PasswordInput label="Password" name="password" required autoComplete="current-password" disabled={busy}/>}
+ {mode==='signup'&&<NewPasswordFields disabled={busy}/>}
  {mode==='signup'&&<fieldset className="signup-avatars"><legend>Pick your first avatar</legend><AvatarChoices value={signupAvatar} onChange={setSignupAvatar} disabled={busy}/><p>You can upload your own photo after signing in.</p></fieldset>}
  {mode!=='login'&&<p className="profile-save-note">Requesting a new email link replaces any earlier pending request in this browser. Use the newest link.</p>}
  <button className="primary-button account-submit" value={mode} disabled={busy||!ready||mode==='signup'&&providers?.signup===false}>{busy?'Please wait…':mode==='signup'?'Create your account':mode==='recover'?'Send recovery link':'Sign in'} <span>→</span></button>
