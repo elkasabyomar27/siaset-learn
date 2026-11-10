@@ -37,7 +37,11 @@ test('real PostgreSQL grants/RLS deny anonymous, cross-owner access, direct writ
   const db = await database();
   try {
     await commit(db, ownerA, [await validateOperation(envelope())]);
-    const tables = (await db.query("select tablename from pg_tables where schemaname='public'")).rows.map(r => r.tablename);
+    const allTables = (await db.query("select tablename from pg_tables where schemaname='public'")).rows.map(r => r.tablename);
+    // Classroom tables have their own teacher/student rules (classroom.test.mjs); every table is still closed to anon.
+    const classroom = ['teacher_requests', 'classes', 'class_members', 'assignments', 'submissions', 'quizzes', 'quiz_sessions', 'quiz_players', 'quiz_answers'];
+    for (const table of allTables) await assert.rejects(asRole(db, 'anon', null, `select * from public.${table}`), /permission denied/);
+    const tables = allTables.filter(table => !classroom.includes(table));
     for (const table of tables) {
       await assert.rejects(asRole(db, 'anon', null, `select * from public.${table}`), /permission denied/);
       assert.equal((await asRole(db, 'authenticated', ownerB, `select * from public.${table}`)).rows.length, 0);
