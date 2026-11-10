@@ -8,6 +8,10 @@ project_id = "siaset-db2-local-synthetic"
 [functions.learner-write]
 verify_jwt = false
 
+# Approval links are opened by the site owner without a session; the handler checks identity itself.
+[functions.teacher-request]
+verify_jwt = false
+
 [api]
 enabled = true
 # Port to use for the API URL.

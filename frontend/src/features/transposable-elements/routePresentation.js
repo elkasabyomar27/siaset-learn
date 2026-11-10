@@ -18,7 +18,13 @@ export function routePresentation(pathname, search = '') {
     [`${lab}/sandbox`]: ['Sandbox', 'sandbox'],
     [`${learn}/assessment`]: ['Cumulative assessment', 'assessment'],
     [`${learn}/progress`]: ['Your learning progress', 'progress'],
+    '/teach': ['Teach', null],
+    '/teach/approve': ['Review teacher request', null],
+    '/classes': ['My classes', null],
+    '/play': ['Join a live quiz', null],
   };
+  if (pathname.startsWith('/teach/live/')) return {title: 'Live quiz host', section: null, identity: pathname};
+  if (pathname.startsWith('/play/')) return {title: 'Live quiz', section: null, identity: pathname};
   const page = pages[pathname];
   if (page) return {title: page[0], section: page[1], identity: pathname};
   const topic = topics.find(t => t.lessonId && pathname === `${learn}/${t.id}`);

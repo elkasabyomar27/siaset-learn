@@ -2,6 +2,8 @@
 
 Local implementation only. No hosted project is linked. Do not apply to production or enable learner uploads.
 
+> Superseded in part (10 November 2026): classroom mode now allows assignment file uploads to a private bucket by class members only. See [CLASSROOM_SETUP.md](CLASSROOM_SETUP.md).
+
 The frontend supports optional email/password and redirect Google OAuth through one PKCE client. With empty configuration, `/account` explains that anonymous learning continues. `frontend/.env.example` accepts only a modern publishable key; privileged keys are rejected. The learning repository remains browser-only even after sign-in. This phase adds no account progress cache, outbox, import, or migration.
 
 ## Local checks

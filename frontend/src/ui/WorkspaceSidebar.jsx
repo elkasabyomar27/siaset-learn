@@ -13,6 +13,7 @@ const groups = [
   { label:'Learn', items:[['Overview','/','home'],['Curriculum','/learn/transposable-elements','book']] },
   { label:'Experiment', items:[['Guided labs','/lab/transposable-elements','flask'],['Sandbox','/lab/transposable-elements/sandbox','orbit']] },
   { label:'Reflect', items:[['Assessment','/learn/transposable-elements/assessment','check'],['Progress','/learn/transposable-elements/progress','chart']] },
+  { label:'Classroom', items:[['My classes','/classes','class'],['Live quiz','/play','bolt'],['Teach','/teach','board']] },
 ];
 const paths = {
   home:'M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9',
@@ -22,6 +23,9 @@ const paths = {
   check:'M8 3h8v3H8zM8 4H5v17h14V4h-3M8 13l3 3 5-6',
   chart:'M4 3v18h17M8 16v-4M13 16V7M18 16v-7',
   user:'M4 21v-2a8 8 0 0 1 16 0v2',
+  class:'M3 8l9-4 9 4-9 4-9-4ZM7 10v5c3 2 7 2 10 0v-5M21 8v6',
+  bolt:'M13 2 4 14h7l-1 8 9-12h-7l1-8Z',
+  board:'M3 4h18v12H3zM8 20h8M12 16v4M7 9h6M7 12h9',
 };
 function NavIcon({name}) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]}/>{name==='orbit'&&<><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></>}{name==='user'&&<circle cx="12" cy="7" r="4"/>}</svg>;
@@ -31,7 +35,7 @@ export default function WorkspaceSidebar({page,menuOpen,setMenuOpen,menuButton,c
   const {user,ready}=useAuth();
   const profile=profileDetails(user), {status:syncStatus}=useSyncStatus();
   function destination(title,to,icon) {
-    return <NavLink key={to} to={to} end={!(title==='Curriculum'&&page==='lesson')} aria-label={title} title={collapsed?title:undefined} onClick={()=>setMenuOpen(false)}><span className="sidebar-nav-icon"><NavIcon name={icon}/></span><span className="sidebar-link-label">{title}</span><span className="sidebar-active-indicator" aria-hidden="true"/></NavLink>;
+    return <NavLink key={to} to={to} end={!(title==='Curriculum'&&page==='lesson')&&!['/teach','/play'].includes(to)} aria-label={title} title={collapsed?title:undefined} onClick={()=>setMenuOpen(false)}><span className="sidebar-nav-icon"><NavIcon name={icon}/></span><span className="sidebar-link-label">{title}</span><span className="sidebar-active-indicator" aria-hidden="true"/></NavLink>;
   }
   return <aside className={`sidebar workspace-sidebar studio-sidebar${menuOpen?' is-menu-open':''}`} aria-label="Main navigation">
     <div className="studio-brand-row"><Link className="studio-brand" to="/" aria-label="SIASET Learn overview" onClick={()=>setMenuOpen(false)}><span className="studio-brand-full"><Brand tone="dark"/><span className="studio-learn-tag">LEARN</span></span><span className="studio-brand-icon"><Brand variant="icon" tone="dark"/></span></Link><button className="sidebar-collapse" onClick={()=>setCollapsed(value=>!value)} aria-label={collapsed?'Expand sidebar':'Collapse sidebar'} aria-expanded={!collapsed} aria-controls="workspace-navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16m7-11-3 3 3 3"/></svg></button><button ref={menuButton} className="menu-toggle" aria-expanded={menuOpen} aria-controls="workspace-navigation" onClick={()=>setMenuOpen(value=>!value)}>{menuOpen?'Close':'Explore'}<span aria-hidden="true">{menuOpen?'×':'☰'}</span></button></div>
