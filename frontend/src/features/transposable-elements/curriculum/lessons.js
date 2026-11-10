@@ -1,5 +1,7 @@
 import {phase6} from './phase6.js';
 import {phase5} from './phase5.js';
+import {extraction} from './extraction.js';
+import {moduleForTopic} from './modules.js';
 const question = (question, options, correct, explanation) => ({question, options, correct, explanation});
 const variant = (label, blocks, explanation) => ({label, blocks, explanation});
 export const lessons = [
@@ -60,8 +62,8 @@ export const lessons = [
     limitations:'Classical symbolic architectures only. Neither flanking module is assumed equally functional. Tn9 is an anatomy example, not an implemented conservative or replicative simulation.'
   }
 ];
-lessons.push(...phase5, phase6);
+lessons.push(...phase5, phase6, ...extraction);
 export const lessonById = id => lessons.find(l => l.id === id);
 export const topicHref = topic => topic.learning?.kind === 'laboratory'
   ? `/lab/transposable-elements?experiment=${topic.learning.experiment}`
-  : topic.status === 'implemented' && topic.lessonId ? `/learn/transposable-elements/${topic.lessonId}` : null;
+  : topic.status === 'implemented' && topic.lessonId ? `${moduleForTopic(topic.id)?.basePath ?? '/learn/transposable-elements'}/${topic.lessonId}` : null;

@@ -364,3 +364,18 @@
 .al-direction { margin-top:14px; }
 .al-feedback { margin:6px 0 0; padding-left:18px; }
 @media (max-width:640px) { .al-shape-gene { width:76px; } .al-shape-host { width:36px; } }
+
+/* Module 2 · reagent stages (lesson 16) and protocol benches (lessons 17–18). */
+.rs-stages { list-style:none; margin:0 0 14px; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; counter-reset:none; }
+.rs-stages > li { display:flex; }
+.rs-stage { width:100%; justify-content:flex-start; min-height:150px; text-align:left; }
+.rs-stage-head { display:grid; gap:2px; margin-bottom:6px; }
+.rs-stage-head b { font-size:13px; color:#3f5236; }
+.rs-stage-head small { font-size:11px; color:#7a8a72; }
+.pr-layout { display:grid; grid-template-columns:140px minmax(0,1fr); align-items:center; }
+.pr-tube { width:120px; margin:12px auto; color:#a8bac3; }
+@media (max-width:760px) {
+  .rs-stages { grid-template-columns:1fr 1fr; }
+  .pr-layout { grid-template-columns:1fr; }
+}
+@media (max-width:460px) { .rs-stages { grid-template-columns:1fr; } }

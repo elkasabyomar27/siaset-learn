@@ -236,5 +236,37 @@
     "verifiedOn": "2026-11-02",
     "evidenceStatus": "primary research",
     "limitations": "Does not establish self-transmissibility or universal cassette expression."
+  },
+  {
+    "id": "miller1988",
+    "citation": "Miller, Dykes & Polesky (1988). A simple salting out procedure for extracting DNA from human nucleated cells. Nucleic Acids Res.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC334765/",
+    "support": "SDS/proteinase K lysis, protein removal by salting out with saturated NaCl, then ethanol precipitation of DNA.",
+    "verification": "bibliography and summary verified via PMC",
+    "verifiedOn": "2026-11-10"
+  },
+  {
+    "id": "green-ethanol",
+    "citation": "Green & Sambrook (2016). Precipitation of DNA with Ethanol. Cold Spring Harb Protoc.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/27934690/",
+    "support": "Cations neutralize the phosphate backbone charge; ethanol precipitation of DNA.",
+    "verification": "PubMed record verified",
+    "verifiedOn": "2026-11-10"
+  },
+  {
+    "id": "green-isopropanol",
+    "citation": "Green & Sambrook (2017). Precipitation of DNA with Isopropanol. Cold Spring Harb Protoc.",
+    "url": "https://doi.org/10.1101/pdb.prot093385",
+    "support": "0.6–0.7 volume isopropanol versus 2–3 volumes ethanol; salts less soluble in isopropanol; ethanol wash to remove residual isopropanol; pellets easily lost.",
+    "verification": "bibliography and summary verified via secondary listing",
+    "verifiedOn": "2026-11-10"
+  },
+  {
+    "id": "desjardins2010",
+    "citation": "Desjardins & Conklin (2010). NanoDrop microvolume quantitation of nucleic acids. J Vis Exp.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3346308/",
+    "support": "A260/A280 of about 1.8 for pure DNA; A260/A230 commonly 1.8–2.2 for pure nucleic acid.",
+    "verification": "bibliography and summary verified via PMC",
+    "verifiedOn": "2026-11-10"
   }
 ]
