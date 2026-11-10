@@ -19,6 +19,7 @@ const MESSAGES = {
   recently_declined: 'Your last request was declined. You can ask again tomorrow.',
   email_failed: 'The request could not be emailed. Please try again in a minute.',
   not_configured: 'Teacher requests are not set up on this site yet.',
+  origin_denied: 'Teacher requests aren’t enabled for this web address yet.',
   link_used_or_invalid: 'This approval link was already used or is no longer valid.',
   'row-level security': 'You don’t have permission to do that.',
   'Payload too large': 'That file is too large. The limit is 25 MB.',

@@ -6,16 +6,19 @@ import {createTeacherRequestHandler} from './handler.js';
 //   TEACHER_ADMIN_EMAIL     where teacher requests are sent for approval
 //   TEACHER_EMAIL_FROM      sender, e.g. "SIASET <onboarding@resend.dev>" or an address on your verified domain
 //   SIASET_APP_ORIGIN       site origin used in links, e.g. https://siaset.example
-//   SIASET_ALLOWED_ORIGINS  comma-separated browser origins allowed to call this function
+//   SIASET_ALLOWED_ORIGINS  optional: comma-separated browser origins allowed to call this function
+//                           (defaults to SIASET_APP_ORIGIN)
 const env = (name: string) => Deno.env.get(name) || '';
 const options = {auth: {persistSession: false, autoRefreshToken: false, detectSessionInUrl: false}};
 const admin = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), options);
 const columns = 'user_id, display_name, school, reason, status, token_hash, notified_at, created_at, decided_at';
+const appOrigin = env('SIASET_APP_ORIGIN').replace(/\/$/, '');
+const listedOrigins = env('SIASET_ALLOWED_ORIGINS').split(',').map(v => v.trim().replace(/\/$/, '')).filter(Boolean);
 
 const handler = createTeacherRequestHandler({
   adminEmail: env('TEACHER_ADMIN_EMAIL'),
-  appOrigin: env('SIASET_APP_ORIGIN').replace(/\/$/, ''),
-  allowedOrigins: env('SIASET_ALLOWED_ORIGINS').split(',').map(v => v.trim()).filter(Boolean),
+  appOrigin,
+  allowedOrigins: listedOrigins.length ? listedOrigins : [appOrigin].filter(Boolean),
   verifyUser: async (token: string) => {
     const {data, error} = await admin.auth.getUser(token);
     if (error) throw error;

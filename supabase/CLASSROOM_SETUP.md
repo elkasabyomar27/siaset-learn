@@ -37,9 +37,9 @@ Browsers can never write `teacher_requests.status`. Only the function (service r
    ```
    supabase secrets set RESEND_API_KEY=… TEACHER_ADMIN_EMAIL=<your email> \
      TEACHER_EMAIL_FROM="SIASET <onboarding@resend.dev>" \
-     SIASET_APP_ORIGIN=https://siaset-learn.vercel.app \
-     SIASET_ALLOWED_ORIGINS=https://siaset-learn.vercel.app,http://localhost:5173,http://127.0.0.1:5173
+     SIASET_APP_ORIGIN=https://siaset-learn.vercel.app
    ```
+   Optional: `SIASET_ALLOWED_ORIGINS` lists the browser origins that may call the function, separated by commas. It defaults to `SIASET_APP_ORIGIN`. Add `http://localhost:5173` to it to test teacher requests from a local dev server.
 4. **Deploy the function:** `supabase functions deploy teacher-request`. `config.toml` already sets `verify_jwt = false`, and the handler verifies the signed-in user itself.
 5. Sign in, request teacher access on `/teach`, and approve yourself from the email.
 
