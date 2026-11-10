@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import topics from '../curriculum/topics.json' with { type: 'json' };
+import { allTopics as topics } from '../curriculum/modules.js';
 import references from '../profiles/references.json';
 import { topicHref } from '../curriculum/lessons.js';
 export default function AssessmentQuestion({

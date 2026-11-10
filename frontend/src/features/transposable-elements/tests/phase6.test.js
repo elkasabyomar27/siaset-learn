@@ -8,7 +8,7 @@ import {isComplete,updateProgress,parseProgress} from '../lessonProgress.js';
 test('Topic 15 completes the original curriculum with five activity groups and traceable references',()=>{
  const topics=JSON.parse(readFileSync(new URL('../curriculum/topics.json',import.meta.url)));
  const refs=JSON.parse(readFileSync(new URL('../profiles/references.json',import.meta.url)));
- assert.equal(topics.length,15);assert.equal(lessons.length,13);
+ assert.equal(topics.length,15);assert.equal(lessons.filter(l=>topics.some(t=>t.id===l.id)).length,13);
  assert.equal(topics[14].id,phase6.id);assert.equal(topics[14].status,'implemented');
  assert.equal(topicHref(topics[14]),'/learn/transposable-elements/bacterial-hgt');
  for(const id of phase6.references)assert.ok(refs.some(r=>r.id===id));

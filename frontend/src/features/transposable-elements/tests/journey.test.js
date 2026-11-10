@@ -9,6 +9,7 @@ import { createServer } from 'vite';
 import topics from '../curriculum/topics.json' with { type: 'json' };
 import { topicHref, lessons } from '../curriculum/lessons.js';
 import { journeyGroups, journeyStops, focusJourneyTarget } from '../journey.js';
+import { allTopics, allChapters, modules } from '../curriculum/modules.js';
 import { createProgressRepository } from '../progressRepository.js';
 import { STORAGE_KEY } from '../lessonProgress.js';
 
@@ -20,11 +21,14 @@ before(async () => {
 after(async () => { await server?.close(); });
 const render = (props = {}, route = '/learn/transposable-elements') => renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: [route] }, createElement(JourneyMap, { progress: {}, labs: {}, pathname: route, ...props })));
 
-test('five stable-ID groups partition all fifteen topics in original order with canonical lab queries', () => {
+test('five stable-ID groups partition the fifteen transposable-element topics in original order with canonical lab queries', () => {
   assert.deepEqual(journeyGroups.map(g => g.topics.length), [4, 3, 2, 4, 2]);
   assert.deepEqual(journeyGroups.flatMap(g => g.topics), topics.map(t => t.id));
+  // Later modules follow the original fifteen; every chapter partitions the whole curriculum.
+  assert.deepEqual(allChapters.flatMap(g => g.topics), allTopics.map(t => t.id));
   const stops = journeyStops({}, {}, '/learn/transposable-elements');
-  assert.deepEqual(stops.map(s => s.href), topics.map(topicHref));
+  assert.deepEqual(stops.slice(0, 15).map(s => s.href), topics.map(topicHref));
+  assert.deepEqual(stops.map(s => s.href), allTopics.map(topicHref));
   assert.equal(stops[5].href, '/lab/transposable-elements?experiment=tn5');
   assert.equal(stops[6].href, '/lab/transposable-elements?experiment=tn3');
   assert.ok(stops.every(s => !s.completed && !s.current));
@@ -69,16 +73,17 @@ test('map and flat list have identical ordered, unlocked links, names, status an
   for (const initialView of ['journey', 'list']) {
     const html = render({ initialView, pathname: '/learn/transposable-elements/anatomy' });
     const hrefs = [...html.matchAll(/class="journey-stop[^"]*"[^>]*href="([^"]+)"/g)].map(m => m[1]);
-    assert.deepEqual(hrefs, topics.map(topicHref));
-    assert.equal((html.match(/Official completion: Incomplete/g) || []).length, 15);
+    assert.deepEqual(hrefs, allTopics.map(topicHref));
+    assert.equal((html.match(/Official completion: Incomplete/g) || []).length, allTopics.length);
     assert.equal((html.match(/aria-current="page"/g) || []).length, 1);
     assert.equal((html.match(/class="journey-current"/g) || []).length, 1);
-    assert.equal((html.match(/aria-hidden="true" focusable="false"/g) || []).length, 5);
+    assert.equal((html.match(/aria-hidden="true" focusable="false"/g) || []).length, allChapters.length);
+    for (const module of modules) assert.ok(html.includes(`id="module-${module.id}" tabindex="-1"`));
     assert.match(html, /<fieldset><legend>Navigation view/);
     assert.match(html, /type="radio" name="journey-view"/);
     assert.doesNotMatch(html, /aria-disabled|disabled="|tabindex="0"/);
     assert.match(html, /navigation metaphor/);
-    for (const group of journeyGroups) {
+    for (const group of allChapters) {
       assert.ok(html.includes(`href="#journey-${group.id}"`));
       assert.ok(html.includes(`id="journey-${group.id}" tabindex="-1"`));
     }
@@ -96,9 +101,9 @@ test('recorded completion and current location remain separate in rendered text 
   const progress = { anatomy: { inspected: [0, 1, 2], exercise: lesson.exercise.correct, check: lesson.check.correct } };
   const complete = render({ progress, labs: { tn5: {} }, pathname: '/lab/transposable-elements', search: '?experiment=tn3' });
   assert.equal((complete.match(/Official completion: Completed/g) || []).length, 2);
-  assert.match(complete, /2 \/ 15/);
+  assert.match(complete, new RegExp(`2 / ${allTopics.length}`));
   assert.match(complete, /Incomplete · guided review not recorded<\/span><span class="journey-current">Current location/);
-  assert.equal((complete.match(/role="list"/g) || []).length, 5);
+  assert.equal((complete.match(/role="list"/g) || []).length, allChapters.length);
   const afterReset = render({ pathname: '/lab/transposable-elements', search: '?experiment=tn3' });
   assert.equal((afterReset.match(/Official completion: Completed/g) || []).length, 0);
   assert.equal((afterReset.match(/class="journey-current"/g) || []).length, 1);
@@ -118,9 +123,9 @@ test('responsive and reduced-motion rules flatten links and remove decorative mo
 test('concept previews reuse existing objectives in both views and regions retain named landmarks', () => {
   for (const initialView of ['journey', 'list']) {
     const html = render({ initialView });
-    assert.equal((html.match(/class="journey-preview"/g) || []).length, 15);
-    for (const topic of topics) assert.ok(html.includes(topic.learningObjectives[0]));
-    for (const group of journeyGroups) assert.ok(html.includes(`journey-region-${group.id}`));
+    assert.equal((html.match(/class="journey-preview"/g) || []).length, allTopics.length);
+    for (const topic of allTopics) assert.ok(html.includes(topic.learningObjectives[0]));
+    for (const group of allChapters) assert.ok(html.includes(`journey-region-${group.id}`));
     assert.match(html, /scientific approval pending/);
     assert.match(html, /navigation, not a reaction mechanism/);
   }
@@ -131,13 +136,13 @@ test('concept previews reuse existing objectives in both views and regions retai
 test('compact navigation retains optional previews without adding nested link controls', () => {
   for (const initialView of ['journey', 'list']) {
     const html = render({ initialView });
-    assert.equal((html.match(/class="journey-preview" hidden=""/g) || []).length, 15);
+    assert.equal((html.match(/class="journey-preview" hidden=""/g) || []).length, allTopics.length);
     assert.match(html, /type="checkbox"/);
     assert.match(html, /Show concept previews/);
     assert.match(html, /<details class="journey-model-note"><summary>About this pathway/);
     assert.doesNotMatch(html, /<details[^>]* open/);
     const links = [...html.matchAll(/<a class="journey-stop[^]*?<\/a>/g)].map(m => m[0]);
-    assert.equal(links.length, 15);
+    assert.equal(links.length, allTopics.length);
     for (const link of links) assert.doesNotMatch(link, /<button|<input|<summary/);
   }
 });

@@ -1,4 +1,4 @@
-import topics from './curriculum/topics.json' with {type:'json'};
+import {allTopics as topics, moduleForTopic} from './curriculum/modules.js';
 import {experimentFromParams} from './experimentRouting.js';
 
 export function routePresentation(pathname, search = '') {
@@ -14,7 +14,7 @@ export function routePresentation(pathname, search = '') {
     '/account': ['Your account', null],
     '/auth/callback': ['Verify sign-in', null],
     '/auth/recovery': ['Password recovery', null],
-    [learn]: ['Transposable elements curriculum', 'curriculum'],
+    [learn]: ['Curriculum', 'curriculum'],
     [`${lab}/sandbox`]: ['Sandbox', 'sandbox'],
     [`${learn}/assessment`]: ['Cumulative assessment', 'assessment'],
     [`${learn}/progress`]: ['Your learning progress', 'progress'],
@@ -27,6 +27,6 @@ export function routePresentation(pathname, search = '') {
   if (pathname.startsWith('/play/')) return {title: 'Live quiz', section: null, identity: pathname};
   const page = pages[pathname];
   if (page) return {title: page[0], section: page[1], identity: pathname};
-  const topic = topics.find(t => t.lessonId && pathname === `${learn}/${t.id}`);
+  const topic = topics.find(t => t.lessonId && pathname === `${moduleForTopic(t.id).basePath}/${t.id}`);
   return {title: topic ? `${topic.title} — Lesson ${topic.order}` : 'Page not found', section: topic ? 'curriculum' : null, identity: pathname};
 }

@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
-import {questions as bank} from '../features/transposable-elements/assessment.js';
+import {allQuestions as bank} from '../features/transposable-elements/assessment.js';
 import {friendlyError, OPTION_STYLES} from './api.js';
 
 const blank = () => ({text: '', options: ['', ''], correct: 0, seconds: 20});

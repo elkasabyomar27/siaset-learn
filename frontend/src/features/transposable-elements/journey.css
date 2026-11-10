@@ -52,3 +52,11 @@
 @media(max-width:700px){.dna-journey{padding:16px 12px}.journey-track li{width:100%}.journey-track li{padding-left:44px;padding-bottom:6px}.journey-group{padding:18px 0 0}.journey-group header{padding-left:44px}.journey-group h3{font-size:18px}.journey-group:not(:last-child)::after{left:9px;width:12px}.journey-number{left:-44px;width:34px;height:36px;font-size:13px}.journey-stop{padding:10px 8px;min-height:76px}.journey-track li::after{top:28px;width:28px}.journey-jumps a{width:auto;font-size:13px}.journey-label strong{font-size:14px}.journey-tools>a{width:100%}}
 @media(max-width:700px){.journey-group::before{left:9px;width:12px}}
 @media(forced-colors:active){.journey-group::before{border-color:CanvasText}}
+
+/* Modules: each module groups its own chapters. */
+.journey-module{margin-top:36px}.journey-module:first-of-type{margin-top:12px}
+.journey-module-header{padding:18px 0 4px;border-top:2px solid var(--color-text);max-width:760px}
+.journey-module-header h3{font-size:26px;margin:6px 0}.journey-module-header>p:last-child{color:var(--color-text-secondary);font-size:14px;margin:0}
+.journey-jumps{align-items:stretch}.journey-jump-module{display:flex;flex-wrap:wrap;gap:10px;width:100%;align-items:center}
+.journey-jump-module>a:first-child{border-color:var(--color-text)}
+.journey-region-isolate{--region:#3d7f9a}

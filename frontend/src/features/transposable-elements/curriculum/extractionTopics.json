@@ -1,0 +1,126 @@
+[
+  {
+    "id": "extraction-principles",
+    "order": 16,
+    "title": "DNA Extraction",
+    "learningObjectives": [
+      "Explain the purpose of each stage: lysis, protein and RNA removal, and DNA recovery.",
+      "Match common reagents to what they do to cells, proteins and nucleic acids.",
+      "Predict how skipping a stage affects yield or purity."
+    ],
+    "essentialTerminology": [
+      "lysis",
+      "SDS",
+      "EDTA",
+      "proteinase K",
+      "RNase A",
+      "salting out",
+      "yield",
+      "purity"
+    ],
+    "mechanismProfiles": [],
+    "plannedActivities": [
+      "Place each reagent in its protocol stage",
+      "Predict the outcome when a stage is skipped"
+    ],
+    "assessmentObjectives": [
+      "Which step recovers DNA from a cleared lysate?",
+      "What does EDTA contribute to a lysis buffer?"
+    ],
+    "references": [
+      "miller1988",
+      "green-ethanol"
+    ],
+    "status": "implemented",
+    "lessonId": "extraction-principles",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {
+      "includeEvidence": true
+    }
+  },
+  {
+    "id": "isopropanol-precipitation",
+    "order": 17,
+    "title": "Isopropanol Precipitation",
+    "learningObjectives": [
+      "Explain why salt and alcohol together bring DNA out of solution.",
+      "Choose an isopropanol volume and temperature that recover DNA without excess salt.",
+      "Compare isopropanol with ethanol precipitation."
+    ],
+    "essentialTerminology": [
+      "precipitation",
+      "monovalent cation",
+      "sodium acetate",
+      "isopropanol",
+      "0.6–0.7 volume",
+      "pellet",
+      "co-precipitation",
+      "supernatant"
+    ],
+    "mechanismProfiles": [],
+    "plannedActivities": [
+      "Set up a precipitation tube and test each requirement",
+      "Predict the outcome of each precipitation set-up"
+    ],
+    "assessmentObjectives": [
+      "Which alcohol fits a 700 µL sample in a 1.5 mL tube?",
+      "Why is isopropanol precipitation usually done at room temperature?"
+    ],
+    "references": [
+      "green-isopropanol",
+      "green-ethanol"
+    ],
+    "status": "implemented",
+    "lessonId": "isopropanol-precipitation",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {
+      "includeEvidence": true
+    }
+  },
+  {
+    "id": "ethanol-wash",
+    "order": 18,
+    "title": "Ethanol Washing",
+    "learningObjectives": [
+      "Explain why a DNA pellet is washed with 70% ethanol.",
+      "Predict the effect of the wrong wash solution or drying time.",
+      "Connect leftover contaminants to purity readings and downstream problems."
+    ],
+    "essentialTerminology": [
+      "70% ethanol",
+      "residual salt",
+      "residual alcohol",
+      "air-drying",
+      "over-drying",
+      "resuspension",
+      "TE buffer",
+      "A260/A280",
+      "A260/A230"
+    ],
+    "mechanismProfiles": [],
+    "plannedActivities": [
+      "Wash and dry a pellet, then read the quality report",
+      "Predict the outcome of each wash and drying choice"
+    ],
+    "assessmentObjectives": [
+      "Why wash with 70% rather than 100% ethanol?",
+      "Which purity reading suggests salt carryover?"
+    ],
+    "references": [
+      "green-isopropanol",
+      "desjardins2010"
+    ],
+    "status": "implemented",
+    "lessonId": "ethanol-wash",
+    "learning": {
+      "kind": "lesson"
+    },
+    "assessment": {
+      "includeEvidence": true
+    }
+  }
+]

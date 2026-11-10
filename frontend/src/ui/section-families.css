@@ -129,3 +129,12 @@
 @media(max-width:380px) { .workspace-shell[data-page=progress] .review-workspace .metrics { grid-template-columns:1fr; } .review-workspace .metrics > div > span { margin-bottom:10px; } }
 @media(prefers-reduced-motion:reduce) { .learning-overview *, .review-workspace * { transition:none!important; } }
 @media(forced-colors:active) { .review-workspace .lesson-question label:has(input:checked) { outline:2px solid Highlight; } }
+
+/* Modules on the overview: each module heads its own chapter grid. */
+.overview-module + .overview-module { margin-top:40px; }
+.overview-module-heading { margin:0 0 18px; max-width:720px; }
+.overview-module-heading .eyebrow { font-size:8px; color:#708867; }
+.workspace-shell .overview-module-heading h3 { font-size:24px; letter-spacing:-.6px; margin:8px 0 6px; }
+.overview-module-heading h3 a { color:#3a573e; }
+.overview-module-heading p { font-size:13px; color:#6b7c63; margin:0; }
+.overview-chapter--isolate { --chapter:#3d7f9a; grid-column:span 6 !important; min-height:180px !important; }
