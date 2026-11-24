@@ -1,0 +1,32 @@
+/* Bench Workflow benches (stations 19–22). Brand tokens only; gel colours come from the
+   --scientific-* variables in src/scientific.css and are used only inside the SVG diagrams. */
+.bw-handoff { margin: var(--space-4) 0; padding: var(--space-3) var(--space-4); border-left: 4px solid var(--lab-teal); border-radius: 0 var(--radius-md) var(--radius-md) 0; background: var(--color-surface-subtle); color: var(--color-text); }
+.bw-handoff .eyebrow { margin: 0 0 var(--space-2); }
+.bw-handoff a { color: var(--color-link); }
+.bw-handoff dl { display: grid; gap: var(--space-2); margin: 0; }
+.bw-handoff dl > div { display: grid; grid-template-columns: minmax(7rem, max-content) 1fr; gap: var(--space-3); }
+.bw-handoff dt { font-weight: 700; }
+.bw-handoff dd { margin: 0; }
+.bw-cards { list-style: none; margin: var(--space-4) 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.bw-card { display: grid; gap: var(--space-2); align-content: start; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+.bw-readings { margin: 0; font-variant-numeric: tabular-nums; color: var(--color-text-secondary); }
+.bw-predict { display: grid; gap: var(--space-1); margin: var(--space-3) 0; color: var(--color-text); }
+.bw-predict select, .bw-predict input { min-height: 44px; padding: 0 var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font: inherit; }
+.parts-bench .primary-button, .parts-bench .outline-button, .bw-toggle { min-height: 44px; }
+.bw-toggle { display: flex; align-items: center; gap: var(--space-2); }
+.bw-toggle input { width: 20px; height: 20px; }
+.bw-fieldset { display: grid; gap: var(--space-1); margin: var(--space-3) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3); }
+.bw-choices { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
+.bw-step { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--color-border); }
+.bw-table { border-collapse: collapse; margin: var(--space-3) 0; font-variant-numeric: tabular-nums; }
+.bw-table th, .bw-table td { padding: var(--space-1) var(--space-3); border-bottom: 1px solid var(--color-border); text-align: right; }
+.bw-table thead th { text-align: left; color: var(--color-text-secondary); }
+.bw-chart { display: block; width: 100%; max-width: 420px; margin: var(--space-3) 0; color: var(--color-text-secondary); }
+.gel-figure { margin: var(--space-4) 0; }
+.gel-svg { display: block; width: 100%; max-width: 360px; height: auto; }
+.gel-band.is-faint { opacity: .45; }
+.gel-figure figcaption { margin-top: var(--space-2); font-size: .85rem; color: var(--color-text-secondary); }
+@media (prefers-reduced-motion: no-preference) {
+  .gel-band { animation: bw-band-in .6s ease-out both; }
+  @keyframes bw-band-in { from { opacity: 0; transform: translateY(-6px); } }
+}

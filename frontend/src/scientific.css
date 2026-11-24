@@ -7,6 +7,9 @@
  --scientific-res: #eb936d;
  --scientific-tir: #f2da99;
  --scientific-gene: #8ea1a9;
+ --scientific-gel: #1c2b33;
+ --scientific-band: #f2a96b;
+ --scientific-ladder: #c9d6dc;
 }
 .legend .donor { background: var(--scientific-donor); }
 .legend .target { background: var(--scientific-target); }
