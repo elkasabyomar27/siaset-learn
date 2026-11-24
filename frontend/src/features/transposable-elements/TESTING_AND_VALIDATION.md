@@ -55,3 +55,26 @@ After successful package installation in a network-enabled terminal, run lint/bu
 ## Scientific review still required
 
 University review has not occurred. References were checked via primary abstracts/publisher or bibliographic records; full text was not uniformly accessible. Symbolic gene placement, unresolved donor repair, permissive res topology, identity allocation after recombination, and lack of strand/kinetic simulation are deliberate boundaries. No experimental validation is claimed.
+
+## Bench Workflow module (stations 19–22) — 2026-11-24
+
+- **Models.** All the logic is in `benchWorkflow.js`, tested in `tests/benchWorkflow.test.js`:
+  - one worked `SAMPLE` threads all four stations: A260 0.75 → 37.5 ng/µL → 3.75 ng template ≈ 1,100 haploid copies → an 850 bp teaching amplicon → EcoRI 300 + 550, HindIII 700 + 150, no BamHI site;
+  - the purity cut-offs (A260/A280 < 1.7, ≥ 1.95; A260/A230 < 1.8) are teaching values;
+  - the gel uses a schematic log-linear model;
+  - the PCR plateau is drawn, not calculated.
+- **Benches.** The predict-then-reveal state is in `benchStep.js`. Changing a setting or a prediction clears any shown verdict. Bench markup, SVG labels and CSS rules are tested in `tests/benchComponents.test.js`.
+- **References, verified 2026-11-24.**
+  - Read in a browser: the QIAGEN bench guide, the Sigma-Aldrich PCR guide, and the NEB EcoRI, HindIII and BamHI pages.
+  - Checked via NCBI E-utilities: Saiki 1988 (abstract), Lee 2012 and Duewer 2018 (full text).
+  - Dropped: the Thermo NanoDrop purity note, because no readable copy was found.
+- **Corrections made while verifying the sources.**
+  - Phenol is not named as a low-A260/A280 cause: QIAGEN notes that phenol raises apparent purity.
+  - The PCR extension-time control was removed: a 1 min extension covers up to 2 kb, so "15 s is too short for 850 bp" could not be defended.
+- **Browser check (Vite dev server, built-in browser).** All four stations were checked:
+  - each prediction was revealed and its feedback read;
+  - the gel lesson was completed to "Lesson completed";
+  - the Lab room and the Station finder list the module;
+  - at 375 px there is no overflow, and every control is at least 44 px;
+  - there were no console errors.
+- **Database.** Contract `siaset-v3` covers 20 lessons and 88 views. The assignment station cap is raised to 64 (migrations `20261124140000` and `20261124140100`).

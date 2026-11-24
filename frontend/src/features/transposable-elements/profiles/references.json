@@ -268,5 +268,69 @@
     "support": "A260/A280 of about 1.8 for pure DNA; A260/A230 commonly 1.8–2.2 for pure nucleic acid.",
     "verification": "bibliography and summary verified via PMC",
     "verifiedOn": "2026-11-10"
+  },
+  {
+    "id": "qiagen-spectro",
+    "citation": "QIAGEN Bench Guide: Spectrophotometric measurement of DNA concentration.",
+    "url": "https://www.qiagen.com/us/knowledge-and-support/knowledge-hub/bench-guide/dna/analysing-dna/spectrophotometric-measurement-of-dna-concentration",
+    "support": "1 A260 unit ≈ 50 µg/mL dsDNA (neutral pH, 1 cm path); A260/A280 ~1.8 for pure DNA, ~2.0 for RNA, and 1.95 can suggest RNA contamination; a low ratio indicates protein; absorbance cannot tell DNA from RNA, so RNA inflates DNA concentration.",
+    "verification": "page text read in browser",
+    "verifiedOn": "2026-11-24"
+  },
+  {
+    "id": "saiki1988",
+    "citation": "Saiki RK, Gelfand DH, Stoffel S, et al. (1988). Primer-directed enzymatic amplification of DNA with a thermostable DNA polymerase. Science 239:487–491.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/2448875/",
+    "support": "Thermostable Taq polymerase in the polymerase chain reaction; single-copy genomic sequences amplified more than 10 million-fold with high specificity.",
+    "verification": "PubMed abstract verified via NCBI E-utilities",
+    "verifiedOn": "2026-11-24"
+  },
+  {
+    "id": "sigma-pcr",
+    "citation": "Sigma-Aldrich (Merck). Polymerase Chain Reaction: a technical guide to PCR technologies.",
+    "url": "https://www.sigmaaldrich.com/US/en/technical-documents/technical-article/genomics/pcr/polymerase-chain-reaction",
+    "support": "Cycles of denaturation, annealing about 5 °C below primer Tm, and extension at 72 °C give exponential amplification; from the third cycle the amplicon-only product becomes the specific template; reactions eventually reach a plateau phase.",
+    "verification": "page text read in browser",
+    "verifiedOn": "2026-11-24"
+  },
+  {
+    "id": "duewer2018",
+    "citation": "Duewer DL, Kline MC, Romsos EL, Toman B (2018). Evaluating droplet digital PCR for the quantification of human genomic DNA: converting copies per nanoliter to nanograms nuclear DNA per microliter. Anal Bioanal Chem 410:2879–2887.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5996397/",
+    "support": "One human haploid genome equivalent (3.012 × 10⁹ bp × 659.9 g/mol per bp) has a mass of about 3.3 pg.",
+    "verification": "full text verified via PMC (E-utilities)",
+    "verifiedOn": "2026-11-24"
+  },
+  {
+    "id": "lee2012",
+    "citation": "Lee PY, Costumbrado J, Hsu CY, Kim YH (2012). Agarose gel electrophoresis for the separation of DNA fragments. J Vis Exp (62):3923.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4846332/",
+    "support": "DNA migrates toward the positive anode; distance travelled is inversely proportional to the log of molecular weight; sizes are read against a DNA ladder; agarose concentration is chosen by fragment size; conformation affects mobility; the cathode sits nearest the wells.",
+    "verification": "full text verified via PMC (E-utilities)",
+    "verifiedOn": "2026-11-24"
+  },
+  {
+    "id": "neb-ecori",
+    "citation": "New England Biolabs. EcoRI (R0101) product page.",
+    "url": "https://www.neb.com/en-us/products/r0101-ecori",
+    "support": "Restriction enzyme cut site G/AATTC.",
+    "verification": "product page read in browser",
+    "verifiedOn": "2026-11-24"
+  },
+  {
+    "id": "neb-hindiii",
+    "citation": "New England Biolabs. HindIII (R0104) product page.",
+    "url": "https://www.neb.com/en-us/products/r0104-hindiii",
+    "support": "Restriction enzyme cut site A/AGCTT.",
+    "verification": "product page read in browser",
+    "verifiedOn": "2026-11-24"
+  },
+  {
+    "id": "neb-bamhi",
+    "citation": "New England Biolabs. BamHI (R0136) product page.",
+    "url": "https://www.neb.com/en-us/products/r0136-bamhi",
+    "support": "Restriction enzyme cut site G/GATCC.",
+    "verification": "product page read in browser",
+    "verifiedOn": "2026-11-24"
   }
 ]

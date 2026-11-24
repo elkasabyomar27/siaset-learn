@@ -35,7 +35,8 @@ test('picker lists every station by field and module with selected chips', () =>
   assert.match(out, /<legend>Genetics · Transposable Elements<\/legend>/);
   assert.match(out, /<legend>Molecular Biology · DNA Extraction &amp; Purification<\/legend>/);
   assert.match(out, /13 · Target-Site Duplication/);
-  assert.equal((out.match(/type="checkbox"/g) || []).length, 18);
+  assert.match(out, /<legend>Molecular Biology · Bench Workflow<\/legend>/);
+  assert.equal((out.match(/type="checkbox"/g) || []).length, 22);
   assert.equal((out.match(/checked=""/g) || []).length, 2);
   assert.ok(out.indexOf('Remove 13') < out.indexOf('Remove 06'), 'chips keep the chosen order');
 });

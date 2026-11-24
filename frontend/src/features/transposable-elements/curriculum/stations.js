@@ -19,6 +19,10 @@ export const stationCopy = {
   'extraction-principles': { challenge: 'Free DNA from cells, one reagent at a time.', activity: 'Reagent stages' },
   'isopropanol-precipitation': { challenge: 'Pull DNA out of solution with isopropanol.', activity: 'Protocol bench' },
   'ethanol-wash': { challenge: 'Wash away the salt without losing your pellet.', activity: 'Protocol bench' },
+  'dna-quantification': { challenge: 'How much DNA did you get, and how clean is it?', activity: 'Spectrophotometer' },
+  'pcr-amplification': { challenge: 'Copy one target a million times over.', activity: 'Thermocycler' },
+  'gel-electrophoresis': { challenge: 'Run your product and read its size off the ladder.', activity: 'Gel rig' },
+  'restriction-digest': { challenge: 'Predict where the enzymes cut, then check on the gel.', activity: 'Digest and check' },
 };
 
 export const challengeFor = id => stationCopy[id]?.challenge;

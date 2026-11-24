@@ -15,13 +15,13 @@ test('pinned full assessment bank, 15 topics, and every lesson view across modul
   assert.deepEqual(contractManifest.questions, JSON.parse(await readFile('frontend/src/features/transposable-elements/tests/assessment-v1.json')));
   assert.equal(contractManifest.topics.length, 15);
   assert.deepEqual(contractManifest.lessons.map(l => l.id), lessons.map(l => l.id));
-  assert.equal(contractManifest.lessons.length, 16);
-  assert.equal(contractManifest.lessons.reduce((n, l) => n + l.variants.length, 0), 71);
+  assert.equal(contractManifest.lessons.length, 20);
+  assert.equal(contractManifest.lessons.reduce((n, l) => n + l.variants.length, 0), 88);
   const pinned = JSON.parse(await readFile('supabase/contract-manifest.json', 'utf8'));
   assert.equal(pinned.version, CONTRACT_VERSION);
   const row = `'${CONTRACT_VERSION}', '${await digest(contractManifest)}', '${pinned.engine_sha256}'`;
   assert.ok((await readFile('supabase/seed.sql', 'utf8')).includes(row), 'seed registers the current contract');
-  assert.ok((await readFile('supabase/migrations/20261124120000_contract_v2.sql', 'utf8')).includes(row), 'migration registers the current contract');
+  assert.ok((await readFile('supabase/migrations/20261124140000_contract_v3.sql', 'utf8')).includes(row), 'migration registers the current contract');
 });
 
 test('trusted validation rejects ownership, completion, score, partial submission, wrong stage and tampered events', async () => {

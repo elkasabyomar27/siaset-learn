@@ -1,5 +1,5 @@
 {
-  "version": "siaset-v2",
+  "version": "siaset-v3",
   "topics": [
     {
       "id": "introduction",
@@ -1814,6 +1814,317 @@
         "correct": 1,
         "explanation": "Many contaminants absorb near 230 nm, lowering A260/A230. A ratio flags a problem; it does not identify the contaminant."
       }
+    },
+    {
+      "id": "dna-quantification",
+      "variants": [
+        {
+          "label": "Your DNA from the wash",
+          "blocks": [
+            "A260 0.75",
+            "A280 0.41",
+            "A230 0.38",
+            "260/280 = 1.83 · 260/230 = 1.97"
+          ],
+          "explanation": "Both ratios are in the usual range for pure DNA: 37.5 ng/µL, about 1.9 µg in 50 µL.",
+          "outcome": "pure DNA"
+        },
+        {
+          "label": "Protein carried over",
+          "blocks": [
+            "A260 0.75",
+            "A280 0.47",
+            "260/280 = 1.60"
+          ],
+          "explanation": "Extra absorbance near 280 nm pulls A260/A280 well below about 1.8. Protein is the usual cause.",
+          "outcome": "protein contamination"
+        },
+        {
+          "label": "RNase skipped",
+          "blocks": [
+            "A260 0.90",
+            "A280 0.44",
+            "260/280 = 2.05"
+          ],
+          "explanation": "Without RNase A, RNA precipitates with the DNA. RNA reads near 2.0 and also adds to A260.",
+          "outcome": "RNA contamination"
+        },
+        {
+          "label": "Carryover from the prep",
+          "blocks": [
+            "A260 0.75",
+            "A230 0.60",
+            "260/230 = 1.25"
+          ],
+          "explanation": "Something absorbing near 230 nm came along with the DNA. The ratio flags it but does not say what it is.",
+          "outcome": "low A260/A230 contaminant"
+        }
+      ],
+      "exercise": {
+        "question": "Your DNA reads A260 = 0.75 (10 mm path). What is its concentration?",
+        "options": [
+          "37.5 ng/µL",
+          "15 ng/µL",
+          "75 ng/µL"
+        ],
+        "correct": 0,
+        "explanation": "For double-stranded DNA an A260 of 1.0 is about 50 ng/µL, so 0.75 × 50 = 37.5 ng/µL."
+      },
+      "check": {
+        "question": "A sample’s A260/A280 is 1.60. What is the most likely explanation?",
+        "options": [
+          "RNA contamination",
+          "Protein contamination",
+          "Pure DNA"
+        ],
+        "correct": 1,
+        "explanation": "Protein absorbs near 280 nm and pulls the ratio below about 1.8. The ratio flags a problem; it does not prove what the contaminant is."
+      },
+      "check2": {
+        "question": "RNase A was skipped and A260/A280 reads 2.05. What else is wrong with this reading?",
+        "options": [
+          "The A260 concentration overestimates the DNA",
+          "The DNA is degraded",
+          "The ratio proves the sample is pure"
+        ],
+        "correct": 0,
+        "explanation": "RNA also absorbs at 260 nm, so it inflates the concentration calculated from A260."
+      }
+    },
+    {
+      "id": "pcr-amplification",
+      "variants": [
+        {
+          "label": "Standard set-up",
+          "blocks": [
+            "primers facing",
+            "anneal 55 °C",
+            "Taq",
+            "30 cycles"
+          ],
+          "explanation": "Both primers bind their own sites and every product is a new template: one band of the expected size.",
+          "outcome": "single product"
+        },
+        {
+          "label": "Primers pointing away",
+          "blocks": [
+            "← forward",
+            "target",
+            "reverse →"
+          ],
+          "explanation": "Primers that point away from each other never define a region between them, so nothing is amplified.",
+          "outcome": "no product"
+        },
+        {
+          "label": "Annealing at 72 °C",
+          "blocks": [
+            "primer Tm ≈ 60 °C",
+            "anneal 72 °C"
+          ],
+          "explanation": "Well above their melting temperature, the primers barely stay bound, so little or nothing is copied.",
+          "outcome": "no product"
+        },
+        {
+          "label": "Annealing at 45 °C",
+          "blocks": [
+            "primer Tm ≈ 60 °C",
+            "anneal 45 °C"
+          ],
+          "explanation": "Far below the melting temperature, primers also bind partly matching sites and make extra products.",
+          "outcome": "extra bands"
+        },
+        {
+          "label": "Only 10 cycles",
+          "blocks": [
+            "primers facing",
+            "anneal 55 °C",
+            "10 cycles"
+          ],
+          "explanation": "The right product, but 2¹⁰ is only about a thousand-fold: too little to see clearly.",
+          "outcome": "weak product"
+        }
+      ],
+      "exercise": {
+        "question": "Starting from about 1,100 template copies, roughly how many copies do 10 ideal cycles give?",
+        "options": [
+          "About 11,000",
+          "About 1.1 million",
+          "About 110,000"
+        ],
+        "correct": 1,
+        "explanation": "2¹⁰ = 1,024, and 1,100 × 1,024 ≈ 1.1 million."
+      },
+      "check": {
+        "question": "Why does the target roughly double every cycle?",
+        "options": [
+          "Each strand of every duplex is a template for a new strand",
+          "The polymerase copies each strand twice",
+          "Primers copy themselves"
+        ],
+        "correct": 0,
+        "explanation": "After denaturation both strands are templates, and each new strand carries the other primer’s site."
+      },
+      "check2": {
+        "question": "You anneal far above the primers’ melting temperature. Predict the result.",
+        "options": [
+          "Little or no product",
+          "Extra non-specific bands",
+          "A longer product"
+        ],
+        "correct": 0,
+        "explanation": "Above their Tm the primers do not stay bound long enough to be extended."
+      }
+    },
+    {
+      "id": "gel-electrophoresis",
+      "variants": [
+        {
+          "label": "1% gel, wells at −",
+          "blocks": [
+            "wells at − (black)",
+            "DNA → +",
+            "100 bp ladder",
+            "PCR product"
+          ],
+          "explanation": "DNA moves toward the anode and separates by size; the product sits between 800 and 900 bp.",
+          "outcome": "band resolved"
+        },
+        {
+          "label": "Electrodes reversed",
+          "blocks": [
+            "wells at + (red)",
+            "DNA → − ?"
+          ],
+          "explanation": "DNA still moves toward the positive electrode, which is now behind the wells, so it leaves the gel into the buffer.",
+          "outcome": "DNA runs out of the gel"
+        },
+        {
+          "label": "Ethanol left in the sample",
+          "blocks": [
+            "pellet not dried",
+            "sample + loading dye",
+            "load the well"
+          ],
+          "explanation": "Residual ethanol makes the sample less dense than the loading mixture, so it floats up out of the well.",
+          "outcome": "sample floats out"
+        },
+        {
+          "label": "Run stopped early",
+          "blocks": [
+            "wells at −",
+            "run 5 min",
+            "stop"
+          ],
+          "explanation": "The fragments have barely entered the gel, so neighbouring sizes have not separated yet.",
+          "outcome": "bands not separated"
+        }
+      ],
+      "exercise": {
+        "question": "The band sits between the 800 and 900 bp ladder bands, about halfway on the log scale. What is the best estimate?",
+        "options": [
+          "About 850 bp",
+          "About 300 bp",
+          "About 1,700 bp"
+        ],
+        "correct": 0,
+        "explanation": "Halfway on a log scale between 800 and 900 is √(800 × 900) ≈ 849 bp."
+      },
+      "check": {
+        "question": "Which way do DNA fragments move in the gel?",
+        "options": [
+          "Toward the positive electrode (anode)",
+          "Toward the negative electrode (cathode)",
+          "They stay in the well"
+        ],
+        "correct": 0,
+        "explanation": "The phosphate backbone is negatively charged, so DNA moves toward the anode."
+      },
+      "check2": {
+        "question": "Why plot the ladder as log(size) against distance?",
+        "options": [
+          "Distance falls roughly linearly with log(size) over the gel’s range",
+          "Distance is proportional to size",
+          "Small fragments move more slowly"
+        ],
+        "correct": 0,
+        "explanation": "Distance travelled falls roughly linearly as log(size) rises, so a log scale turns the ladder into a straight line to read from."
+      }
+    },
+    {
+      "id": "restriction-digest",
+      "variants": [
+        {
+          "label": "EcoRI",
+          "blocks": [
+            "0",
+            "EcoRI at 300",
+            "850"
+          ],
+          "explanation": "One cut, 300 bp from one end, of a linear 850 bp molecule: two pieces.",
+          "outcome": "300 + 550 bp"
+        },
+        {
+          "label": "BamHI",
+          "blocks": [
+            "0",
+            "no GGATCC",
+            "850"
+          ],
+          "explanation": "The amplicon has no BamHI site, so the enzyme has nothing to cut.",
+          "outcome": "850 bp, uncut"
+        },
+        {
+          "label": "EcoRI + HindIII",
+          "blocks": [
+            "0",
+            "EcoRI at 300",
+            "HindIII at 700",
+            "850"
+          ],
+          "explanation": "Two cuts in a linear molecule give three pieces: 300, 400 and 150 bp.",
+          "outcome": "150 + 300 + 400 bp"
+        },
+        {
+          "label": "EcoRI, short incubation",
+          "blocks": [
+            "0",
+            "EcoRI at 300 (not every molecule cut)",
+            "850"
+          ],
+          "explanation": "Some molecules are still uncut, so an 850 bp band remains beside 550 and 300 bp.",
+          "outcome": "extra uncut band"
+        }
+      ],
+      "exercise": {
+        "question": "EcoRI cuts the 850 bp product once, 300 bp from one end. Which bands do you expect?",
+        "options": [
+          "300 + 550 bp",
+          "425 + 425 bp",
+          "850 bp only"
+        ],
+        "correct": 0,
+        "explanation": "850 − 300 = 550, so the cut leaves 300 and 550 bp pieces."
+      },
+      "check": {
+        "question": "A linear DNA has two sites for an enzyme. How many fragments does a complete digest give?",
+        "options": [
+          "Three",
+          "Two",
+          "Four"
+        ],
+        "correct": 0,
+        "explanation": "n cuts in a linear molecule give n + 1 pieces. A circle with two sites would give two."
+      },
+      "check2": {
+        "question": "After an EcoRI digest you see bands at 850, 550 and 300 bp. What is most likely?",
+        "options": [
+          "The digest was incomplete",
+          "EcoRI has a second site",
+          "The PCR made two products"
+        ],
+        "correct": 0,
+        "explanation": "The 850 bp band is uncut product: some molecules were never cut."
+      }
     }
   ],
   "questions": [
@@ -2236,5 +2547,5 @@
     }
   ],
   "engine_sha256": "4020c786c78ac56e3a9fc7933c57710df241d94505945f7038a7fef9afcac2a5",
-  "sha256": "a5c65a062667b7c024ecef466783eb1a25f69221b3f91c1eb0d497b8d73abf39"
+  "sha256": "e01b8a6f4250804146fda79900ba40099f9dd9ffbd95bd6046bcd0951a25732b"
 }

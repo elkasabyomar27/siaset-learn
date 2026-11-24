@@ -5,7 +5,7 @@
 // entries, are never sent: learner-write deliberately has no import step.
 
 export const MIRROR_PREFIX = 'siaset-learner-mirror-v1:';
-export const CONTRACT_VERSION = 'siaset-v2';
+export const CONTRACT_VERSION = 'siaset-v3';
 export const FUNCTION_NAME = 'learner-write';
 const PER_RUN = 20;
 const MAX_QUEUE = 2000;

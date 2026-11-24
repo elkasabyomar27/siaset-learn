@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {database} from './database.mjs';
+import {allTopics} from '../../frontend/src/features/transposable-elements/curriculum/modules.js';
 
 const teacherA = '0a000000-0000-4000-8000-00000000000a', teacherB = '0b000000-0000-4000-8000-00000000000b';
 const studentA = '0c000000-0000-4000-8000-00000000000c', studentB = '0d000000-0000-4000-8000-00000000000d';
@@ -66,7 +67,9 @@ test('stations column is validated', async () => {
   const {db, assignment} = await setup();
   try {
     const set = list => as(db, teacherA, 'update public.assignments set stations = $1 where id = $2', [list, assignment]);
-    await assert.rejects(set(Array.from({length: 19}, (_, i) => `s${i}`)));
+    await assert.rejects(set(Array.from({length: 65}, (_, i) => `s${i}`)));
+    await set(allTopics.map(t => t.id));
+    assert.equal((await db.query('select cardinality(stations) as n from public.assignments where id = $1', [assignment])).rows[0].n, 22);
     await assert.rejects(set(['Bad_Id']));
     await assert.rejects(set(['tsd', 'tsd']));
     await set(['tsd']);
