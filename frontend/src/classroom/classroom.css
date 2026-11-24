@@ -163,3 +163,9 @@ button.live-option:active{transform:translateY(3px);box-shadow:0 2px 0 #0003}
 .station-assigned a{min-height:44px;display:inline-flex;align-items:center}
 .station-privacy{margin:4px 0 0;font-size:13px;color:var(--color-text-muted)}
 .station-dashboard .class-button,.station-detail .class-link,.station-assigned .class-link{min-height:44px;min-width:44px}
+
+/* Classroom sub-menu: My classes · Live quiz · Teach. */
+.classroom-nav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px;padding:4px;background:var(--color-surface-subtle);border-radius:14px;width:fit-content;max-width:100%}
+.classroom-nav a{min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:10px;color:var(--color-text-secondary);font-weight:600;text-decoration:none}
+.classroom-nav a:hover{color:var(--color-text);background:var(--color-surface)}
+.classroom-nav a[aria-current="page"]{background:var(--color-surface);color:var(--color-text);box-shadow:0 1px 3px rgba(16,40,63,.12)}

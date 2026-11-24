@@ -8,6 +8,7 @@ import {assignedTopics} from './stationResults.js';
 import {useProgress} from '../features/transposable-elements/useProgress.js';
 import {journeyStops} from '../features/transposable-elements/journey.js';
 import {stationStatus, STATUS_LABEL} from '../ui/labData.js';
+import ClassroomNav from './ClassroomNav.jsx';
 import './classroom.css';
 
 const MAX_BYTES = 25 * 1024 * 1024;
@@ -131,6 +132,7 @@ export default function MyClasses() {
   }
   const current = classes?.find(c => c.id === selected);
   return <main className="dashboard classroom-page">
+    <ClassroomNav/>
     <header className="class-heading"><p className="class-eyebrow">SIASET / CLASSROOM</p><h1>My classes</h1><p>Join your teacher’s class, hand in assignments and see your feedback.</p></header>
     <ClassroomGate client={client} user={user} ready={ready}>
       {unavailable ? <p className="class-notice">The classroom isn’t set up on this site yet.</p> : <div className="class-columns">
