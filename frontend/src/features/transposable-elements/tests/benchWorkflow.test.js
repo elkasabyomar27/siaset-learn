@@ -57,7 +57,8 @@ test('PCR outcomes follow the gates', () => {
     assert.equal(run(patch).outcome, outcome, JSON.stringify(patch));
   assert.deepEqual(run({}).gates.map(g => g.state), run({}).gates.map(() => 'open'));
   assert.equal(run({cycles: 40}).gates.find(g => g.id === 'cycles').state, 'restricted');
-  assert.deepEqual(run({anneal: 45}).bands.map(b => [b.bp, b.schematic]), [[1300, true], [850, false], [420, true]]);
+  assert.deepEqual(run({anneal: 45}).bands.map(b => [b.bp, b.schematic]), [[1150, true], [850, false], [420, true]]);
+  for (const b of run({anneal: 45}).bands) assert.ok(bench.migrate(b.bp, '1', 'right') > 0.03, `${b.bp} bp stays clear of the well`);
   assert.deepEqual(run({cycles: 10}).bands, [{bp: 850, intensity: 'faint', schematic: false}]);
   assert.deepEqual(run({primers: 'away'}).bands, []);
   for (const key of ['single', 'none', 'extra', 'weak']) assert.ok(bench.PCR_OUTCOMES[key].label, key);
@@ -206,4 +207,12 @@ test('earlier saved progress still reads; a bench lesson records and completes',
   const p = parseProgress(raw);
   assert.equal(isComplete('introduction', p.introduction), true);
   assert.equal(isComplete('restriction-digest', p['restriction-digest']), true);
+});
+
+test('lesson wording matches the models: cycle 3 is when exact-length copies first appear; distance falls linearly with log(size)', () => {
+  const pcr = lessonById('pcr-amplification').concept;
+  assert.doesNotMatch(pcr, /becomes the main template/);
+  assert.match(pcr, /first appear in the third cycle/);
+  const gel = lessonById('gel-electrophoresis');
+  assert.doesNotMatch(gel.check2.explanation, /inversely proportional/);
 });

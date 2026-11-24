@@ -10,9 +10,9 @@ const LABELS = {ladder: '100 bp ladder', product: 'PCR', ntc: 'No template', eth
 const [LOW, HIGH] = bracket(SAMPLE.ampliconBp);
 const midpoint = Math.round(Math.sqrt(LOW * HIGH));
 
-function evaluate(settings) {
+export function evaluateGel(settings) {
   const gel = runGel(settings, {ethanolLane: settings.ethanol});
-  const sized = gel.outcome === 'resolved' || gel.outcome === 'unseparated';
+  const sized = gel.outcome === 'resolved';
   return {...gel, gelOutcome: gel.outcome, outcome: sized ? `${LOW}-${HIGH}` : 'none'};
 }
 
@@ -28,15 +28,15 @@ export default function GelBench() {
     <h2 id={`${uid}-title`}>Run your PCR product beside a ladder.</h2>
     <SampleHandoff from={{title: 'PCR Amplification', href: '/learn/bench-workflow/pcr-amplification'}} items={[
       {label: 'PCR product', value: `Expected ${SAMPLE.ampliconBp} bp, set by where the primers bind`},
-      {label: 'Ladder', value: '100 bp steps, 100–1,000 bp'},
+      {label: 'Ladder', value: `${SAMPLE.ladder[1] - SAMPLE.ladder[0]} bp steps, ${SAMPLE.ladder[0]}–${SAMPLE.ladder.at(-1).toLocaleString('en-US')} bp`},
     ]} />
     <p className="pb-goal">Pour the gel, set up the electrodes and choose how long to run. Predict where the product will sit against the ladder, then run it.</p>
     <Controls config={CONFIG} settings={step.settings} onChange={patch => act({type: 'set', patch})} />
     <Predict label="The product will sit between the ladder bands at" options={BRACKETS} value={step.prediction} onChange={value => act({type: 'predict', value})} />
-    <div className="pb-actions"><button type="button" className="primary-button" disabled={!step.prediction} onClick={() => act({type: 'reveal', evaluate})}>Run the gel</button></div>
+    <div className="pb-actions"><button type="button" className="primary-button" disabled={!step.prediction} onClick={() => act({type: 'reveal', evaluate: evaluateGel})}>Run the gel</button></div>
     {r && <>
       <Verdict tone={outcome.tone}><b>{outcome.label[0].toUpperCase() + outcome.label.slice(1)}.</b> {outcome.text} {r.outcome === 'none' ? 'There is no band to size.' : r.correct ? '✓ Your bracket was right.' : `✗ The band sits between ${LOW} and ${HIGH} bp.`}</Verdict>
-      <GelImage caption={`${step.settings.agarose}% agarose gel.`} lanes={r.lanes.map(l => ({...l, label: LABELS[l.id]}))} />
+      <GelImage caption={`${step.settings.agarose}% agarose gel.`} polarity={step.settings.polarity} lanes={r.lanes.map(l => ({...l, label: LABELS[l.id]}))} />
     </>}
     {r?.gelOutcome === 'resolved' && <section className="bw-step" aria-labelledby={`${uid}-est`}>
       <h3 id={`${uid}-est`}>Estimate the size</h3>

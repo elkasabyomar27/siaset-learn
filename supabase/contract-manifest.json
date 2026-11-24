@@ -2047,7 +2047,7 @@
           "Small fragments move more slowly"
         ],
         "correct": 0,
-        "explanation": "Distance travelled is inversely proportional to the log of size, so a log scale turns the ladder into a straight line to read from."
+        "explanation": "Distance travelled falls roughly linearly as log(size) rises, so a log scale turns the ladder into a straight line to read from."
       }
     },
     {
@@ -2547,5 +2547,5 @@
     }
   ],
   "engine_sha256": "4020c786c78ac56e3a9fc7933c57710df241d94505945f7038a7fef9afcac2a5",
-  "sha256": "8a204aa145a648d4048c3eab66ba314c0065176f9d003813c43fe7c454983f94"
+  "sha256": "e01b8a6f4250804146fda79900ba40099f9dd9ffbd95bd6046bcd0951a25732b"
 }

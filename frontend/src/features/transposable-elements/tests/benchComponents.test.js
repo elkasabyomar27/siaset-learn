@@ -73,3 +73,22 @@ test('bench styles use tokens only and animate only without reduced motion', () 
   const sci = readFileSync(new URL('../../../scientific.css', import.meta.url), 'utf8');
   for (const v of ['--scientific-gel', '--scientific-band', '--scientific-ladder']) assert.match(sci, new RegExp(v));
 });
+
+test('the gel shows the electrode set-up the learner chose', () => {
+  const lanes = [{id: 'ladder', label: 'Ladder', bands: []}];
+  const reversed = html('GelImage', {caption: 'Gel.', lanes, polarity: 'wells-positive'});
+  assert.match(reversed, /aria-label="Gel\. Wells at the positive electrode; DNA moves away from the wells, out of the gel\./);
+  assert.match(html('GelImage', {caption: 'Gel.', lanes}), /Wells at the negative electrode; DNA runs toward the positive electrode/);
+});
+
+test('hand-off values are computed, and an early-stopped gel cannot be sized', async () => {
+  for (const [file, literal] of [['Thermocycler', '1.83'], ['GelBench', '100–1,000']]) {
+    const src = readFileSync(new URL(`../components/${file}.jsx`, import.meta.url), 'utf8');
+    assert.ok(!src.includes(literal), `${file} types ${literal} instead of computing it`);
+  }
+  const {evaluateGel} = await server.ssrLoadModule('/src/features/transposable-elements/components/GelBench.jsx');
+  assert.equal(evaluateGel({agarose: '1', polarity: 'wells-negative', run: 'short', ethanol: false}).outcome, 'none');
+  assert.equal(evaluateGel({agarose: '1', polarity: 'wells-negative', run: 'right', ethanol: false}).outcome, '800-900');
+  assert.match(html('Thermocycler'), /A260\/A280 1\.83/);
+  assert.match(html('GelBench'), /100–1,000 bp/);
+});

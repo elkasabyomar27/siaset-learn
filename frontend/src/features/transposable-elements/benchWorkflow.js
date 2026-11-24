@@ -95,7 +95,7 @@ export function runPcr(settings) {
   const outcome = gates.some(g => g.state === 'closed') ? 'none' : cycles <= 10 ? 'weak' : anneal <= PRIMER_TM - 10 ? 'extra' : 'single';
   const target = {bp: SAMPLE.ampliconBp, intensity: outcome === 'weak' ? 'faint' : 'strong', schematic: false};
   const bands = outcome === 'none' ? [] : outcome === 'extra'
-    ? [{bp: 1300, intensity: 'faint', schematic: true}, target, {bp: 420, intensity: 'faint', schematic: true}] : [target];
+    ? [{bp: 1150, intensity: 'faint', schematic: true}, target, {bp: 420, intensity: 'faint', schematic: true}] : [target];
   return {gates, outcome, bands};
 }
 

@@ -31,14 +31,15 @@ export default function Thermocycler() {
   const [step, dispatch] = useReducer(benchStep, PCR.defaults, initialStep);
   const [curve, curveDispatch] = useReducer(benchStep, {}, initialStep);
   const r = step.result;
-  const conc = quantify({...SAMPLE.readings, volumeUl: SAMPLE.volumeUl}).concentration;
+  const q = quantify({...SAMPLE.readings, volumeUl: SAMPLE.volumeUl}), conc = q.concentration;
+  const templateNg = conc / SAMPLE.dilution * SAMPLE.templateUl;
   const ladder = SAMPLE.ladder.map(bp => ({bp, pos: migrate(bp, '1', 'right')}));
   return <section className="lesson-section parts-bench" aria-labelledby={`${uid}-title`}>
     <p className="eyebrow">HANDS-ON · THERMOCYCLER</p>
     <h2 id={`${uid}-title`}>Copy one target from your genomic DNA.</h2>
     <SampleHandoff from={{title: 'DNA Quantification', href: '/learn/bench-workflow/dna-quantification'}} items={[
-      {label: 'Your DNA', value: `${conc} ng/µL, A260/A280 1.83`},
-      {label: 'Template', value: `1 µL of a 1:${SAMPLE.dilution} dilution = ${conc / SAMPLE.dilution} ng, about ${fmt(startCopies)} haploid genome copies`},
+      {label: 'Your DNA', value: `${conc} ng/µL, A260/A280 ${q.r280.toFixed(2)}`},
+      {label: 'Template', value: `${SAMPLE.templateUl} µL of a 1:${SAMPLE.dilution} dilution = ${templateNg} ng, about ${fmt(startCopies)} haploid genome copies`},
     ]} />
     <p className="pb-goal">Set up the reaction. Predict what comes out, then run the cycler. The primers are designed to bracket an {SAMPLE.ampliconBp} bp target.</p>
     <Controls config={PCR} settings={step.settings} onChange={patch => dispatch({type: 'set', patch})} />
