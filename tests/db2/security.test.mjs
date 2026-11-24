@@ -2,18 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
-import {validateOperation, contractManifest} from '../../server/validate.js';
+import {validateOperation, contractManifest, CONTRACT_VERSION, digest} from '../../server/validate.js';
+import {lessons} from '../../frontend/src/features/transposable-elements/curriculum/lessons.js';
 import {createWriteHandler} from '../../server/handler.js';
 import {database, commit, asRole, ownerA, ownerB, device} from './database.mjs';
 import {newSandbox, runSandbox} from '../../frontend/src/features/transposable-elements/sandboxSession.js';
 
-const envelope = (overrides = {}) => ({protocol_version: 1, contract_version: 'siaset-v1', op_id: randomUUID(), device_id: device,
+const envelope = (overrides = {}) => ({protocol_version: 1, contract_version: CONTRACT_VERSION, op_id: randomUUID(), device_id: device,
   device_seq: '1', expected_epoch: '0', expected_revision: '0', type: 'lesson', payload: {lessonId: 'introduction', kind: 'inspect', value: 0}, ...overrides});
 
-test('pinned full assessment bank, 15 topics, and 55 index domains match canonical source', async () => {
+test('pinned full assessment bank, 15 topics, and every lesson view across modules match canonical source', async () => {
   assert.deepEqual(contractManifest.questions, JSON.parse(await readFile('frontend/src/features/transposable-elements/tests/assessment-v1.json')));
   assert.equal(contractManifest.topics.length, 15);
-  assert.equal(contractManifest.lessons.reduce((n, l) => n + l.variants.length, 0), 55);
+  assert.deepEqual(contractManifest.lessons.map(l => l.id), lessons.map(l => l.id));
+  assert.equal(contractManifest.lessons.length, 16);
+  assert.equal(contractManifest.lessons.reduce((n, l) => n + l.variants.length, 0), 71);
+  const pinned = JSON.parse(await readFile('supabase/contract-manifest.json', 'utf8'));
+  assert.equal(pinned.version, CONTRACT_VERSION);
+  const row = `'${CONTRACT_VERSION}', '${await digest(contractManifest)}', '${pinned.engine_sha256}'`;
+  assert.ok((await readFile('supabase/seed.sql', 'utf8')).includes(row), 'seed registers the current contract');
+  assert.ok((await readFile('supabase/migrations/20261124120000_contract_v2.sql', 'utf8')).includes(row), 'migration registers the current contract');
 });
 
 test('trusted validation rejects ownership, completion, score, partial submission, wrong stage and tampered events', async () => {

@@ -186,4 +186,4 @@ The three-column station layout (steps | bench | tool tray) is CSS grid over the
 - Streak: lessons store no dates.
 - "Explain it back" note: would need new storage.
 
-**Known pre-existing issue:** `npm run test:db2` fails 6 tests on `HEAD` as well. The server contract pins 55 lesson views, but the curriculum has had 71 since the DNA Extraction module was added. Fixing it means regenerating the backend contract (`npm run build:db2`), which is outside this UI change.
+**Fixed (db2 contract):** the server contract is now `siaset-v2`. It covers all 16 lessons (71 views) and is registered by migration `20261124120000_contract_v2.sql`; `siaset-v1` stays for operations already recorded under it. `npm run test:db2` passes 36/36.

@@ -4,7 +4,9 @@ import {updateProgress} from '../frontend/src/features/transposable-elements/les
 import {validLabEvidence} from '../frontend/src/features/transposable-elements/learnerRecords.js';
 import {questions, scoreAssessment, BANK_VERSION} from '../frontend/src/features/transposable-elements/assessment.js';
 
-export const CONTRACT_VERSION = 'siaset-v1';
+// v2: the lesson list grew to include the DNA Extraction module (16 lessons, 71 views).
+// v1 stays registered in existing databases for the operations already recorded under it.
+export const CONTRACT_VERSION = 'siaset-v2';
 export const MAX_BYTES = 65536;
 const uuid = value => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 const decimal = value => typeof value === 'string' && /^(0|[1-9][0-9]{0,17})$/.test(value);
