@@ -33,12 +33,12 @@ function labResult(topic, state) {
   return {status: saved ? 'done' : 'new', detail: {kind: 'lab', saved, answers: saved ? record.answers : undefined}};
 }
 
-/** One entry per student (sorted by name), each with a result per topic. */
+/** One entry per student (sorted by name), each with a result per topic. Rows carry `ops` arrays. */
 export function buildResults(rows, topics) {
   const byUser = new Map();
   for (const row of rows) {
     const entry = byUser.get(row.user_id) || {userId: row.user_id, name: row.display_name, ops: []};
-    if (row.op) entry.ops.push(row.op);
+    if (Array.isArray(row.ops)) entry.ops.push(...row.ops);
     byUser.set(row.user_id, entry);
   }
   return [...byUser.values()].sort((a, b) => a.name.localeCompare(b.name)).map(({userId, name, ops}) => {

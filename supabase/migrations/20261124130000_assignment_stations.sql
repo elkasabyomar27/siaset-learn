@@ -26,21 +26,24 @@ language sql immutable set search_path = '' as $$
   from unnest(s) as x
 $$;
 
+-- One row per class member, with that member's matching entries as a JSON array. Returning one
+-- row per entry would be silently cut by the API's max_rows limit at ordinary class sizes.
 create function public.assignment_station_progress(p_assignment uuid)
-returns table (user_id uuid, display_name text, op jsonb)
+returns table (user_id uuid, display_name text, ops jsonb)
 language sql stable security definer set search_path = '' as $$
   with a as (
     select id, class_id, stations, public.station_lab_scenarios(stations) as labs
     from public.assignments
     where id = p_assignment and public.teaches_class(class_id)
   )
-  select m.user_id, m.display_name, p.op
+  select m.user_id, m.display_name, coalesce(jsonb_agg(p.op) filter (where p.op is not null), '[]'::jsonb)
   from a
   join public.class_members m on m.class_id = a.class_id
   left join public.progress_ops p on p.user_id = m.user_id and (
     (p.op->>'type' in ('lesson', 'resetLesson') and p.op->>'lessonId' = any(a.stations))
     or (p.op->>'type' = 'lab' and p.op->'record'->>'scenario' = any(a.labs))
   )
+  group by m.user_id, m.display_name
 $$;
 
 revoke all on function public.assignment_station_progress(uuid) from public, anon;

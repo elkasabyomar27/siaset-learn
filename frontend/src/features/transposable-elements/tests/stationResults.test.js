@@ -9,7 +9,7 @@ import {newSandbox, runSandbox} from '../sandboxSession.js';
 
 let clock = 0;
 const op = body => ({version: 1, id: `op-${++clock}`, clock, ...body});
-const row = (user, name, entry) => ({user_id: user, display_name: name, op: entry});
+const row = (user, name, entry) => ({user_id: user, display_name: name, ops: entry ? [entry] : []});
 function completeLessonOps(lessonId) {
   const lesson = lessonById(lessonId), ops = lesson.variants.map((_, i) => op({type: 'lesson', lessonId, kind: 'inspect', value: i}));
   for (const kind of ['exercise', 'check', 'check2']) if (lesson[kind]) ops.push(op({type: 'lesson', lessonId, kind, value: lesson[kind].correct}));

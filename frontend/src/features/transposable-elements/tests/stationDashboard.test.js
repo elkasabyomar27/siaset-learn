@@ -24,8 +24,8 @@ function view(load, rows = [], submissions = []) {
   return html(createElement(dashboard.StationDashboardView, {load, topics, results: built, totals: results.stationTotals(built, topics), submissions, joinCode: 'ABC234', onRefresh() {}}));
 }
 const fixture = [
-  {user_id: 'u1', display_name: 'Amira', op: inspect('o1', 'tsd', 0)},
-  {user_id: 'u2', display_name: 'Ben', op: null},
+  {user_id: 'u1', display_name: 'Amira', ops: [inspect('o1', 'tsd', 0)]},
+  {user_id: 'u2', display_name: 'Ben', ops: []},
 ];
 
 test('picker lists every station by field and module with selected chips', () => {
