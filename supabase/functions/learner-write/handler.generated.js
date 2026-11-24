@@ -101,6 +101,81 @@ var extraction = [
   }
 ];
 
+// frontend/src/features/transposable-elements/curriculum/benchWorkflow.js
+var q4 = (question2, options, correct, explanation) => ({ question: question2, options, correct, explanation });
+var v4 = (label, blocks, explanation, outcome) => ({ label, blocks, explanation, outcome });
+var benchWorkflow = [
+  {
+    id: "dna-quantification",
+    objectives: ["Calculate DNA concentration and yield from A260.", "Read A260/A280 and A260/A230 as purity checks.", "Predict what a ratio outside the usual range suggests, and what it cannot tell you."],
+    terms: ["A260", "50 ng/\xB5L per A260 unit", "yield", "A260/A280", "A260/A230", "path length", "contaminant"],
+    references: ["qiagen-spectro", "desjardins2010"],
+    concept: "Nucleic acids absorb ultraviolet light most strongly at 260 nm, and absorbance rises in proportion to concentration. For double-stranded DNA at neutral pH and a 1 cm (10 mm) path, an A260 of 1.0 corresponds to about 50 ng/\xB5L, so concentration = A260 \xD7 50 ng/\xB5L, and yield = concentration \xD7 volume. Ratios give a quick purity check. Pure DNA reads an A260/A280 of about 1.8; protein absorbs near 280 nm and pulls the ratio down, while RNA reads about 2.0 and pushes it up. Absorbance cannot tell DNA from RNA, so RNA also inflates the apparent DNA concentration. A260/A230 is usually about 1.8\u20132.2 for pure nucleic acid; a much lower value means something absorbing near 230 nm came along. A ratio flags a problem; it does not identify the contaminant.",
+    variants: [
+      v4("Your DNA from the wash", ["A260 0.75", "A280 0.41", "A230 0.38", "260/280 = 1.83 \xB7 260/230 = 1.97"], "Both ratios are in the usual range for pure DNA: 37.5 ng/\xB5L, about 1.9 \xB5g in 50 \xB5L.", "pure DNA"),
+      v4("Protein carried over", ["A260 0.75", "A280 0.47", "260/280 = 1.60"], "Extra absorbance near 280 nm pulls A260/A280 well below about 1.8. Protein is the usual cause.", "protein contamination"),
+      v4("RNase skipped", ["A260 0.90", "A280 0.44", "260/280 = 2.05"], "Without RNase A, RNA precipitates with the DNA. RNA reads near 2.0 and also adds to A260.", "RNA contamination"),
+      v4("Carryover from the prep", ["A260 0.75", "A230 0.60", "260/230 = 1.25"], "Something absorbing near 230 nm came along with the DNA. The ratio flags it but does not say what it is.", "low A260/A230 contaminant")
+    ],
+    exercise: q4("Your DNA reads A260 = 0.75 (10 mm path). What is its concentration?", ["37.5 ng/\xB5L", "15 ng/\xB5L", "75 ng/\xB5L"], 0, "For double-stranded DNA an A260 of 1.0 is about 50 ng/\xB5L, so 0.75 \xD7 50 = 37.5 ng/\xB5L."),
+    check: q4("A sample\u2019s A260/A280 is 1.60. What is the most likely explanation?", ["RNA contamination", "Protein contamination", "Pure DNA"], 1, "Protein absorbs near 280 nm and pulls the ratio below about 1.8. The ratio flags a problem; it does not prove what the contaminant is."),
+    check2: q4("RNase A was skipped and A260/A280 reads 2.05. What else is wrong with this reading?", ["The A260 concentration overestimates the DNA", "The DNA is degraded", "The ratio proves the sample is pure"], 0, "RNA also absorbs at 260 nm, so it inflates the concentration calculated from A260."),
+    limitations: "Absorbance cannot tell DNA from RNA or free nucleotides. A260/A280 is insensitive to small amounts of protein. Ratios depend on the instrument, blank, pH and concentration, and are unreliable at very low A260; fluorescent dye assays measure dsDNA more specifically. The flag cut-offs used here (A260/A280 below 1.7 or at least 1.95; A260/A230 below 1.8) are teaching values, not instrument specifications."
+  },
+  {
+    id: "pcr-amplification",
+    objectives: ["Explain why each PCR cycle roughly doubles the target.", "Predict how primer orientation, annealing temperature, polymerase and cycle number change the product.", "Convert template mass into a starting copy number."],
+    terms: ["primer", "template", "denaturation", "annealing", "extension", "Taq polymerase", "melting temperature (Tm)", "amplicon", "plateau"],
+    references: ["saiki1988", "sigma-pcr", "duewer2018"],
+    concept: "The polymerase chain reaction copies the stretch of DNA between two primers. Each cycle has three steps: heat to separate the strands (denaturation), cool so the primers bind their sites (annealing, typically about 5 \xB0C below the primers\u2019 melting temperature), then let a heat-stable polymerase such as Taq extend them at 72 \xB0C. The primers point toward each other on opposite strands, so every new strand carries the other primer\u2019s site and becomes a template in the next cycle: in an ideal cycle the target doubles. The first cycles make strands of variable length; from the third cycle the amplicon-only product becomes the main template, so after n ideal cycles one template gives about 2\u207F copies. Here 3.75 ng of human genomic DNA, at about 3.3 pg per haploid genome, is about 1,100 starting copies. Real reactions fall short of perfect doubling and eventually level off in a plateau phase.",
+    variants: [
+      v4("Standard set-up", ["primers facing", "anneal 55 \xB0C", "Taq", "30 cycles"], "Both primers bind their own sites and every product is a new template: one band of the expected size.", "single product"),
+      v4("Primers pointing away", ["\u2190 forward", "target", "reverse \u2192"], "Primers that point away from each other never define a region between them, so nothing is amplified.", "no product"),
+      v4("Annealing at 72 \xB0C", ["primer Tm \u2248 60 \xB0C", "anneal 72 \xB0C"], "Well above their melting temperature, the primers barely stay bound, so little or nothing is copied.", "no product"),
+      v4("Annealing at 45 \xB0C", ["primer Tm \u2248 60 \xB0C", "anneal 45 \xB0C"], "Far below the melting temperature, primers also bind partly matching sites and make extra products.", "extra bands"),
+      v4("Only 10 cycles", ["primers facing", "anneal 55 \xB0C", "10 cycles"], "The right product, but 2\xB9\u2070 is only about a thousand-fold: too little to see clearly.", "weak product")
+    ],
+    exercise: q4("Starting from about 1,100 template copies, roughly how many copies do 10 ideal cycles give?", ["About 11,000", "About 1.1 million", "About 110,000"], 1, "2\xB9\u2070 = 1,024, and 1,100 \xD7 1,024 \u2248 1.1 million."),
+    check: q4("Why does the target roughly double every cycle?", ["Each strand of every duplex is a template for a new strand", "The polymerase copies each strand twice", "Primers copy themselves"], 0, "After denaturation both strands are templates, and each new strand carries the other primer\u2019s site."),
+    check2: q4("You anneal far above the primers\u2019 melting temperature. Predict the result.", ["Little or no product", "Extra non-specific bands", "A longer product"], 0, "Above their Tm the primers do not stay bound long enough to be extended."),
+    limitations: "An idealized model. Real efficiency is below 100% and falls in late cycles; the plateau curve shown is schematic, not calculated, and the cycle where it sets in varies. Annealing outcomes are qualitative categories around a stated primer Tm of about 60 \xB0C. Primer-dimers, mispriming details, extension time, polymerase fidelity and hot-start chemistry are not modelled. The genome-copy conversion assumes about 3.3 pg per haploid human genome."
+  },
+  {
+    id: "gel-electrophoresis",
+    objectives: ["Explain why DNA moves through an agarose gel and which way it goes.", "Estimate a fragment\u2019s size against a ladder using a log scale.", "Predict the effect of reversed electrodes, an early stop or ethanol in the sample."],
+    terms: ["agarose", "anode", "cathode", "DNA ladder", "log-linear migration", "well", "loading dye"],
+    references: ["lee2012", "green-ethanol"],
+    concept: "DNA\u2019s phosphate backbone is negatively charged, so in an electric field it moves toward the positive electrode (the anode); the wells sit at the negative end. DNA has a uniform charge per unit mass, so the agarose mesh sorts molecules by size: shorter fragments slip through faster. Over a gel\u2019s working range the distance travelled falls roughly linearly with the logarithm of size. A ladder of known sizes run in the next lane lets you read an unknown band: find the ladder bands either side, then interpolate on the log scale. Higher-percentage gels have smaller pores and spread small fragments; lower-percentage gels suit larger ones. Your PCR product should run as one band between the 800 and 900 bp ladder bands.",
+    variants: [
+      v4("1% gel, wells at \u2212", ["wells at \u2212 (black)", "DNA \u2192 +", "100 bp ladder", "PCR product"], "DNA moves toward the anode and separates by size; the product sits between 800 and 900 bp.", "band resolved"),
+      v4("Electrodes reversed", ["wells at + (red)", "DNA \u2192 \u2212 ?"], "DNA still moves toward the positive electrode, which is now behind the wells, so it leaves the gel into the buffer.", "DNA runs out of the gel"),
+      v4("Ethanol left in the sample", ["pellet not dried", "sample + loading dye", "load the well"], "Residual ethanol makes the sample less dense than the loading mixture, so it floats up out of the well.", "sample floats out"),
+      v4("Run stopped early", ["wells at \u2212", "run 5 min", "stop"], "The fragments have barely entered the gel, so neighbouring sizes have not separated yet.", "bands not separated")
+    ],
+    exercise: q4("The band sits between the 800 and 900 bp ladder bands, about halfway on the log scale. What is the best estimate?", ["About 850 bp", "About 300 bp", "About 1,700 bp"], 0, "Halfway on a log scale between 800 and 900 is \u221A(800 \xD7 900) \u2248 849 bp."),
+    check: q4("Which way do DNA fragments move in the gel?", ["Toward the positive electrode (anode)", "Toward the negative electrode (cathode)", "They stay in the well"], 0, "The phosphate backbone is negatively charged, so DNA moves toward the anode."),
+    check2: q4("Why plot the ladder as log(size) against distance?", ["Distance falls roughly linearly with log(size) over the gel\u2019s range", "Distance is proportional to size", "Small fragments move more slowly"], 0, "Distance travelled is inversely proportional to the log of size, so a log scale turns the ladder into a straight line to read from."),
+    limitations: "Band positions come from a schematic log-linear model, not from a specific gel, buffer, voltage or stain. Sizes read from a gel are estimates. Supercoiled, nicked and linear DNA of the same length migrate differently. Very large fragments leave the log-linear range. The agarose effect is shown as a qualitative trend; real resolution ranges depend on the agarose type and running conditions."
+  },
+  {
+    id: "restriction-digest",
+    objectives: ["Predict fragment sizes from known restriction sites.", "Count fragments for linear and circular DNA.", "Recognize an incomplete digest on a gel."],
+    terms: ["restriction enzyme", "recognition site", "palindrome", "sticky end", "5\u2032 overhang", "EcoRI", "HindIII", "BamHI", "partial digest"],
+    references: ["neb-ecori", "neb-hindiii", "neb-bamhi", "lee2012"],
+    concept: "A restriction enzyme cuts DNA wherever its recognition sequence occurs. EcoRI recognizes GAATTC and cuts between the G and the first A on both strands (G^AATTC), leaving four-base 5\u2032 AATT overhangs; HindIII cuts A^AGCTT and BamHI cuts G^GATCC. If you know where the sites are, you can predict the fragments by subtracting positions. Cutting a linear molecule at n sites gives n + 1 pieces; cutting a circle gives n. In this station your gel-checked 850 bp product has one EcoRI site at 300 bp and one HindIII site at 700 bp, and no BamHI site. Comparing the digest lane with an uncut lane and the ladder checks the prediction. If the enzyme had too little time, some molecules stay uncut or cut once, and extra bands appear.",
+    variants: [
+      v4("EcoRI", ["0", "EcoRI at 300", "850"], "One cut, 300 bp from one end, of a linear 850 bp molecule: two pieces.", "300 + 550 bp"),
+      v4("BamHI", ["0", "no GGATCC", "850"], "The amplicon has no BamHI site, so the enzyme has nothing to cut.", "850 bp, uncut"),
+      v4("EcoRI + HindIII", ["0", "EcoRI at 300", "HindIII at 700", "850"], "Two cuts in a linear molecule give three pieces: 300, 400 and 150 bp.", "150 + 300 + 400 bp"),
+      v4("EcoRI, short incubation", ["0", "EcoRI at 300 (not every molecule cut)", "850"], "Some molecules are still uncut, so an 850 bp band remains beside 550 and 300 bp.", "extra uncut band")
+    ],
+    exercise: q4("EcoRI cuts the 850 bp product once, 300 bp from one end. Which bands do you expect?", ["300 + 550 bp", "425 + 425 bp", "850 bp only"], 0, "850 \u2212 300 = 550, so the cut leaves 300 and 550 bp pieces."),
+    check: q4("A linear DNA has two sites for an enzyme. How many fragments does a complete digest give?", ["Three", "Two", "Four"], 0, "n cuts in a linear molecule give n + 1 pieces. A circle with two sites would give two."),
+    check2: q4("After an EcoRI digest you see bands at 850, 550 and 300 bp. What is most likely?", ["The digest was incomplete", "EcoRI has a second site", "The PCR made two products"], 0, "The 850 bp band is uncut product: some molecules were never cut."),
+    limitations: "The 850 bp product and its site map are a schematic teaching amplicon, not a real human locus or sequence. Sizes use the top-strand cut position and ignore overhang bases. Star activity, methylation sensitivity, buffer compatibility and end effects (a site very close to a PCR product\u2019s end may cut poorly) are not modelled. The partial digest shows which products are possible, not their amounts."
+  }
+];
+
 // frontend/src/features/transposable-elements/curriculum/topics.json
 var topics_default = [
   {
@@ -855,6 +930,177 @@ var extractionTopics_default = [
   }
 ];
 
+// frontend/src/features/transposable-elements/curriculum/benchWorkflowTopics.json
+var benchWorkflowTopics_default = [
+  {
+    id: "dna-quantification",
+    order: 19,
+    title: "DNA Quantification",
+    learningObjectives: [
+      "Calculate DNA concentration and yield from A260.",
+      "Read A260/A280 and A260/A230 as purity checks.",
+      "Predict what a ratio outside the usual range suggests, and what it cannot tell you."
+    ],
+    essentialTerminology: [
+      "A260",
+      "50 ng/\xB5L per A260 unit",
+      "yield",
+      "A260/A280",
+      "A260/A230",
+      "path length",
+      "contaminant"
+    ],
+    mechanismProfiles: [],
+    plannedActivities: [
+      "Predict the verdict for each sample card, then read its ratios",
+      "Calculate the concentration and yield of your DNA"
+    ],
+    assessmentObjectives: [
+      "Your DNA reads A260 = 0.75 (10 mm path). What is its concentration?",
+      "A sample\u2019s A260/A280 is 1.60. What is the most likely explanation?"
+    ],
+    references: [
+      "qiagen-spectro",
+      "desjardins2010"
+    ],
+    status: "implemented",
+    lessonId: "dna-quantification",
+    learning: {
+      kind: "lesson"
+    },
+    assessment: {
+      includeEvidence: true
+    }
+  },
+  {
+    id: "pcr-amplification",
+    order: 20,
+    title: "PCR Amplification",
+    learningObjectives: [
+      "Explain why each PCR cycle roughly doubles the target.",
+      "Predict how primer orientation, annealing temperature, polymerase and cycle number change the product.",
+      "Convert template mass into a starting copy number."
+    ],
+    essentialTerminology: [
+      "primer",
+      "template",
+      "denaturation",
+      "annealing",
+      "extension",
+      "Taq polymerase",
+      "melting temperature (Tm)",
+      "amplicon",
+      "plateau"
+    ],
+    mechanismProfiles: [],
+    plannedActivities: [
+      "Set up the thermocycler and predict the product",
+      "Follow the copy count cycle by cycle"
+    ],
+    assessmentObjectives: [
+      "Starting from about 1,100 template copies, roughly how many copies do 10 ideal cycles give?",
+      "Why does the target roughly double every cycle?"
+    ],
+    references: [
+      "saiki1988",
+      "sigma-pcr",
+      "duewer2018"
+    ],
+    status: "implemented",
+    lessonId: "pcr-amplification",
+    learning: {
+      kind: "lesson"
+    },
+    assessment: {
+      includeEvidence: true
+    }
+  },
+  {
+    id: "gel-electrophoresis",
+    order: 21,
+    title: "Gel Electrophoresis",
+    learningObjectives: [
+      "Explain why DNA moves through an agarose gel and which way it goes.",
+      "Estimate a fragment\u2019s size against a ladder using a log scale.",
+      "Predict the effect of reversed electrodes, an early stop or ethanol in the sample."
+    ],
+    essentialTerminology: [
+      "agarose",
+      "anode",
+      "cathode",
+      "DNA ladder",
+      "log-linear migration",
+      "well",
+      "loading dye"
+    ],
+    mechanismProfiles: [],
+    plannedActivities: [
+      "Run the PCR product beside a ladder",
+      "Estimate the band size on a log scale"
+    ],
+    assessmentObjectives: [
+      "The band sits between the 800 and 900 bp ladder bands, about halfway on the log scale. What is the best estimate?",
+      "Which way do DNA fragments move in the gel?"
+    ],
+    references: [
+      "lee2012",
+      "green-ethanol"
+    ],
+    status: "implemented",
+    lessonId: "gel-electrophoresis",
+    learning: {
+      kind: "lesson"
+    },
+    assessment: {
+      includeEvidence: true
+    }
+  },
+  {
+    id: "restriction-digest",
+    order: 22,
+    title: "Restriction Digest",
+    learningObjectives: [
+      "Predict fragment sizes from known restriction sites.",
+      "Count fragments for linear and circular DNA.",
+      "Recognize an incomplete digest on a gel."
+    ],
+    essentialTerminology: [
+      "restriction enzyme",
+      "recognition site",
+      "palindrome",
+      "sticky end",
+      "5\u2032 overhang",
+      "EcoRI",
+      "HindIII",
+      "BamHI",
+      "partial digest"
+    ],
+    mechanismProfiles: [],
+    plannedActivities: [
+      "Choose enzymes and predict the fragments",
+      "Check the prediction on a gel beside the uncut product"
+    ],
+    assessmentObjectives: [
+      "EcoRI cuts the 850 bp product once, 300 bp from one end. Which bands do you expect?",
+      "A linear DNA has two sites for an enzyme. How many fragments does a complete digest give?"
+    ],
+    references: [
+      "neb-ecori",
+      "neb-hindiii",
+      "neb-bamhi",
+      "lee2012"
+    ],
+    status: "implemented",
+    lessonId: "restriction-digest",
+    learning: {
+      kind: "lesson"
+    },
+    assessment: {
+      includeEvidence: true
+    }
+  }
+];
+
 // frontend/src/features/transposable-elements/curriculum/modules.js
 var modules = [
   {
@@ -881,6 +1127,18 @@ var modules = [
     topics: extractionTopics_default,
     chapters: [
       { id: "isolate", title: "From cell to clean DNA", question: "How do we release DNA, bring it out of solution, and remove what came with it?", topics: ["extraction-principles", "isopropanol-precipitation", "ethanol-wash"] }
+    ]
+  },
+  {
+    id: "bench-workflow",
+    field: "molecular-biology",
+    title: "Bench Workflow",
+    summary: "Measure your DNA, copy a target with PCR, size it on a gel and cut it with restriction enzymes.",
+    basePath: "/learn/bench-workflow",
+    topics: benchWorkflowTopics_default,
+    chapters: [
+      { id: "measure-amplify", title: "Measure and amplify", question: "How much DNA do we have, how clean is it, and how do we copy one target from it?", topics: ["dna-quantification", "pcr-amplification"] },
+      { id: "analyze-product", title: "Analyze the product", question: "Is the product the size we expect, and does it cut where its sites say it should?", topics: ["gel-electrophoresis", "restriction-digest"] }
     ]
   }
 ];
@@ -970,7 +1228,7 @@ var lessons = [
     limitations: "Classical symbolic architectures only. Neither flanking module is assumed equally functional. Tn9 is an anatomy example, not an implemented conservative or replicative simulation."
   }
 ];
-lessons.push(...phase5, phase6, ...extraction);
+lessons.push(...phase5, phase6, ...extraction, ...benchWorkflow);
 var lessonById = (id) => lessons.find((l) => l.id === id);
 
 // frontend/src/features/transposable-elements/lessonProgress.js
@@ -1373,10 +1631,10 @@ var allQuestions = [...questions, ...Object.values(moduleBanks).flat()];
 function scoreAssessment(answers) {
   if (!answers || typeof answers !== "object" || Array.isArray(answers)) throw new Error("Answer map required");
   for (const [id, value] of Object.entries(answers)) {
-    const q4 = questions.find((q5) => q5.id === id);
-    if (!q4 || !Number.isInteger(value) || value < 0 || value >= q4.options.length) throw new Error("Invalid assessment answer");
+    const q5 = questions.find((q6) => q6.id === id);
+    if (!q5 || !Number.isInteger(value) || value < 0 || value >= q5.options.length) throw new Error("Invalid assessment answer");
   }
-  const items = questions.map((q4) => ({ id: q4.id, topicId: q4.topicId, correct: answers[q4.id] === q4.correct, answered: Object.hasOwn(answers, q4.id) }));
+  const items = questions.map((q5) => ({ id: q5.id, topicId: q5.topicId, correct: answers[q5.id] === q5.correct, answered: Object.hasOwn(answers, q5.id) }));
   return { correct: items.filter((i) => i.correct).length, total: items.length, answered: items.filter((i) => i.answered).length, items, topics: order.map((topicId) => ({ topicId, correct: items.filter((i) => i.topicId === topicId && i.correct).length, total: items.filter((i) => i.topicId === topicId).length })) };
 }
 
@@ -1394,7 +1652,7 @@ function validLabEvidence(record) {
 }
 
 // server/validate.js
-var CONTRACT_VERSION = "siaset-v2";
+var CONTRACT_VERSION = "siaset-v3";
 var MAX_BYTES = 65536;
 var uuid = (value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 var decimal = (value) => typeof value === "string" && /^(0|[1-9][0-9]{0,17})$/.test(value);
