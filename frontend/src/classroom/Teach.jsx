@@ -4,6 +4,7 @@ import {useAuth} from '../auth/AuthProvider.jsx';
 import {teacherRequest, useTeacherStatus} from './api.js';
 import TeacherClasses from './TeacherClasses.jsx';
 import TeacherQuizzes from './TeacherQuizzes.jsx';
+import ClassroomNav from './ClassroomNav.jsx';
 import './classroom.css';
 
 export function ClassroomGate({client, user, ready, children}) {
@@ -44,6 +45,7 @@ export default function Teach() {
   const teacher = useTeacherStatus(client, user);
   const [tab, setTab] = useState('classes');
   return <main className="dashboard classroom-page">
+    <ClassroomNav/>
     <header className="class-heading"><p className="class-eyebrow">SIASET / CLASSROOM</p><h1>Teach</h1><p>Run your classes, collect assignments and host live quizzes.</p></header>
     <ClassroomGate client={client} user={user} ready={ready}>
       {teacher.status === 'loading' ? <p role="status">Loading…</p>

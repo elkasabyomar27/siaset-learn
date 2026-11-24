@@ -5,6 +5,7 @@ import {profileDetails} from '../auth/profile.js';
 import {friendlyError, OPTION_STYLES, useCountdown, useLive} from './api.js';
 import {ClassroomGate} from './Teach.jsx';
 import {Leaderboard} from './QuizHost.jsx';
+import ClassroomNav from './ClassroomNav.jsx';
 import './classroom.css';
 
 function JoinGame({client, user}) {
@@ -79,6 +80,7 @@ export default function QuizPlay() {
   const {client, user, ready} = useAuth();
   const {sessionId} = useParams();
   return <main className="classroom-page live-page">
+    <ClassroomNav/>
     <ClassroomGate client={client} user={user} ready={ready}>{sessionId ? <PlayScreen key={sessionId} client={client} user={user} sessionId={sessionId}/> : <JoinGame client={client} user={user}/>}</ClassroomGate>
   </main>;
 }
