@@ -1,7 +1,7 @@
 import { useId, useReducer } from 'react';
 import { SAMPLE, ENZYMES, SIZE_CHOICES, digest, cutsFor, fragmentsMatch, migrate } from '../benchWorkflow.js';
 import { benchStep, initialStep } from '../benchStep.js';
-import { SampleHandoff, Predict, Verdict, PracticeNote } from './BenchParts.jsx';
+import { SampleHandoff, Predict, Verdict, LiveRegion, PracticeNote } from './BenchParts.jsx';
 import GelImage from './GelImage.jsx';
 
 const DEFAULTS = {enzymes: ['EcoRI'], partial: false};
@@ -40,11 +40,11 @@ export default function DigestBench() {
       {SIZE_CHOICES.map(bp => <button type="button" key={bp} className="outline-button" aria-pressed={picked.includes(bp)} onClick={() => toggleSize(bp)}>{bp} bp</button>)}
     </div>
     <div className="pb-actions"><button type="button" className="primary-button" disabled={!picked.length} onClick={() => dispatch({type: 'reveal', evaluate, judge})}>Digest and run</button></div>
-    {r && <>
-      <Verdict tone={r.correct ? 'good' : 'bad'}>
+    <LiveRegion>{r && <Verdict tone={r.correct ? 'good' : 'bad'}>
         <b>{r.correct ? '✓ Your prediction holds.' : '✗ Not quite.'}</b> A complete digest with {settings.enzymes.length ? settings.enzymes.join(' + ') : 'no enzyme'} gives {r.full.join(' + ')} bp.
         {settings.partial && r.fragments.length > r.full.length && <> With a short incubation some molecules are uncut or cut once, so you also see {r.fragments.filter(f => !r.full.includes(f)).join(', ')} bp.</>}
-      </Verdict>
+      </Verdict>}</LiveRegion>
+      {r && <>
       <GelImage caption="1% agarose gel." lanes={[{id: 'ladder', label: 'Ladder', bands: place(SAMPLE.ladder)}, {id: 'uncut', label: 'Uncut', bands: place([L])}, {id: 'digest', label: 'Digest', bands: place(r.fragments).map(b => ({...b, intensity: r.full.includes(b.bp) ? 'strong' : 'faint'}))}]} />
     </>}
     <section className="bw-step" aria-labelledby={`${uid}-rule`}>
@@ -52,7 +52,7 @@ export default function DigestBench() {
       <p>Cutting a <b>linear</b> molecule at n sites gives n + 1 pieces. Cutting a <b>circle</b> at n sites gives n pieces.</p>
       <Predict label="A 3,000 bp circular plasmid has one EcoRI site. What does a complete EcoRI digest give?" options={CIRCLE} value={circle.prediction} onChange={value => circleDispatch({type: 'predict', value})} />
       <div className="pb-actions"><button type="button" className="primary-button" disabled={!circle.prediction} onClick={() => circleDispatch({type: 'reveal', evaluate: () => ({outcome: 'one'})})}>Reveal</button></div>
-      {circle.result && <Verdict tone={circle.result.correct ? 'good' : 'bad'}><b>{circle.result.correct ? '✓ Right.' : '✗ Not quite.'}</b> One cut opens the circle into a single linear {digest(3000, [100], {topology: 'circular'})[0].toLocaleString('en-US')} bp piece.</Verdict>}
+      <LiveRegion>{circle.result && <Verdict tone={circle.result.correct ? 'good' : 'bad'}><b>{circle.result.correct ? '✓ Right.' : '✗ Not quite.'}</b> One cut opens the circle into a single linear {digest(3000, [100], {topology: 'circular'})[0].toLocaleString('en-US')} bp piece.</Verdict>}</LiveRegion>
     </section>
     <div className="pb-actions"><button type="button" className="outline-button" onClick={() => dispatch({type: 'reset', settings: DEFAULTS})}>Reset the digest</button></div>
     <PracticeNote>The amplicon and its sites are a schematic teaching example.</PracticeNote>

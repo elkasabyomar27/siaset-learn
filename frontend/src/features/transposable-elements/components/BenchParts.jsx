@@ -39,8 +39,11 @@ export function Gates({gates}) {
   </ol>;
 }
 
+/** Stays mounted so screen readers are already watching it when a verdict appears inside. */
+export const LiveRegion = ({children}) => <div role="status" aria-live="polite">{children}</div>;
+
 export function Verdict({tone, children}) {
-  return <div className={`pb-verdict${tone === 'good' ? ' is-good' : tone === 'bad' ? ' is-bad' : ''}`} role="status" aria-live="polite">{children}</div>;
+  return <div className={`pb-verdict${tone === 'good' ? ' is-good' : tone === 'bad' ? ' is-bad' : ''}`}>{children}</div>;
 }
 
 export const PracticeNote = ({children}) => <p className="quiet">Practice only; it doesn’t change lesson completion.{children ? <> {children}</> : null}</p>;

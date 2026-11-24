@@ -24,7 +24,7 @@ export default function GelImage({lanes, caption, polarity = 'wells-negative'}) 
         return <g key={lane.id}>
           <text x={x + LANE / 2 - 4} y="14" fontSize="9" textAnchor="middle" fill="var(--scientific-ladder)">{lane.label}</text>
           <rect x={x + 6} y={TOP - 10} width={LANE - 20} height="7" rx="1.5" fill="none" stroke="var(--scientific-ladder)" />
-          {lane.floats && <text x={x + LANE / 2 - 4} y={TOP - 14} fontSize="9" textAnchor="middle" fill="var(--scientific-band)">↑ floated</text>}
+          {lane.floats && <text x={x + LANE / 2 - 4} y={TOP + 14} fontSize="9" textAnchor="middle" fill="var(--scientific-band)">↑ floated</text>}
           {lane.bands.filter(b => b.pos <= 1).map(b => <rect key={b.bp} className={`gel-band${b.intensity === 'faint' ? ' is-faint' : ''}`} x={x + 6} y={TOP + b.pos * LENGTH} width={LANE - 20} height="4" rx="1.5" fill={lane.id === 'ladder' ? 'var(--scientific-ladder)' : 'var(--scientific-band)'}><title>{b.schematic ? 'extra band' : `${b.bp} bp`}</title></rect>)}
         </g>;
       })}

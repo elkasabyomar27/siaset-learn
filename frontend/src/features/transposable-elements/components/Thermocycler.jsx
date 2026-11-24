@@ -1,7 +1,7 @@
 import { useId, useReducer } from 'react';
 import { SAMPLE, PCR, PCR_OUTCOMES, runPcr, pcrTable, idealCopies, templateCopies, quantify, migrate } from '../benchWorkflow.js';
 import { benchStep, initialStep } from '../benchStep.js';
-import { SampleHandoff, Controls, Predict, Gates, Verdict, PracticeNote } from './BenchParts.jsx';
+import { SampleHandoff, Controls, Predict, Gates, Verdict, LiveRegion, PracticeNote } from './BenchParts.jsx';
 import GelImage from './GelImage.jsx';
 
 const OUTCOME_OPTIONS = Object.entries(PCR_OUTCOMES).map(([k, v]) => [k, v.label]);
@@ -45,8 +45,8 @@ export default function Thermocycler() {
     <Controls config={PCR} settings={step.settings} onChange={patch => dispatch({type: 'set', patch})} />
     <Predict label="Predict the product" options={OUTCOME_OPTIONS} value={step.prediction} onChange={value => dispatch({type: 'predict', value})} />
     <div className="pb-actions"><button type="button" className="primary-button" disabled={!step.prediction} onClick={() => dispatch({type: 'reveal', evaluate: runPcr})}>Run the cycler</button></div>
-    {r && <>
-      <Verdict tone={PCR_OUTCOMES[r.outcome].tone}><b>{r.correct ? '✓ Your prediction holds: ' : '✗ Not quite: '}{PCR_OUTCOMES[r.outcome].label}.</b> {PCR_OUTCOMES[r.outcome].text}</Verdict>
+    <LiveRegion>{r && <Verdict tone={PCR_OUTCOMES[r.outcome].tone}><b>{r.correct ? '✓ Your prediction holds: ' : '✗ Not quite: '}{PCR_OUTCOMES[r.outcome].label}.</b> {PCR_OUTCOMES[r.outcome].text}</Verdict>}</LiveRegion>
+      {r && <>
       <figure className="pb-stage"><div className="pb-stage-head"><span>REQUIREMENTS</span><span>{r.gates.filter(g => g.state === 'open').length} / {r.gates.length} met</span></div><Gates gates={r.gates} /></figure>
       <GelImage caption="Quick check of the reaction on a 1% gel." lanes={[{id: 'ladder', label: 'Ladder', bands: ladder}, {id: 'product', label: 'PCR', bands: r.bands.map(b => ({...b, pos: migrate(b.bp, '1', 'right')}))}]} />
       {r.bands.some(b => b.schematic) && <p className="quiet">The extra bands are placed schematically; their sizes are not predicted.</p>}
@@ -60,7 +60,7 @@ export default function Thermocycler() {
       <p className="quiet">Exact-length duplexes first appear in cycle 3: 2ⁿ − 2n of the 2ⁿ.</p>
       <Predict label={`Starting from about ${fmt(startCopies)} copies, how many after 10 ideal cycles?`} options={CYCLE10} value={curve.prediction} onChange={value => curveDispatch({type: 'predict', value})} />
       <div className="pb-actions"><button type="button" className="primary-button" disabled={!curve.prediction} onClick={() => curveDispatch({type: 'reveal', evaluate: () => ({outcome: '1.1m'})})}>Reveal the curve</button></div>
-      {curve.result && <><Verdict tone={curve.result.correct ? 'good' : 'bad'}><b>{curve.result.correct ? '✓ Right.' : '✗ Not quite.'}</b> 2¹⁰ = 1,024, so {fmt(startCopies)} × 1,024 ≈ {fmt(idealCopies(startCopies, 10))}, about 1.1 million.</Verdict><CopyChart /></>}
+      <LiveRegion>{curve.result && <Verdict tone={curve.result.correct ? 'good' : 'bad'}><b>{curve.result.correct ? '✓ Right.' : '✗ Not quite.'}</b> 2¹⁰ = 1,024, so {fmt(startCopies)} × 1,024 ≈ {fmt(idealCopies(startCopies, 10))}, about 1.1 million.</Verdict>}</LiveRegion>{curve.result && <CopyChart />}
       <p className="quiet">Solid line: ideal doubling. Dashed line: a schematic plateau. Real reactions level off in late cycles; where that happens varies, and this curve is not calculated.</p>
     </section>
     <div className="pb-actions"><button type="button" className="outline-button" onClick={() => dispatch({type: 'reset', settings: PCR.defaults})}>Reset the cycler</button></div>

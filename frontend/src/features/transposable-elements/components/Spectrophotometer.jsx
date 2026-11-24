@@ -1,7 +1,7 @@
 import { useId, useReducer, useState } from 'react';
 import { SAMPLE, QUANT_SAMPLES, VERDICTS, quantify, verdictFor, DS_DNA_NG_PER_UL_PER_A260 } from '../benchWorkflow.js';
 import { benchStep, initialStep } from '../benchStep.js';
-import { SampleHandoff, Predict, Verdict, PracticeNote } from './BenchParts.jsx';
+import { SampleHandoff, Predict, Verdict, LiveRegion, PracticeNote } from './BenchParts.jsx';
 
 const VERDICT_OPTIONS = Object.entries(VERDICTS).map(([k, v]) => [k, v.label]);
 const evaluateCard = card => () => { const r = quantify({...card, volumeUl: SAMPLE.volumeUl}); return {...r, outcome: verdictFor(r)}; };
@@ -14,9 +14,9 @@ function SampleCard({card}) {
     <p className="bw-readings">A260 {card.a260.toFixed(2)} · A280 {card.a280.toFixed(2)} · A230 {card.a230.toFixed(2)}</p>
     <Predict label="What does this sample show?" options={VERDICT_OPTIONS} value={step.prediction} onChange={value => dispatch({type: 'predict', value})} />
     <button type="button" className="primary-button" disabled={!step.prediction} onClick={() => dispatch({type: 'reveal', evaluate: evaluateCard(card)})}>Reveal the ratios</button>
-    {r && <Verdict tone={r.correct ? 'good' : 'bad'}>
+    <LiveRegion>{r && <Verdict tone={r.correct ? 'good' : 'bad'}>
       <b>{r.correct ? '✓ Your prediction holds.' : `✗ Not quite: this is ${VERDICTS[r.outcome].label}.`}</b> A260/A280 = {r.r280.toFixed(2)} · A260/A230 = {r.r230.toFixed(2)} · {r.concentration} ng/µL. {VERDICTS[r.outcome].text}
-    </Verdict>}
+    </Verdict>}</LiveRegion>
   </li>;
 }
 
@@ -41,9 +41,9 @@ export default function Spectrophotometer() {
       <div className="bw-choices" role="group" aria-label="Concentration">
         {CONC_OPTIONS.map(c => <button type="button" key={c} className="outline-button" aria-pressed={answer === c} onClick={() => setAnswer(c)}>{c} ng/µL</button>)}
       </div>
-      {answer !== null && <Verdict tone={answer === ours.concentration ? 'good' : 'bad'}>
+      <LiveRegion>{answer !== null && <Verdict tone={answer === ours.concentration ? 'good' : 'bad'}>
         <b>{answer === ours.concentration ? '✓ Right.' : '✗ Not quite.'}</b> {SAMPLE.readings.a260} × {DS_DNA_NG_PER_UL_PER_A260} ng/µL = {ours.concentration} ng/µL; × {SAMPLE.volumeUl} µL = {ours.yieldNg.toLocaleString('en-US')} ng, about {(ours.yieldNg / 1000).toFixed(1)} µg. This DNA goes on to the PCR station.
-      </Verdict>}
+      </Verdict>}</LiveRegion>
     </section>
     <PracticeNote>Flag cut-offs are teaching values, not instrument specifications.</PracticeNote>
   </section>;
