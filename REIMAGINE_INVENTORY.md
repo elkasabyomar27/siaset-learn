@@ -110,6 +110,7 @@ Prototype: https://claude.ai/artifact/YBRo3cVE9BiFXm2VbeXKVS (private until shar
 | Account, profile, avatar, password, sync status | Notebook profile card; avatar + sync dot in header; signed-out state |
 | Classes, assignments, live quiz (play) | Classroom → "I'm a learner" |
 | Teach, approval, classes, quizzes, live host | Classroom → "I teach" |
+| Assignable stations + teacher dashboard (new) | Classroom → assignment form station picker; each assignment opens a students × stations dashboard; students see assigned stations on their card |
 | Loading, 404, save/sync errors | States board |
 
 New engagement layers: challenge banner, predict-first gating (already in the lab), streak, chapter badges, next-station suggestion, onboarding tour, and an "Explain it back" note. Streak, badges and the note are new derived or stored data that need a decision before implementation. The note needs new storage; streak and badges can be derived from existing evidence.

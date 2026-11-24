@@ -44,6 +44,16 @@ function apply(state, op) {
   }
 }
 
+/**
+ * Replays progress entries in (clock, id) order onto `base`, skipping invalid ones. Pure: inputs are
+ * not changed. The repository and read-only views (e.g. a teacher's dashboard) share this rule.
+ */
+export function replayProgress(ops, base = empty()) {
+  const state = structuredClone(base);
+  for (const op of ops.filter(validOperation).sort(compare)) apply(state, op);
+  return state;
+}
+
 // Each operation owns a unique key: no shared read/modify/write record can lose
 // an unrelated tab's update. The v1 legacy keys are read, never rewritten.
 export function createProgressRepository({
@@ -57,9 +67,8 @@ export function createProgressRepository({
   const listeners = new Set();
 
   function publish() {
-    const state = structuredClone(base);
     const operations = new Map([...known, ...pending]);
-    for (const op of [...operations.values()].sort(compare)) apply(state, op);
+    const state = replayProgress([...operations.values()], base);
     const next = { ...state, status: readFailed ? 'read-failed' : pending.size || writeFailed ? 'temporary' : 'saved', damaged };
     const nextSignature = JSON.stringify(next);
     if (signature === nextSignature) return;

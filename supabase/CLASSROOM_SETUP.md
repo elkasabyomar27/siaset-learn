@@ -32,6 +32,7 @@ Browsers can never write `teacher_requests.status`. Only the function (service r
 ## Turning it on (staging first)
 
 1. **Database:** apply `migrations/20261110120000_classroom.sql` to the project (`supabase db push`, or through the Supabase connector). It adds tables, functions, storage policies and the `class-submissions` bucket, and adds the quiz tables to the `supabase_realtime` publication.
+   Then apply `migrations/20261124130000_assignment_stations.sql`, which adds assignable stations and the teacher's `assignment_station_progress` function. **Apply it before deploying a frontend that includes the station picker.** File-only assignments still post without it, but saving stations and opening the dashboard need it.
 2. **Email:** create a [Resend](https://resend.com) account and API key. Until you verify a sending domain, Resend can only send from `onboarding@resend.dev` to your own Resend account address. That is enough for approval emails to you, but the "you're approved" email to teachers needs a verified domain.
 3. **Function secrets:**
    ```

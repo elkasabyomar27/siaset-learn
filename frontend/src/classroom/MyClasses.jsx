@@ -4,6 +4,10 @@ import {useAuth} from '../auth/AuthProvider.jsx';
 import {profileDetails} from '../auth/profile.js';
 import {formatDate, friendlyError, missingSetup, safeFileName} from './api.js';
 import {ClassroomGate} from './Teach.jsx';
+import {assignedTopics} from './stationResults.js';
+import {useProgress} from '../features/transposable-elements/useProgress.js';
+import {journeyStops} from '../features/transposable-elements/journey.js';
+import {stationStatus, STATUS_LABEL} from '../ui/labData.js';
 import './classroom.css';
 
 const MAX_BYTES = 25 * 1024 * 1024;
@@ -12,9 +16,38 @@ const ALLOWED_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.oasis.opendocument.text'];
 
+/** The status pill: a file decides it when there is one; otherwise station progress does. */
+export function assignmentPill({submission, overdue, stationsTotal, stationsDone}) {
+  if (submission?.graded_at) return {label: 'Graded', tone: 'graded'};
+  if (submission) return {label: 'Handed in', tone: 'done'};
+  if (stationsTotal > 0 && stationsDone === stationsTotal) return {label: 'Stations done', tone: 'done'};
+  return overdue ? {label: 'Overdue', tone: 'late'} : {label: 'To do', tone: ''};
+}
+
+/** Assigned stations with this student's own status (same rules as the Lab room). */
+export function AssignedStations({stations, progress, labs}) {
+  const topics = assignedTopics(stations);
+  if (!topics.length) return null;
+  const stops = journeyStops(progress, labs, '/classes');
+  return <div className="station-assigned-wrap">
+    <ul className="station-assigned" aria-label="Assigned stations">
+      {topics.map(topic => { const stop = stops.find(s => s.id === topic.id), status = stationStatus(stop, progress);
+        return <li key={topic.id}><b>{String(topic.order).padStart(2, '0')} · {topic.title}</b>
+          <span className={`lab-status is-${status}`}>{STATUS_LABEL[status]}</span>
+          <Link className="class-link" to={stop.href}>Open station</Link></li>; })}
+    </ul>
+    <p className="station-privacy">Your teacher can see your progress and answers on these stations.</p>
+  </div>;
+}
+
 function AssignmentCard({client, user, cls, assignment, submission, onChanged}) {
   const [busy, setBusy] = useState(false), [message, setMessage] = useState('');
+  const {progress, labs} = useProgress();
+  const assigned = assignedTopics(assignment.stations || []);
+  const stops = assigned.length ? journeyStops(progress, labs, '/classes') : [];
+  const stationsDone = assigned.filter(topic => stops.find(stop => stop.id === topic.id)?.completed).length;
   const overdue = assignment.due_at && new Date(assignment.due_at) < new Date();
+  const pill = assignmentPill({submission, overdue, stationsTotal: assigned.length, stationsDone});
   async function submit(event) {
     event.preventDefault();
     const form = event.currentTarget, values = new FormData(form), file = values.get('file');
@@ -41,15 +74,16 @@ function AssignmentCard({client, user, cls, assignment, submission, onChanged}) 
   }
   return <article className="assignment-row student">
     <div className="assignment-title"><b>{assignment.title}</b>
-      <span className={`class-pill ${submission?.graded_at ? 'graded' : submission ? 'done' : overdue ? 'late' : ''}`}>{submission?.graded_at ? 'Graded' : submission ? 'Handed in' : overdue ? 'Overdue' : 'To do'}</span></div>
+      <span className={`class-pill ${pill.tone}`}>{pill.label}</span></div>
     <p className="class-muted">{assignment.due_at ? `Due ${formatDate(assignment.due_at)}` : 'No due date'}</p>
     {assignment.instructions && <p className="class-pre">{assignment.instructions}</p>}
+    <AssignedStations stations={assignment.stations || []} progress={progress} labs={labs}/>
     {submission && <div className="my-submission">
       <span>Your file: <button className="class-link" onClick={view}>📎 {submission.file_name}</button> · {formatDate(submission.submitted_at)}</span>
       {submission.graded_at && <div className="feedback-box"><b>Grade: {submission.grade || '—'}</b>{submission.feedback && <p>{submission.feedback}</p>}</div>}
     </div>}
     <form className="class-form inline-form" onSubmit={submit}>
-      <label>{submission ? 'Replace your file' : 'Your file'}<input name="file" type="file" accept={ACCEPT} required disabled={busy}/></label>
+      <label>{submission ? 'Replace your file' : assigned.length ? 'Your file (optional)' : 'Your file'}<input name="file" type="file" accept={ACCEPT} required disabled={busy}/></label>
       <label className="wide">Note to your teacher (optional)<input name="note" maxLength={2000} disabled={busy}/></label>
       <button className="class-button primary" disabled={busy}>{busy ? 'Uploading…' : submission ? 'Hand in again' : 'Hand in'}</button>
     </form>
