@@ -101,3 +101,36 @@ test('gel outcomes', () => {
   assert.ok(eth.floats && eth.bands.length === 0);
   for (const key of ['resolved', 'ranOut', 'floats', 'unseparated']) assert.ok(bench.GEL_OUTCOMES[key].label, key);
 });
+
+test('digest of the 850 bp amplicon', () => {
+  const cut = (names, opts) => bench.digest(bench.SAMPLE.ampliconBp, bench.cutsFor(names), opts);
+  assert.deepEqual(cut(['EcoRI']), [550, 300]);
+  assert.deepEqual(cut(['BamHI']), [850]);
+  assert.deepEqual(cut(['HindIII']), [700, 150]);
+  assert.deepEqual(cut(['EcoRI', 'HindIII']), [400, 300, 150]);
+  assert.deepEqual(cut(['EcoRI', 'BamHI']), cut(['EcoRI']));
+  assert.deepEqual(cut([]), [850]);
+  assert.deepEqual(cut(['EcoRI'], {partial: true}), [850, 550, 300]);
+  assert.deepEqual(cut(['EcoRI', 'HindIII'], {partial: true}), [850, 700, 550, 400, 300, 150]);
+  assert.deepEqual(Object.fromEntries(Object.entries(bench.ENZYMES).map(([k, e]) => [k, e.cut])), {EcoRI: 'G^AATTC', HindIII: 'A^AGCTT', BamHI: 'G^GATCC'});
+});
+
+test('fragment counting: linear n cuts → n + 1, circular n cuts → n', () => {
+  assert.deepEqual(bench.digest(3000, [100], {topology: 'circular'}), [3000]);
+  assert.deepEqual(bench.digest(3000, [100, 1100], {topology: 'circular'}), [2000, 1000]);
+  assert.deepEqual(bench.digest(3000, [], {topology: 'circular'}), [3000]);
+  assert.deepEqual(bench.digest(1000, [100, 600]), [500, 400, 100]);
+  assert.deepEqual(bench.digest(1000, [200, 200]), [800, 200]);
+  assert.deepEqual(bench.digest(1000, [500]), [500], 'equal pieces collapse to one size');
+  assert.deepEqual(bench.cutsFor(['HindIII', 'EcoRI', 'EcoRI']), [300, 700]);
+});
+
+test('fragment predictions match ignoring order; every answer is a size choice', () => {
+  assert.equal(bench.fragmentsMatch([300, 550], [550, 300]), true);
+  assert.equal(bench.fragmentsMatch([300], [550, 300]), false);
+  const names = Object.keys(bench.ENZYMES);
+  for (let mask = 0; mask < 8; mask++) for (const partial of [false, true]) {
+    const chosen = names.filter((_, i) => mask & (1 << i));
+    for (const bp of bench.digest(bench.SAMPLE.ampliconBp, bench.cutsFor(chosen), {partial})) assert.ok(bench.SIZE_CHOICES.includes(bp), `${chosen} ${bp}`);
+  }
+});

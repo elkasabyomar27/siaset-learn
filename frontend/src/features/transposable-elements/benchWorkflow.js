@@ -150,3 +150,32 @@ export function runGel(settings, {ethanolLane = false} = {}) {
   const outcome = reversed ? 'ranOut' : ethanolLane ? 'floats' : s.run === 'short' ? 'unseparated' : 'resolved';
   return {lanes, outcome};
 }
+
+// ── Station 22: restriction digest ── Site positions are a defined teaching map for the
+// schematic amplicon. Sizes use the top-strand cut position; overhang bases are not counted.
+export const ENZYMES = {
+  EcoRI: {site: 'GAATTC', cut: 'G^AATTC', at: [300]},
+  HindIII: {site: 'AAGCTT', cut: 'A^AGCTT', at: [700]},
+  BamHI: {site: 'GGATCC', cut: 'G^GATCC', at: []},
+};
+export const SIZE_CHOICES = [150, 300, 400, 550, 700, 850];
+
+const uniqueDesc = sizes => [...new Set(sizes.filter(s => s > 0))].sort((a, b) => b - a);
+export const cutsFor = names => [...new Set(names.flatMap(n => ENZYMES[n]?.at ?? []))].sort((a, b) => a - b);
+
+/** Fragment sizes (unique, descending) from cutting a molecule of lengthBp at the given positions. */
+export function digest(lengthBp, cuts, {topology = 'linear', partial = false} = {}) {
+  const sites = [...new Set(cuts)].filter(c => c > 0 && c < lengthBp).sort((a, b) => a - b);
+  if (topology === 'circular') {
+    if (sites.length <= 1) return [lengthBp];
+    return uniqueDesc(sites.map((c, i) => i ? c - sites[i - 1] : lengthBp - sites.at(-1) + c));
+  }
+  const points = [0, ...sites, lengthBp];
+  if (!partial) return uniqueDesc(points.slice(1).map((p, i) => p - points[i]));
+  return uniqueDesc(points.flatMap((p, i) => points.slice(i + 1).map(q => q - p)));
+}
+
+export const fragmentsMatch = (predicted, actual) => {
+  const a = new Set(predicted), b = new Set(actual);
+  return a.size === b.size && [...a].every(x => b.has(x));
+};
