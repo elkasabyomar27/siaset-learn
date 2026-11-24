@@ -270,6 +270,14 @@
     "verifiedOn": "2026-11-10"
   },
   {
+    "id": "thermo-contaminants",
+    "citation": "Thermo Fisher Scientific. Impact of contaminants on nucleic acid fluorescence measurements. Application note AN1813.",
+    "url": "https://documents.thermofisher.com/TFS-Assets/CAD/Application-Notes/impact-of-contaminants-an1813-en.pdf",
+    "support": "Phenol, protein (BSA), ethanol and sodium acetate all absorb at and below 230 nm; organic solvent and salt contamination affect A260/A230. In its spike test, 10–100 mM sodium acetate gave A260/A230 values above the clean control, not below it.",
+    "verification": "PDF text extracted and read; table values taken from the extracted text",
+    "verifiedOn": "2026-11-24"
+  },
+  {
     "id": "qiagen-spectro",
     "citation": "QIAGEN Bench Guide: Spectrophotometric measurement of DNA concentration.",
     "url": "https://www.qiagen.com/us/knowledge-and-support/knowledge-hub/bench-guide/dna/analysing-dna/spectrophotometric-measurement-of-dna-concentration",

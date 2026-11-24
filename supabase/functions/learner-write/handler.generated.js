@@ -84,8 +84,8 @@ var extraction = [
     id: "ethanol-wash",
     objectives: ["Explain why a DNA pellet is washed with 70% ethanol.", "Predict the effect of the wrong wash solution or drying time.", "Connect leftover contaminants to purity readings and downstream problems."],
     terms: ["70% ethanol", "residual salt", "residual alcohol", "air-drying", "over-drying", "resuspension", "TE buffer", "A260/A280", "A260/A230"],
-    references: ["green-isopropanol", "desjardins2010"],
-    concept: "After precipitation the pellet still holds salt and traces of isopropanol. Washing with 70% ethanol dissolves salt in its water fraction while the DNA stays insoluble, and it replaces the less volatile isopropanol with ethanol that evaporates more readily. The tube is spun again, the wash removed carefully, and the pellet air-dried briefly. Leftover ethanol can inhibit enzymes and make a sample float out of a gel well; over-drying makes large DNA slow to redissolve. The DNA is then dissolved in TE buffer or water. Absorbance ratios give a quick purity check: an A260/A280 of about 1.8 is typical of pure DNA, and an A260/A230 well below the usual 1.8\u20132.2 suggests carryover of contaminants that absorb near 230 nm.",
+    references: ["green-isopropanol", "desjardins2010", "thermo-contaminants"],
+    concept: "After precipitation the pellet still holds salt and traces of isopropanol. Washing with 70% ethanol dissolves salt in its water fraction while the DNA stays insoluble, and it replaces the less volatile isopropanol with ethanol that evaporates more readily. The tube is spun again, the wash removed carefully, and the pellet air-dried briefly. Leftover ethanol can inhibit enzymes and make a sample float out of a gel well; over-drying makes large DNA slow to redissolve. The DNA is then dissolved in TE buffer or water. Absorbance ratios give a quick purity check: an A260/A280 of about 1.8 is typical of pure DNA, and an A260/A230 well below the usual 1.8\u20132.2 suggests carryover of something that absorbs near 230 nm, such as guanidine, EDTA or phenol. Leftover NaCl or sodium acetate often does not show up in this ratio.",
     variants: [
       v3("70% ethanol, brief air-dry", ["pellet + residual salt", "wash: 70% ethanol, spin", "remove wash, air-dry briefly", "dissolve in TE buffer"], "Salt dissolves in the aqueous fraction, DNA stays pelleted, and only a little ethanol needs to evaporate.", "clean DNA"),
       v3("Wash with water", ["pellet", "wash: water", "spin, discard liquid"], "DNA dissolves in water, so this \u201Cwash\u201D pours the DNA away with the salt.", "DNA lost"),
@@ -96,7 +96,7 @@ var extraction = [
     ],
     exercise: q3("Why wash the pellet with 70% rather than 100% ethanol?", ["DNA dissolves in 100% ethanol", "The water fraction dissolves salt while DNA stays insoluble", "70% ethanol leaves no residue at all"], 1, "The wash needs enough water to dissolve salt, but enough ethanol to keep DNA out of solution."),
     check: q3("A sample floats out of the well when loaded on an agarose gel. What is the most likely cause?", ["Residual ethanol from incomplete drying", "Too much RNase A", "The DNA is too pure"], 0, "Ethanol is less dense than the loading mixture, so leftover ethanol lifts the sample out of the well."),
-    check2: q3("Which reading most suggests salt or another contaminant carried over from the wash?", ["A260/A280 of about 1.8", "A260/A230 well below 1.8", "A260/A230 of about 2.1"], 1, "Many contaminants absorb near 230 nm, lowering A260/A230. A ratio flags a problem; it does not identify the contaminant."),
+    check2: q3("Which reading most suggests the prep carried over something that absorbs near 230 nm?", ["A260/A280 of about 1.8", "A260/A230 well below 1.8", "A260/A230 of about 2.1"], 1, "Guanidine salts from column kits, EDTA, phenol and carbohydrates absorb near 230 nm and lower A260/A230. The NaCl or sodium acetate left by a poor wash often leaves the ratio looking normal, so a good reading does not prove the salt is gone. A ratio flags a problem; it does not identify the contaminant."),
     limitations: "Qualitative outcomes only. Real purity ratios depend on the instrument, blank, pH and concentration, and cannot identify a contaminant with certainty. Drying times depend on pellet size and method."
   }
 ];
@@ -1652,7 +1652,7 @@ function validLabEvidence(record) {
 }
 
 // server/validate.js
-var CONTRACT_VERSION = "siaset-v3";
+var CONTRACT_VERSION = "siaset-v4";
 var MAX_BYTES = 65536;
 var uuid = (value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 var decimal = (value) => typeof value === "string" && /^(0|[1-9][0-9]{0,17})$/.test(value);

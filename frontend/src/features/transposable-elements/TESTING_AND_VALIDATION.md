@@ -77,4 +77,4 @@ University review has not occurred. References were checked via primary abstract
   - the Lab room and the Station finder list the module;
   - at 375 px there is no overflow, and every control is at least 44 px;
   - there were no console errors.
-- **Database.** Contract `siaset-v3` covers 20 lessons and 88 views. The assignment station cap is raised to 64 (migrations `20261124140000` and `20261124140100`).
+- **Database.** Contract `siaset-v4` covers 20 lessons and 88 views (v4 rewords station 18's A260/A230 question). The assignment station cap is raised to 64 (migrations `20261124140000` and `20261124140100`).
