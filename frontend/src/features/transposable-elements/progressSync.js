@@ -5,6 +5,7 @@
 import { OP_PREFIX, validOperation } from './progressRepository.js';
 import { STORAGE_KEY, parseProgress } from './lessonProgress.js';
 import { LAB_KEY, ASSESSMENT_KEY, readLabs, readAttempts } from './learnerRecords.js';
+import * as learnerMirror from './learnerMirror.js';
 
 export const OWNER_KEY = 'siaset-progress-owner-v1';
 export const TABLE = 'progress_ops';
@@ -58,7 +59,7 @@ export function clearLocalProgress(store) {
   for (const key of [...keys, ...LEGACY_KEYS, OWNER_KEY]) store.removeItem(key);
 }
 
-/** One full sync for `userId`. Returns {downloaded, uploaded, synced: Set of ids known to the account}. */
+/** One full sync for `userId`. Returns {downloaded, uploaded, uploadedOps, synced: Set of ids known to the account}. */
 export async function syncProgress(client, userId, store) {
   const owner = store.getItem(OWNER_KEY);
   // Leftovers from a different account (e.g. its session expired without signing out) are not merged.
@@ -80,7 +81,7 @@ export async function syncProgress(client, userId, store) {
     if (error) throw Error('progress_upload_failed');
   }
   store.setItem(OWNER_KEY, userId);
-  return {downloaded, uploaded: missing.length, synced: new Set([...remote.keys(), ...local.keys()])};
+  return {downloaded, uploaded: missing.length, uploadedOps: missing, synced: new Set([...remote.keys(), ...local.keys()])};
 }
 
 /**
@@ -89,7 +90,7 @@ export async function syncProgress(client, userId, store) {
  * off | syncing | synced | error.
  */
 export function createProgressSync({repository, storage = () => globalThis.localStorage, events = globalThis.window,
-  doc = globalThis.document, timers = globalThis, debounceMs = 1500, intervalMs = 60000} = {}) {
+  doc = globalThis.document, timers = globalThis, debounceMs = 1500, intervalMs = 60000, mirror = learnerMirror} = {}) {
   let session = null, running = null, again = false, debounce = null, interval = null, unsubscribe = null;
   let synced = new Set(), state = {status: 'off', lastSynced: null};
   const listeners = new Set();
@@ -115,6 +116,12 @@ export function createProgressSync({repository, storage = () => globalThis.local
         synced = result.synced;
         repository.refresh();
         set({status: 'synced', lastSynced: Date.now()});
+        // Dual-write: a shadow copy through learner-write. It never changes the sync result.
+        try {
+          const store = storage();
+          mirror.enqueue(store, current.userId, result.uploadedOps || []);
+          if (session === current) await mirror.drain(current.client, current.userId, store);
+        } catch { /* The shadow copy is best effort. */ }
         return true;
       } catch {
         if (session === current) set({status: 'error'});
@@ -158,8 +165,9 @@ export function createProgressSync({repository, storage = () => globalThis.local
       // Let any in-flight sync finish first, so the final run sees every local change.
       while (running) await running;
       if (session && !(await run())) throw Error('Your latest progress could not be saved to your account. Check your connection and try again.');
+      const userId = session?.userId;
       stop();
-      try { clearLocalProgress(storage()); } catch { /* Storage unavailable: nothing to clear. */ }
+      try { clearLocalProgress(storage()); if (userId) mirror.clearMirror(storage(), userId); } catch { /* Storage unavailable: nothing to clear. */ }
       repository.refresh();
     },
     getSnapshot: () => state,
