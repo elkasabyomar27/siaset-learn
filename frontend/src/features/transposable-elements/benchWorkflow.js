@@ -103,3 +103,50 @@ export const idealCopies = (start, n) => start * 2 ** n;
 /** Exact-length duplexes from one template duplex after n ideal cycles. */
 export const exactLengthDuplexes = n => Math.max(0, 2 ** n - 2 * n);
 export const pcrTable = (cycles = 5) => Array.from({length: cycles}, (_, i) => ({cycle: i + 1, total: 2 ** (i + 1), exact: exactLengthDuplexes(i + 1)}));
+
+// ── Station 21: gel electrophoresis ── Schematic log-linear model: distance from the well
+// falls with log(size). Windows are teaching values per agarose %, not measured ranges.
+export const GEL = {
+  defaults: {agarose: '1', polarity: 'wells-negative', run: 'right'},
+  controls: [
+    {key: 'agarose', label: 'Agarose', options: [['0.7', '0.7%'], ['1', '1%'], ['2', '2%']]},
+    {key: 'polarity', label: 'Wells sit at the', options: {'wells-negative': 'Negative (black) electrode', 'wells-positive': 'Positive (red) electrode'}},
+    {key: 'run', label: 'Run time', options: {short: 'Stopped early', right: 'Run until the dye front is near the end'}},
+  ],
+};
+export const GEL_WINDOWS = {'0.7': [300, 12000], '1': [80, 8000], '2': [40, 2500]};
+export const RUN_FACTOR = {short: 0.25, right: 0.9};
+export const GEL_OUTCOMES = {
+  resolved: {label: 'band resolved', tone: 'good', text: 'The ladder spreads out and the product runs as one clear band you can size.'},
+  ranOut: {label: 'DNA runs out of the gel', tone: 'bad', text: 'DNA is negative and moves toward the positive electrode. With the wells at the positive end it leaves the gel into the buffer.'},
+  floats: {label: 'sample floats out', tone: 'bad', text: 'Ethanol left in the sample makes it lighter than the loading mix, so it rises out of the well instead of sinking in.'},
+  unseparated: {label: 'bands not separated', tone: 'warn', text: 'The gel was stopped too early: the bands are still bunched near the wells.'},
+};
+
+const span = agarose => { const [lo, hi] = GEL_WINDOWS[agarose]; return [Math.log10(lo), Math.log10(hi)]; };
+/** Fraction of the lane from the well; above 1 means the band ran off the gel. */
+export function migrate(sizeBp, agarose, run) {
+  const [lo, hi] = span(agarose);
+  return RUN_FACTOR[run] * (hi - Math.log10(sizeBp)) / (hi - lo);
+}
+export function estimateSize(pos, agarose, run) {
+  const [lo, hi] = span(agarose);
+  return Math.round(10 ** (hi - pos / RUN_FACTOR[run] * (hi - lo)) / 10) * 10;
+}
+export function bracket(bp, ladder = SAMPLE.ladder) {
+  return [Math.max(...ladder.filter(s => s <= bp)), Math.min(...ladder.filter(s => s >= bp))];
+}
+
+export function runGel(settings, {ethanolLane = false} = {}) {
+  const s = {...GEL.defaults, ...settings};
+  const reversed = s.polarity === 'wells-positive';
+  const bands = sizes => reversed ? [] : sizes.map(bp => ({bp, pos: migrate(bp, s.agarose, s.run)}));
+  const lanes = [
+    {id: 'ladder', bands: bands(SAMPLE.ladder)},
+    {id: 'product', bands: ethanolLane ? [] : bands([SAMPLE.ampliconBp])},
+    {id: 'ntc', bands: []},
+    ...(ethanolLane ? [{id: 'ethanol', bands: [], floats: true}] : []),
+  ];
+  const outcome = reversed ? 'ranOut' : ethanolLane ? 'floats' : s.run === 'short' ? 'unseparated' : 'resolved';
+  return {lanes, outcome};
+}

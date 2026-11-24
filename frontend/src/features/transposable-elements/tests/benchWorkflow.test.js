@@ -69,3 +69,35 @@ test('PCR copy counts double per cycle; the exact-length product appears at cycl
   assert.deepEqual(bench.pcrTable(5).map(r => r.cycle), [1, 2, 3, 4, 5]);
   assert.equal(bench.idealCopies(1100, 10), 1126400);
 });
+
+test('gel migration is log-linear and the product falls between 800 and 900', () => {
+  const sizes = [...bench.SAMPLE.ladder, 850].sort((a, b) => a - b);
+  for (const agarose of ['0.7', '1', '2']) for (const run of ['short', 'right']) {
+    const pos = sizes.map(s => bench.migrate(s, agarose, run));
+    for (let i = 1; i < pos.length; i++) assert.ok(pos[i] < pos[i - 1], `${agarose}/${run}`);
+  }
+  const at = s => bench.migrate(s, '1', 'right');
+  assert.ok(at(900) < at(850) && at(850) < at(800));
+  assert.equal(bench.estimateSize(at(850), '1', 'right'), 850);
+  assert.deepEqual(bench.bracket(850), [800, 900]);
+  assert.equal(Math.round(Math.sqrt(800 * 900)), 849);
+  assert.ok(bench.migrate(100, '0.7', 'right') > 1, '100 bp runs off a 0.7% gel');
+  assert.ok(bench.migrate(850, '2', 'right') < at(850), 'a 2% gel holds 850 bp back');
+});
+
+test('gel outcomes', () => {
+  const run = (patch, opts) => bench.runGel({...bench.GEL.defaults, ...patch}, opts);
+  assert.equal(run({}).outcome, 'resolved');
+  const reversed = run({polarity: 'wells-positive'});
+  assert.equal(reversed.outcome, 'ranOut');
+  assert.ok(reversed.lanes.every(l => l.bands.length === 0));
+  assert.equal(run({run: 'short'}).outcome, 'unseparated');
+  assert.equal(run({}, {ethanolLane: true}).outcome, 'floats');
+  const lanes = run({}).lanes;
+  assert.deepEqual(lanes.map(l => l.id), ['ladder', 'product', 'ntc']);
+  assert.deepEqual(lanes[1].bands.map(b => b.bp), [850]);
+  assert.deepEqual(lanes[2].bands, []);
+  const eth = run({}, {ethanolLane: true}).lanes.find(l => l.id === 'ethanol');
+  assert.ok(eth.floats && eth.bands.length === 0);
+  for (const key of ['resolved', 'ranOut', 'floats', 'unseparated']) assert.ok(bench.GEL_OUTCOMES[key].label, key);
+});
