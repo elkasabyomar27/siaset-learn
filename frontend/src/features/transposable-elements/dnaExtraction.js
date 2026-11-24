@@ -111,6 +111,6 @@ export function evaluateWash(settings) {
   ];
   const outcome = lost ? 'lost' : saltLeft ? 'salty' : s.dry === 'none' ? 'ethanol' : s.dry === 'long' ? 'hard' : 'clean';
   // Qualitative purity flag only; numbers are typical reference values, not a calculation.
-  const purity = lost ? 'nothing to measure' : saltLeft ? 'A260/A230 likely low (well below 1.8)' : 'A260/A230 in the usual 1.8–2.2 range expected';
+  const purity = lost ? 'nothing to measure' : saltLeft ? 'A260/A230 may not show it: leftover NaCl or sodium acetate often leaves the ratio looking normal, yet the salt can still interfere with enzymes and how bands run on a gel' : 'A260/A230 in the usual 1.8–2.2 range expected';
   return {gates, outcome, purity};
 }

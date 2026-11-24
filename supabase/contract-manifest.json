@@ -1,5 +1,5 @@
 {
-  "version": "siaset-v3",
+  "version": "siaset-v4",
   "topics": [
     {
       "id": "introduction",
@@ -1805,14 +1805,14 @@
         "explanation": "Ethanol is less dense than the loading mixture, so leftover ethanol lifts the sample out of the well."
       },
       "check2": {
-        "question": "Which reading most suggests salt or another contaminant carried over from the wash?",
+        "question": "Which reading most suggests the prep carried over something that absorbs near 230 nm?",
         "options": [
           "A260/A280 of about 1.8",
           "A260/A230 well below 1.8",
           "A260/A230 of about 2.1"
         ],
         "correct": 1,
-        "explanation": "Many contaminants absorb near 230 nm, lowering A260/A230. A ratio flags a problem; it does not identify the contaminant."
+        "explanation": "Guanidine salts from column kits, EDTA, phenol and carbohydrates absorb near 230 nm and lower A260/A230. The NaCl or sodium acetate left by a poor wash often leaves the ratio looking normal, so a good reading does not prove the salt is gone. A ratio flags a problem; it does not identify the contaminant."
       }
     },
     {
@@ -2547,5 +2547,5 @@
     }
   ],
   "engine_sha256": "4020c786c78ac56e3a9fc7933c57710df241d94505945f7038a7fef9afcac2a5",
-  "sha256": "e01b8a6f4250804146fda79900ba40099f9dd9ffbd95bd6046bcd0951a25732b"
+  "sha256": "144ce44e6337ba04be550cbb560fd1355beb74b29d7747f053b080cb41569476"
 }

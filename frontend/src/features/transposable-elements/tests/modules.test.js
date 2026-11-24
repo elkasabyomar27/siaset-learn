@@ -112,5 +112,18 @@ test('washing: 70% ethanol and a brief dry give clean DNA; each mistake has its 
   assert.equal(evaluateWash({ wash: 'none' }).outcome, 'salty');
   assert.equal(evaluateWash({ wash: 'e70', dry: 'none' }).outcome, 'ethanol');
   assert.equal(evaluateWash({ wash: 'e70', dry: 'long' }).outcome, 'hard');
-  assert.match(evaluateWash({ wash: 'e100' }).purity, /A260\/A230 likely low/);
+  for (const wash of ['e100', 'none']) {
+    assert.doesNotMatch(evaluateWash({ wash }).purity, /likely low/, 'NaCl and sodium acetate absorb only weakly near 230 nm');
+    assert.match(evaluateWash({ wash }).purity, /may not show/);
+  }
+});
+
+test('station 18 does not claim A260/A230 detects leftover wash salt', () => {
+  const wash = lessonById('ethanol-wash');
+  assert.doesNotMatch(wash.check2.question, /salt/i);
+  assert.match(wash.check2.question, /230 nm/);
+  for (const word of [/guanidine/i, /EDTA/, /phenol/i, /sodium acetate/i]) assert.match(wash.check2.explanation, word);
+  assert.ok(wash.references.includes('thermo-contaminants'));
+  const ref = references.find(r => r.id === 'thermo-contaminants');
+  assert.ok(ref && ref.url && ref.verification && ref.verifiedOn, 'reference has a verification note');
 });
