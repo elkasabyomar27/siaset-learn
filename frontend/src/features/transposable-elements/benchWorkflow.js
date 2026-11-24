@@ -143,9 +143,8 @@ export function runGel(settings, {ethanolLane = false} = {}) {
   const bands = sizes => reversed ? [] : sizes.map(bp => ({bp, pos: migrate(bp, s.agarose, s.run)}));
   const lanes = [
     {id: 'ladder', bands: bands(SAMPLE.ladder)},
-    {id: 'product', bands: ethanolLane ? [] : bands([SAMPLE.ampliconBp])},
+    ethanolLane ? {id: 'ethanol', bands: [], floats: true} : {id: 'product', bands: bands([SAMPLE.ampliconBp])},
     {id: 'ntc', bands: []},
-    ...(ethanolLane ? [{id: 'ethanol', bands: [], floats: true}] : []),
   ];
   const outcome = reversed ? 'ranOut' : ethanolLane ? 'floats' : s.run === 'short' ? 'unseparated' : 'resolved';
   return {lanes, outcome};

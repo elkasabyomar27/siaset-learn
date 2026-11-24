@@ -98,7 +98,9 @@ test('gel outcomes', () => {
   assert.deepEqual(lanes.map(l => l.id), ['ladder', 'product', 'ntc']);
   assert.deepEqual(lanes[1].bands.map(b => b.bp), [850]);
   assert.deepEqual(lanes[2].bands, []);
-  const eth = run({}, {ethanolLane: true}).lanes.find(l => l.id === 'ethanol');
+  const withEthanol = run({}, {ethanolLane: true}).lanes;
+  assert.deepEqual(withEthanol.map(l => l.id), ['ladder', 'ethanol', 'ntc'], 'the ethanol sample is the PCR lane, not an extra one');
+  const eth = withEthanol.find(l => l.id === 'ethanol');
   assert.ok(eth.floats && eth.bands.length === 0);
   for (const key of ['resolved', 'ranOut', 'floats', 'unseparated']) assert.ok(bench.GEL_OUTCOMES[key].label, key);
 });

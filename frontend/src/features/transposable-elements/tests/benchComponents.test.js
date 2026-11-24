@@ -92,3 +92,25 @@ test('hand-off values are computed, and an early-stopped gel cannot be sized', a
   assert.match(html('Thermocycler'), /A260\/A280 1\.83/);
   assert.match(html('GelBench'), /100–1,000 bp/);
 });
+
+test('the gel size estimate clears whenever the gel run changes', async () => {
+  const {gelStep, initialGel, evaluateGel} = await server.ssrLoadModule('/src/features/transposable-elements/components/GelBench.jsx');
+  let s = initialGel();
+  s = gelStep(s, {type: 'predict', value: '800-900'});
+  s = gelStep(s, {type: 'reveal', evaluate: evaluateGel});
+  s = gelStep(gelStep(s, {type: 'estimate', value: '850'}), {type: 'check'});
+  assert.equal(s.checked, 850);
+  for (const action of [{type: 'set', patch: {agarose: '2'}}, {type: 'predict', value: '700-800'}, {type: 'reveal', evaluate: evaluateGel}, {type: 'reset', settings: s.settings}]) {
+    const next = gelStep(s, action);
+    assert.deepEqual([next.estimate, next.checked], ['', null], action.type);
+  }
+  const edited = gelStep(s, {type: 'estimate', value: '900'});
+  assert.deepEqual([edited.estimate, edited.checked], ['900', null], 'editing the estimate hides the old check');
+});
+
+test('result announcements go to live regions that exist before the result', async () => {
+  for (const name of ['Spectrophotometer', 'Thermocycler', 'GelBench', 'DigestBench'])
+    assert.match(html(name), /<div role="status" aria-live="polite"><\/div>/, name);
+  const {Verdict} = await server.ssrLoadModule('/src/features/transposable-elements/components/BenchParts.jsx');
+  assert.doesNotMatch(renderToStaticMarkup(createElement(Verdict, {tone: 'good'}, 'x')), /role=|aria-live/, 'a verdict is not itself a new live region');
+});
