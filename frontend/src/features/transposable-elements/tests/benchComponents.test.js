@@ -58,6 +58,8 @@ test('GelImage names every band in its label and drops bands that ran off', () =
   const out = html('GelImage', {caption: 'test gel', lanes: [{id: 'ladder', label: 'Ladder', bands: [{bp: 100, pos: 1.2}, {bp: 800, pos: 0.4}]}, {id: 'product', label: 'PCR product', bands: [{bp: 850, pos: 0.38}]}]});
   assert.match(out, /aria-label="[^"]*PCR product: 850 bp[^"]*"/);
   assert.match(out, /100 bp ran off the gel/);
+  assert.match(out, /aria-label="test gel\. Wells/);
+  assert.match(html('GelImage', {caption: '1% gel.', lanes: []}), /aria-label="1% gel\. Wells/, 'one full stop, not two');
   assert.equal((out.match(/class="gel-band/g) || []).length, 2);
 });
 

@@ -12,7 +12,7 @@ const bandText = lane => {
 
 export default function GelImage({lanes, caption}) {
   const width = 40 + lanes.length * LANE;
-  const label = `${caption}. Wells at the negative electrode; DNA runs toward the positive electrode. ${lanes.map(bandText).join('. ')}.`;
+  const label = `${caption.replace(/\.$/, '')}. Wells at the negative electrode; DNA runs toward the positive electrode.${lanes.map(l => ` ${bandText(l)}.`).join('')}`;
   return <figure className="gel-figure">
     <svg className="gel-svg" viewBox={`0 0 ${width} ${TOP + LENGTH + 26}`} role="img" aria-label={label}>
       <rect x="0" y="0" width={width} height={TOP + LENGTH + 26} rx="10" fill="var(--scientific-gel)" />

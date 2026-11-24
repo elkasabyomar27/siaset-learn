@@ -114,7 +114,7 @@ export const GEL = {
     {key: 'run', label: 'Run time', options: {short: 'Stopped early', right: 'Run until the dye front is near the end'}},
   ],
 };
-export const GEL_WINDOWS = {'0.7': [300, 12000], '1': [80, 8000], '2': [40, 2500]};
+export const GEL_WINDOWS = {'0.7': [300, 12000], '1': [70, 1300], '2': [30, 1100]};
 export const RUN_FACTOR = {short: 0.25, right: 0.9};
 export const GEL_OUTCOMES = {
   resolved: {label: 'band resolved', tone: 'good', text: 'The ladder spreads out and the product runs as one clear band you can size.'},
