@@ -134,3 +134,76 @@ test('fragment predictions match ignoring order; every answer is a size choice',
     for (const bp of bench.digest(bench.SAMPLE.ampliconBp, bench.cutsFor(chosen), {partial})) assert.ok(bench.SIZE_CHOICES.includes(bp), `${chosen} ${bp}`);
   }
 });
+
+import { moduleById, allTopics, moduleForTopic, fieldForModule } from '../curriculum/modules.js';
+import { lessonById, topicHref } from '../curriculum/lessons.js';
+import { moduleBanks } from '../assessment.js';
+import { routePresentation } from '../routePresentation.js';
+import { parseProgress, isComplete } from '../lessonProgress.js';
+import { challengeFor, activityFor } from '../curriculum/stations.js';
+
+const IDS = ['dna-quantification', 'pcr-amplification', 'gel-electrophoresis', 'restriction-digest'];
+
+test('Bench Workflow is module 3 of Molecular Biology with stations 19–22', () => {
+  const mod = moduleById('bench-workflow');
+  assert.equal(fieldForModule(mod).id, 'molecular-biology');
+  assert.equal(fieldForModule(mod).summary, 'Bench methods for getting DNA out of cells, measuring it, copying it and cutting it.');
+  assert.equal(mod.title, 'Bench Workflow');
+  assert.equal(mod.basePath, '/learn/bench-workflow');
+  assert.deepEqual(mod.topics.map(t => [t.id, t.order]), IDS.map((id, i) => [id, 19 + i]));
+  assert.deepEqual(mod.chapters.map(c => [c.id, c.title, c.topics]), [['measure-amplify', 'Measure and amplify', IDS.slice(0, 2)], ['analyze-product', 'Analyze the product', IDS.slice(2)]]);
+  assert.deepEqual(allTopics.map(t => t.order), Array.from({length: 22}, (_, i) => i + 1));
+});
+
+test('each bench lesson has the predict-first shape, resolvable references and stated limits', () => {
+  assert.deepEqual(IDS.map(id => lessonById(id).variants.length), [4, 5, 4, 4]);
+  for (const t of moduleById('bench-workflow').topics) {
+    const lesson = lessonById(t.lessonId);
+    assert.equal(t.lessonId, t.id);
+    assert.equal(t.learning.kind, 'lesson');
+    assert.deepEqual(lesson.objectives, t.learningObjectives);
+    assert.deepEqual(lesson.references, t.references);
+    assert.ok(lesson.check2 && lesson.variants.every(v => v.outcome && v.blocks.length && v.explanation), t.id);
+    for (const id of lesson.references) assert.ok(references.some(r => r.id === id), `${t.id}: ${id}`);
+    assert.ok(lesson.limitations.length > 80, t.id);
+    assert.equal(topicHref(t), `/learn/bench-workflow/${t.id}`);
+    assert.equal(routePresentation(topicHref(t)).title, `${t.title} — Lesson ${t.order}`);
+    assert.ok(challengeFor(t.id) && activityFor(t.id), t.id);
+  }
+  assert.match(lessonById('restriction-digest').limitations, /teaching amplicon/);
+  assert.match(lessonById('pcr-amplification').limitations, /schematic/);
+});
+
+test('bench outcome labels are exactly the lesson variant outcomes', () => {
+  const outcomes = id => new Set(lessonById(id).variants.map(v => v.outcome));
+  assert.deepEqual(outcomes('dna-quantification'), new Set(Object.values(bench.VERDICTS).map(v => v.label)));
+  for (const o of outcomes('pcr-amplification')) assert.ok(Object.values(bench.PCR_OUTCOMES).some(x => x.label === o), o);
+  assert.deepEqual(outcomes('gel-electrophoresis'), new Set(Object.values(bench.GEL_OUTCOMES).map(v => v.label)));
+  assert.deepEqual([...outcomes('restriction-digest')], ['300 + 550 bp', '850 bp, uncut', '150 + 300 + 400 bp', 'extra uncut band']);
+});
+
+test('the module practice bank has 12 importable questions with the spec answers', () => {
+  const bank = moduleBanks['bench-workflow'];
+  assert.equal(bank.length, 12);
+  for (const q of bank) {
+    assert.ok(q.options.length >= 2 && q.options.length <= 4, q.id);
+    assert.ok(q.question.length <= 300 && q.options.every(o => o.length <= 120), q.id);
+    assert.ok(moduleForTopic(q.topicId) === moduleById('bench-workflow'));
+  }
+  const answer = (id, kind) => { const l = lessonById(id); return l[kind].options[l[kind].correct]; };
+  assert.equal(answer('dna-quantification', 'exercise'), '37.5 ng/µL');
+  assert.equal(answer('pcr-amplification', 'exercise'), 'About 1.1 million');
+  assert.equal(answer('gel-electrophoresis', 'exercise'), 'About 850 bp');
+  assert.equal(answer('restriction-digest', 'exercise'), '300 + 550 bp');
+  assert.equal(answer('restriction-digest', 'check'), 'Three');
+  assert.equal(answer('restriction-digest', 'check2'), 'The digest was incomplete');
+  assert.match(answer('gel-electrophoresis', 'check'), /positive electrode/);
+});
+
+test('earlier saved progress still reads; a bench lesson records and completes', () => {
+  const l = lessonById('restriction-digest');
+  const raw = JSON.stringify({version: 1, records: {introduction: {inspected: [0, 1, 2], exercise: 1, check: 1}, 'restriction-digest': {inspected: [0, 1, 2, 3], exercise: l.exercise.correct, check: l.check.correct, check2: l.check2.correct}}});
+  const p = parseProgress(raw);
+  assert.equal(isComplete('introduction', p.introduction), true);
+  assert.equal(isComplete('restriction-digest', p['restriction-digest']), true);
+});

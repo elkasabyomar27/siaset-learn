@@ -15,7 +15,7 @@ import bankV1 from './assessment-v1.json' with { type: 'json' };
 const extraction = moduleForTopic('extraction-principles');
 
 test('the original fifteen topics form module 1 unchanged; DNA extraction is module 2', () => {
-  assert.deepEqual(modules.map(m => m.id), ['transposable-elements', 'dna-extraction']);
+  assert.deepEqual(modules.map(m => m.id), ['transposable-elements', 'dna-extraction', 'bench-workflow']);
   assert.equal(modules[0].topics, topics);
   assert.deepEqual(extraction.topics.map(t => t.id), ['extraction-principles', 'isopropanol-precipitation', 'ethanol-wash']);
   assert.deepEqual(allTopics.map(t => t.order), Array.from({ length: allTopics.length }, (_, i) => i + 1));
@@ -39,8 +39,9 @@ test('new topics have registry fields, lessons, references and module routes', (
   }
   for (const t of topics) if (t.learning.kind === 'lesson') assert.equal(topicHref(t), `/learn/transposable-elements/${t.id}`);
   assert.equal(adjacentTopics('bacterial-hgt').next.id, 'extraction-principles');
-  assert.equal(adjacentTopics('ethanol-wash').next, undefined);
-  assert.equal(lessons.length, 16);
+  assert.equal(adjacentTopics('ethanol-wash').next.id, 'dna-quantification');
+  assert.equal(adjacentTopics('restriction-digest').next, undefined);
+  assert.equal(lessons.length, 20);
 });
 
 test('the saved cumulative bank stays frozen; module 2 has its own practice bank', () => {
@@ -55,7 +56,7 @@ test('the saved cumulative bank stays frozen; module 2 has its own practice bank
     assert.ok(q.question.length <= 300, q.id);
     assert.ok(q.options.every(o => o.length <= 120), q.id);
   }
-  assert.equal(allQuestions.length, questions.length + bank.length);
+  assert.equal(allQuestions.length, questions.length + bank.length + moduleBanks['bench-workflow'].length);
   const perfect = Object.fromEntries(bank.map(q => [q.id, q.correct]));
   assert.deepEqual([scoreModulePractice('dna-extraction', perfect).correct, scoreModulePractice('dna-extraction', perfect).total], [9, 9]);
   // An earlier saved attempt (original bank only) still scores in full.

@@ -1,5 +1,6 @@
 import teTopics from './topics.json' with { type: 'json' };
 import extractionTopics from './extractionTopics.json' with { type: 'json' };
+import benchWorkflowTopics from './benchWorkflowTopics.json' with { type: 'json' };
 
 // The curriculum is a list of modules. Topic ids are unique across modules (they key saved
 // progress), and `order` continues across modules so the whole path reads 01…N.
@@ -8,7 +9,7 @@ import extractionTopics from './extractionTopics.json' with { type: 'json' };
 // Add a field here and point new modules at it; every lab page groups and filters by field.
 export const fields = [
   { id: 'genetics', title: 'Genetics', summary: 'How genes are built, move and change what a cell can do.' },
-  { id: 'molecular-biology', title: 'Molecular Biology', summary: 'Bench methods for getting molecules out of cells and cleaning them up.' },
+  { id: 'molecular-biology', title: 'Molecular Biology', summary: 'Bench methods for getting DNA out of cells, measuring it, copying it and cutting it.' },
 ];
 
 export const modules = [
@@ -36,6 +37,18 @@ export const modules = [
     topics: extractionTopics,
     chapters: [
       { id: 'isolate', title: 'From cell to clean DNA', question: 'How do we release DNA, bring it out of solution, and remove what came with it?', topics: ['extraction-principles', 'isopropanol-precipitation', 'ethanol-wash'] },
+    ],
+  },
+  {
+    id: 'bench-workflow',
+    field: 'molecular-biology',
+    title: 'Bench Workflow',
+    summary: 'Measure your DNA, copy a target with PCR, size it on a gel and cut it with restriction enzymes.',
+    basePath: '/learn/bench-workflow',
+    topics: benchWorkflowTopics,
+    chapters: [
+      { id: 'measure-amplify', title: 'Measure and amplify', question: 'How much DNA do we have, how clean is it, and how do we copy one target from it?', topics: ['dna-quantification', 'pcr-amplification'] },
+      { id: 'analyze-product', title: 'Analyze the product', question: 'Is the product the size we expect, and does it cut where its sites say it should?', topics: ['gel-electrophoresis', 'restriction-digest'] },
     ],
   },
 ];
