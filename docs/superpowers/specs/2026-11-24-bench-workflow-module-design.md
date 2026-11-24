@@ -372,3 +372,14 @@ Every entry has the existing shape: `id`, `citation`, `url`, `support`, `verific
 6. **The amplicon is 850 bp, not 800.** A 100 bp ladder has an 800 band, so an 800 bp product would sit level with it and there would be nothing to interpolate. All digest numbers move with it.
 7. **The station cap goes from 18 to 64** (see Contract and database).
 8. **The fourth quantification card is generic carryover**, not "wash skipped": salt isn't a strong 230 nm absorber.
+
+## Amendments during the build (2026-11-24)
+
+These changes came from checking the sources. Each one is recorded in the plan ledger.
+
+- **No extension-time control.** The PCR bench drops it, because Sigma-Aldrich says a 1 min extension suffices up to 2 kb. The "15 s extension" variant becomes "Only 10 cycles" → `weak product`.
+- **Annealing options are 45 / 55 / 72 °C,** since annealing is about 5 °C below a Tm of 60 °C.
+- **Phenol is not named as a low-A260/A280 cause.** QIAGEN notes that phenol raises the apparent purity. The verdict is `protein contamination`.
+- **`thermo-purity` is dropped,** because no readable copy was found. The 230 nm card names no specific contaminant.
+- **The plateau is described neutrally:** "real reactions level off; the cause and timing vary", not "reagents run out".
+- **The gel windows are 1% [70, 1300] and 2% [30, 1100].** This keeps the 100–1,000 bp ladder readable. The positions are still schematic.
