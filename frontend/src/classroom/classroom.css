@@ -162,3 +162,4 @@ button.live-option:active{transform:translateY(3px);box-shadow:0 2px 0 #0003}
 .station-assigned li{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 .station-assigned a{min-height:44px;display:inline-flex;align-items:center}
 .station-privacy{margin:4px 0 0;font-size:13px;color:var(--color-text-muted)}
+.station-dashboard .class-button,.station-detail .class-link,.station-assigned .class-link{min-height:44px;min-width:44px}
