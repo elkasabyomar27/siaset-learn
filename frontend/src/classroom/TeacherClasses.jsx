@@ -1,5 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {formatDate, friendlyError} from './api.js';
+import StationPicker from './StationPicker.jsx';
+import StationDashboard from './StationDashboard.jsx';
 
 function useRows(load, deps) {
   const [rows, setRows] = useState(null), [error, setError] = useState('');
@@ -49,12 +51,13 @@ function ClassDetail({client, cls, onChanged, onDeleted}) {
   const [members, reloadMembers] = useRows(() => client.from('class_members').select('user_id, display_name, joined_at').eq('class_id', cls.id).order('display_name'), [client, cls.id]);
   const [assignments, reloadAssignments] = useRows(() => client.from('assignments').select('*').eq('class_id', cls.id).order('created_at', {ascending: false}), [client, cls.id]);
   const [openId, setOpenId] = useState(null), [message, setMessage] = useState(''), [confirmDelete, setConfirmDelete] = useState(false);
+  const [stations, setStations] = useState([]);
   const roster = Object.fromEntries((members || []).map(m => [m.user_id, m.display_name]));
   async function act(promise, done) { const {error} = await promise; setMessage(error ? friendlyError(error) : done); return !error; }
   async function addAssignment(event) {
     event.preventDefault();
     const form = event.currentTarget, values = new FormData(form), due = values.get('due');
-    if (await act(client.from('assignments').insert({class_id: cls.id, title: values.get('title'), instructions: values.get('instructions'), due_at: due ? new Date(due).toISOString() : null}), 'Assignment posted.')) { form.reset(); reloadAssignments(); }
+    if (await act(client.from('assignments').insert({class_id: cls.id, title: values.get('title'), instructions: values.get('instructions'), due_at: due ? new Date(due).toISOString() : null, stations}), 'Assignment posted.')) { form.reset(); setStations([]); reloadAssignments(); }
   }
   return <section className="class-card">
     <div className="class-detail-head">
@@ -69,6 +72,7 @@ function ClassDetail({client, cls, onChanged, onDeleted}) {
       <label>Title<input name="title" required maxLength={160}/></label>
       <label>Due (optional)<input name="due" type="datetime-local"/></label>
       <label className="wide">Instructions<textarea name="instructions" maxLength={5000} rows={2}/></label>
+      <div className="wide"><StationPicker value={stations} onChange={setStations}/></div>
       <button className="class-button primary">Post assignment</button>
     </form>
     {assignments?.length === 0 && <p className="class-muted">No assignments yet.</p>}
@@ -77,6 +81,7 @@ function ClassDetail({client, cls, onChanged, onDeleted}) {
         <b>{a.title}</b><span className="class-muted">{a.due_at ? `Due ${formatDate(a.due_at)}` : 'No due date'}</span><span aria-hidden="true">{openId === a.id ? '▾' : '▸'}</span></button>
       {openId === a.id && <div className="assignment-body">
         {a.instructions && <p className="class-pre">{a.instructions}</p>}
+        {a.stations?.length > 0 && <StationDashboard client={client} assignment={a} joinCode={cls.join_code}/>}
         <Submissions client={client} assignment={a} roster={roster}/>
         <button className="class-link danger" onClick={async () => { if (window.confirm(`Delete “${a.title}” and all its submissions?`) && await act(client.from('assignments').delete().eq('id', a.id), 'Assignment deleted.')) reloadAssignments(); }}>Delete assignment</button>
       </div>}
