@@ -3,6 +3,13 @@ import {formatDate, friendlyError} from './api.js';
 import StationPicker from './StationPicker.jsx';
 import StationDashboard from './StationDashboard.jsx';
 
+/** Row for a new assignment. `stations` is sent only when chosen, so file-only posts never depend on that column. */
+export function newAssignmentRow({classId, title, instructions, due, stations}) {
+  const row = {class_id: classId, title, instructions, due_at: due ? new Date(due).toISOString() : null};
+  if (stations.length) row.stations = stations;
+  return row;
+}
+
 function useRows(load, deps) {
   const [rows, setRows] = useState(null), [error, setError] = useState('');
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,7 +64,7 @@ function ClassDetail({client, cls, onChanged, onDeleted}) {
   async function addAssignment(event) {
     event.preventDefault();
     const form = event.currentTarget, values = new FormData(form), due = values.get('due');
-    if (await act(client.from('assignments').insert({class_id: cls.id, title: values.get('title'), instructions: values.get('instructions'), due_at: due ? new Date(due).toISOString() : null, stations}), 'Assignment posted.')) { form.reset(); setStations([]); reloadAssignments(); }
+    if (await act(client.from('assignments').insert(newAssignmentRow({classId: cls.id, title: values.get('title'), instructions: values.get('instructions'), due, stations})), 'Assignment posted.')) { form.reset(); setStations([]); reloadAssignments(); }
   }
   return <section className="class-card">
     <div className="class-detail-head">

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { assignedTopics, buildResults, stationTotals } from './stationResults.js';
 
 const num = topic => String(topic.order).padStart(2, '0');
@@ -32,10 +32,12 @@ export function StationDashboardView({ load, topics, results, totals, submission
   const complete = results.filter(s => topics.every(t => s.stations[t.id]?.status === 'done')).length;
   const files = new Map(submissions.map(s => [s.user_id, s]));
   const showFiles = submissions.length > 0;
+  const refreshing = load === 'refreshing';
   const current = open && results.find(s => s.userId === open.userId);
   const currentTopic = open && topics.find(t => t.id === open.topicId);
-  return <div className="station-dashboard">
+  return <div className="station-dashboard" aria-busy={refreshing ? 'true' : undefined}>
     <div className="station-dashboard-head"><p><b>{complete} of {results.length} complete</b> <span className="class-muted">· every assigned station done</span></p>
+      <span role="status" className="class-muted">{refreshing ? 'Updating…' : ''}</span>
       <button type="button" className="class-button" onClick={onRefresh}>Refresh</button></div>
     <div className="station-grid-scroll">
       <table className="station-grid">
@@ -60,13 +62,20 @@ export function StationDashboardView({ load, topics, results, totals, submission
 /** Loads class members' progress for the assigned stations once, with a Refresh button. */
 export default function StationDashboard({ client, assignment, joinCode }) {
   const [state, setState] = useState({ load: 'loading', rows: [], files: [] });
+  const latest = useRef(0);
   const fetchRows = useCallback(async () => {
-    setState(s => ({ ...s, load: 'loading' }));
-    const [progress, files] = await Promise.all([
-      client.rpc('assignment_station_progress', { p_assignment: assignment.id }),
-      client.from('submissions').select('user_id, file_name').eq('assignment_id', assignment.id),
-    ]);
-    setState(progress.error ? { load: 'error', rows: [], files: [] } : { load: 'ready', rows: progress.data || [], files: files.data || [] });
+    const request = ++latest.current;
+    // After the first load, keep the table (and the focused Refresh button) on screen while updating.
+    setState(s => ({ ...s, load: s.load === 'ready' ? 'refreshing' : 'loading' }));
+    let next;
+    try {
+      const [progress, files] = await Promise.all([
+        client.rpc('assignment_station_progress', { p_assignment: assignment.id }),
+        client.from('submissions').select('user_id, file_name').eq('assignment_id', assignment.id),
+      ]);
+      next = progress.error ? { load: 'error', rows: [], files: [] } : { load: 'ready', rows: progress.data || [], files: files.data || [] };
+    } catch { next = { load: 'error', rows: [], files: [] }; }
+    if (request === latest.current) setState(next); // Ignore answers to older, superseded requests.
   }, [client, assignment.id]);
   useEffect(() => { fetchRows(); }, [fetchRows]);
   const topics = assignedTopics(assignment.stations);

@@ -16,6 +16,14 @@ const ALLOWED_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.oasis.opendocument.text'];
 
+/** The status pill: a file decides it when there is one; otherwise station progress does. */
+export function assignmentPill({submission, overdue, stationsTotal, stationsDone}) {
+  if (submission?.graded_at) return {label: 'Graded', tone: 'graded'};
+  if (submission) return {label: 'Handed in', tone: 'done'};
+  if (stationsTotal > 0 && stationsDone === stationsTotal) return {label: 'Stations done', tone: 'done'};
+  return overdue ? {label: 'Overdue', tone: 'late'} : {label: 'To do', tone: ''};
+}
+
 /** Assigned stations with this student's own status (same rules as the Lab room). */
 export function AssignedStations({stations, progress, labs}) {
   const topics = assignedTopics(stations);
@@ -35,7 +43,11 @@ export function AssignedStations({stations, progress, labs}) {
 function AssignmentCard({client, user, cls, assignment, submission, onChanged}) {
   const [busy, setBusy] = useState(false), [message, setMessage] = useState('');
   const {progress, labs} = useProgress();
+  const assigned = assignedTopics(assignment.stations || []);
+  const stops = assigned.length ? journeyStops(progress, labs, '/classes') : [];
+  const stationsDone = assigned.filter(topic => stops.find(stop => stop.id === topic.id)?.completed).length;
   const overdue = assignment.due_at && new Date(assignment.due_at) < new Date();
+  const pill = assignmentPill({submission, overdue, stationsTotal: assigned.length, stationsDone});
   async function submit(event) {
     event.preventDefault();
     const form = event.currentTarget, values = new FormData(form), file = values.get('file');
@@ -62,7 +74,7 @@ function AssignmentCard({client, user, cls, assignment, submission, onChanged}) 
   }
   return <article className="assignment-row student">
     <div className="assignment-title"><b>{assignment.title}</b>
-      <span className={`class-pill ${submission?.graded_at ? 'graded' : submission ? 'done' : overdue ? 'late' : ''}`}>{submission?.graded_at ? 'Graded' : submission ? 'Handed in' : overdue ? 'Overdue' : 'To do'}</span></div>
+      <span className={`class-pill ${pill.tone}`}>{pill.label}</span></div>
     <p className="class-muted">{assignment.due_at ? `Due ${formatDate(assignment.due_at)}` : 'No due date'}</p>
     {assignment.instructions && <p className="class-pre">{assignment.instructions}</p>}
     <AssignedStations stations={assignment.stations || []} progress={progress} labs={labs}/>
@@ -71,7 +83,7 @@ function AssignmentCard({client, user, cls, assignment, submission, onChanged}) 
       {submission.graded_at && <div className="feedback-box"><b>Grade: {submission.grade || '—'}</b>{submission.feedback && <p>{submission.feedback}</p>}</div>}
     </div>}
     <form className="class-form inline-form" onSubmit={submit}>
-      <label>{submission ? 'Replace your file' : 'Your file'}<input name="file" type="file" accept={ACCEPT} required disabled={busy}/></label>
+      <label>{submission ? 'Replace your file' : assigned.length ? 'Your file (optional)' : 'Your file'}<input name="file" type="file" accept={ACCEPT} required disabled={busy}/></label>
       <label className="wide">Note to your teacher (optional)<input name="note" maxLength={2000} disabled={busy}/></label>
       <button className="class-button primary" disabled={busy}>{busy ? 'Uploading…' : submission ? 'Hand in again' : 'Hand in'}</button>
     </form>

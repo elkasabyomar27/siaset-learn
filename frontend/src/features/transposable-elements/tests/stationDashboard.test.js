@@ -6,13 +6,14 @@ import {MemoryRouter} from 'react-router';
 import {createServer} from 'vite';
 import {fileURLToPath} from 'node:url';
 
-let server, picker, dashboard, results, student;
+let server, picker, dashboard, results, student, teacher;
 before(async () => {
   server = await createServer({root: fileURLToPath(new URL('../../../../', import.meta.url)), server: {middlewareMode: true, hmr: false}, appType: 'custom'});
   picker = await server.ssrLoadModule('/src/classroom/StationPicker.jsx');
   dashboard = await server.ssrLoadModule('/src/classroom/StationDashboard.jsx');
   results = await server.ssrLoadModule('/src/classroom/stationResults.js');
   student = await server.ssrLoadModule('/src/classroom/MyClasses.jsx');
+  teacher = await server.ssrLoadModule('/src/classroom/TeacherClasses.jsx');
 });
 after(async () => { await server?.close(); });
 
@@ -98,4 +99,37 @@ test('privacy line', () => {
 test('file-only assignment', () => {
   const out = card([]);
   assert.equal(out, '');
+});
+
+test('station assignments get a pill from station progress, not only the file', () => {
+  const pill = args => student.assignmentPill({submission: null, overdue: false, stationsTotal: 0, stationsDone: 0, ...args});
+  assert.deepEqual(pill({stationsTotal: 2, stationsDone: 2, overdue: true}), {label: 'Stations done', tone: 'done'});
+  assert.deepEqual(pill({stationsTotal: 2, stationsDone: 1, overdue: true}), {label: 'Overdue', tone: 'late'});
+  assert.deepEqual(pill({stationsTotal: 2, stationsDone: 1}), {label: 'To do', tone: ''});
+  assert.deepEqual(pill({submission: {graded_at: 'x'}}), {label: 'Graded', tone: 'graded'});
+  assert.deepEqual(pill({submission: {}, stationsTotal: 2, stationsDone: 0}), {label: 'Handed in', tone: 'done'});
+  assert.deepEqual(pill({overdue: true}), {label: 'Overdue', tone: 'late'});
+});
+
+test('pressing Enter in the station search never submits the assignment form', () => {
+  let prevented = false;
+  picker.ignoreEnter({key: 'Enter', preventDefault() { prevented = true; }});
+  assert.equal(prevented, true);
+  prevented = false;
+  picker.ignoreEnter({key: 'a', preventDefault() { prevented = true; }});
+  assert.equal(prevented, false);
+});
+
+test('file-only assignments do not send a stations field', () => {
+  assert.equal('stations' in teacher.newAssignmentRow({classId: 'c', title: 'T', instructions: '', due: '', stations: []}), false);
+  assert.deepEqual(teacher.newAssignmentRow({classId: 'c', title: 'T', instructions: 'i', due: '', stations: ['tsd']}),
+    {class_id: 'c', title: 'T', instructions: 'i', due_at: null, stations: ['tsd']});
+});
+
+test('refreshing keeps the table and Refresh button on screen', () => {
+  const out = view('refreshing', fixture);
+  assert.match(out, /aria-busy="true"/);
+  assert.match(out, /<table/);
+  assert.match(out, />Refresh</);
+  assert.match(out, /Updating…/);
 });
