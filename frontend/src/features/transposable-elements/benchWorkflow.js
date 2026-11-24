@@ -54,3 +54,52 @@ export function templateCopies(sample = SAMPLE) {
   const ng = quantify({a260, a280, a230, volumeUl: sample.volumeUl}).concentration / sample.dilution * sample.templateUl;
   return Math.round(ng * 1000 / sample.pgPerHaploidGenome);
 }
+
+// ── Shared gate shape (as in dnaExtraction.js): open / restricted / closed ──
+const gate = (id, label, state, note) => ({id, label, state, note});
+
+// ── Station 20: PCR ── Primer Tm is taken as 60 °C; annealing ~5 °C below Tm is typical.
+export const PRIMER_TM = 60;
+export const PCR = {
+  defaults: {primers: 'facing', anneal: 55, polymerase: 'taq', cycles: 30},
+  controls: [
+    {key: 'primers', label: 'Primers', options: {facing: 'Facing each other', same: 'Both on one strand', away: 'Pointing away'}},
+    {key: 'anneal', label: `Annealing temperature (primer Tm ≈ ${PRIMER_TM} °C)`, options: [['45', '45 °C'], ['55', '55 °C'], ['72', '72 °C']]},
+    {key: 'polymerase', label: 'Polymerase', options: {taq: 'Thermostable (Taq)', mesophile: 'Not heat-stable'}},
+    {key: 'cycles', label: 'Cycles', options: [['10', '10'], ['20', '20'], ['30', '30'], ['40', '40']]},
+  ],
+};
+export const PCR_OUTCOMES = {
+  single: {label: 'single product', tone: 'good', text: 'One band at the expected size: the primers bracket one target and copy it.'},
+  none: {label: 'no product', tone: 'bad', text: 'A requirement for amplification is missing, so the target is not copied.'},
+  extra: {label: 'extra bands', tone: 'warn', text: 'The target is made, but primers also bound loosely elsewhere and made other products.'},
+  weak: {label: 'weak product', tone: 'warn', text: 'The right product, but too few cycles to make much of it.'},
+};
+
+export function runPcr(settings) {
+  const s = {...PCR.defaults, ...settings};
+  const anneal = Number(s.anneal), cycles = Number(s.cycles);
+  const gates = [
+    gate('primers', 'Primers bracket the target', s.primers === 'facing' ? 'open' : 'closed',
+      s.primers === 'facing' ? 'Forward and reverse primers point toward each other, so each new strand carries the other primer’s site.'
+        : s.primers === 'same' ? 'Both primers bind the same strand, so new strands never serve as templates for each other: copies only add up linearly, far too few to see.'
+        : 'Primers pointing away copy outward and never define a region between them.'),
+    gate('polymerase', 'Polymerase survives denaturation', s.polymerase === 'taq' ? 'open' : 'closed',
+      s.polymerase === 'taq' ? 'Taq polymerase from Thermus aquaticus tolerates the repeated heating steps.' : 'A non-heat-stable enzyme is inactivated by the first denaturation step.'),
+    gate('anneal', 'Primers bind only their sites', anneal >= PRIMER_TM + 5 ? 'closed' : anneal <= PRIMER_TM - 10 ? 'restricted' : 'open',
+      anneal >= PRIMER_TM + 5 ? `At ${anneal} °C, well above the primer Tm, primers barely stay bound.`
+        : anneal <= PRIMER_TM - 10 ? `At ${anneal} °C primers also bind partly matching sites.` : `About 5 °C below the Tm: primers bind their own sites.`),
+    gate('cycles', 'Enough cycles', cycles <= 10 ? 'restricted' : cycles >= 40 ? 'restricted' : 'open',
+      cycles <= 10 ? 'Ten cycles make only about a thousand-fold more product.' : cycles >= 40 ? 'The reaction has levelled off by then; extra cycles add little and raise the risk of side products.' : `${cycles} cycles take the product well into the visible range.`),
+  ];
+  const outcome = gates.some(g => g.state === 'closed') ? 'none' : cycles <= 10 ? 'weak' : anneal <= PRIMER_TM - 10 ? 'extra' : 'single';
+  const target = {bp: SAMPLE.ampliconBp, intensity: outcome === 'weak' ? 'faint' : 'strong', schematic: false};
+  const bands = outcome === 'none' ? [] : outcome === 'extra'
+    ? [{bp: 1300, intensity: 'faint', schematic: true}, target, {bp: 420, intensity: 'faint', schematic: true}] : [target];
+  return {gates, outcome, bands};
+}
+
+export const idealCopies = (start, n) => start * 2 ** n;
+/** Exact-length duplexes from one template duplex after n ideal cycles. */
+export const exactLengthDuplexes = n => Math.max(0, 2 ** n - 2 * n);
+export const pcrTable = (cycles = 5) => Array.from({length: cycles}, (_, i) => ({cycle: i + 1, total: 2 ** (i + 1), exact: exactLengthDuplexes(i + 1)}));

@@ -48,3 +48,24 @@ test('the template carries about 1,100 genome copies into PCR', () => {
 test('quantify rejects impossible readings', () => {
   for (const bad of [{a280: 0}, {a230: -1}, {volumeUl: 0}]) assert.throws(() => bench.quantify({a260: 0.75, a280: 0.41, a230: 0.38, volumeUl: 50, ...bad}));
 });
+
+test('PCR outcomes follow the gates', () => {
+  const run = patch => bench.runPcr({...bench.PCR.defaults, ...patch});
+  assert.equal(run({}).outcome, 'single');
+  assert.deepEqual(run({}).bands, [{bp: 850, intensity: 'strong', schematic: false}]);
+  for (const [patch, outcome] of [[{primers: 'away'}, 'none'], [{primers: 'same'}, 'none'], [{anneal: 72}, 'none'], [{polymerase: 'mesophile'}, 'none'], [{anneal: 45}, 'extra'], [{cycles: 10}, 'weak'], [{cycles: 40}, 'single']])
+    assert.equal(run(patch).outcome, outcome, JSON.stringify(patch));
+  assert.deepEqual(run({}).gates.map(g => g.state), run({}).gates.map(() => 'open'));
+  assert.equal(run({cycles: 40}).gates.find(g => g.id === 'cycles').state, 'restricted');
+  assert.deepEqual(run({anneal: 45}).bands.map(b => [b.bp, b.schematic]), [[1300, true], [850, false], [420, true]]);
+  assert.deepEqual(run({cycles: 10}).bands, [{bp: 850, intensity: 'faint', schematic: false}]);
+  assert.deepEqual(run({primers: 'away'}).bands, []);
+  for (const key of ['single', 'none', 'extra', 'weak']) assert.ok(bench.PCR_OUTCOMES[key].label, key);
+});
+
+test('PCR copy counts double per cycle; the exact-length product appears at cycle 3', () => {
+  assert.deepEqual([1, 2, 3, 4].map(bench.exactLengthDuplexes), [0, 0, 2, 8]);
+  assert.deepEqual(bench.pcrTable(5).map(r => r.total), [2, 4, 8, 16, 32]);
+  assert.deepEqual(bench.pcrTable(5).map(r => r.cycle), [1, 2, 3, 4, 5]);
+  assert.equal(bench.idealCopies(1100, 10), 1126400);
+});
