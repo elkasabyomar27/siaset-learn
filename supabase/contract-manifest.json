@@ -1,5 +1,5 @@
 {
-  "version": "siaset-v1",
+  "version": "siaset-v2",
   "topics": [
     {
       "id": "introduction",
@@ -1546,6 +1546,274 @@
         "correct": 1,
         "explanation": "Cassette recombination, transposition, plasmid transfer and phenotypic selection are distinct."
       }
+    },
+    {
+      "id": "extraction-principles",
+      "variants": [
+        {
+          "label": "Complete protocol",
+          "blocks": [
+            "lysis: detergent + EDTA",
+            "proteinase K + RNase A digestion",
+            "salt out proteins, centrifuge",
+            "recover DNA: alcohol precipitation + wash"
+          ],
+          "explanation": "Every stage is present: membranes are opened, nucleases are held back, proteins and RNA are removed, and DNA is recovered from the cleared supernatant.",
+          "outcome": "good yield and purity"
+        },
+        {
+          "label": "No detergent",
+          "blocks": [
+            "cells in buffer, no detergent",
+            "proteinase K added",
+            "centrifuge, keep supernatant"
+          ],
+          "explanation": "Assume no other lysis method (such as grinding or bead beating). Many cells stay intact, and their DNA is discarded with the cell pellet.",
+          "outcome": "low yield"
+        },
+        {
+          "label": "Protein removal skipped",
+          "blocks": [
+            "lysis: detergent + EDTA",
+            "no proteinase K, no salting out",
+            "alcohol precipitation"
+          ],
+          "explanation": "Proteins stay in solution and can come down with the DNA; any surviving nucleases can also act on it later.",
+          "outcome": "protein contamination"
+        },
+        {
+          "label": "No EDTA, nucleases active",
+          "blocks": [
+            "lysis without EDTA",
+            "Mg²⁺ available",
+            "endogenous DNases active"
+          ],
+          "explanation": "Assume active cellular DNases and free divalent cations: DNA can be fragmented before the nucleases are digested or removed.",
+          "outcome": "degraded DNA"
+        },
+        {
+          "label": "No RNase A",
+          "blocks": [
+            "lysis: detergent + EDTA",
+            "proteinase K, no RNase",
+            "alcohol precipitation"
+          ],
+          "explanation": "Alcohol precipitates RNA as well as DNA, so RNA co-purifies and inflates a concentration estimated from absorbance at 260 nm.",
+          "outcome": "RNA contamination"
+        }
+      ],
+      "exercise": {
+        "question": "A lysate has been cleared of proteins and RNA. Which step recovers the DNA from this aqueous solution?",
+        "options": [
+          "Adding more detergent",
+          "Alcohol precipitation in the presence of salt",
+          "Adding RNase A"
+        ],
+        "correct": 1,
+        "explanation": "Salt cations neutralize the phosphate backbone and alcohol lowers DNA solubility, so DNA comes out of solution and can be pelleted."
+      },
+      "check": {
+        "question": "What does EDTA contribute to a lysis buffer?",
+        "options": [
+          "It digests proteins",
+          "It chelates Mg²⁺ so DNases are inhibited",
+          "It dissolves lipid membranes"
+        ],
+        "correct": 1,
+        "explanation": "DNases need divalent cations such as Mg²⁺. Binding them up protects the DNA; the detergent, not EDTA, opens membranes."
+      },
+      "check2": {
+        "question": "Why is RNase A added when extracting genomic DNA?",
+        "options": [
+          "RNA would also precipitate and contaminate the DNA",
+          "RNase A breaks open the nucleus",
+          "RNase A removes salt"
+        ],
+        "correct": 0,
+        "explanation": "Alcohol precipitation does not tell DNA from RNA, so RNA co-purifies unless it is degraded."
+      }
+    },
+    {
+      "id": "isopropanol-precipitation",
+      "variants": [
+        {
+          "label": "Salt + 0.7 vol isopropanol",
+          "blocks": [
+            "aqueous DNA + 0.3 M sodium acetate",
+            "+ 0.7 volume isopropanol, mix",
+            "room temperature",
+            "centrifuge → pellet"
+          ],
+          "explanation": "Both requirements are met: the backbone charge is neutralized and the alcohol fraction is high enough. Room temperature limits salt co-precipitation.",
+          "outcome": "DNA pellets"
+        },
+        {
+          "label": "No salt added",
+          "blocks": [
+            "DNA in low-salt water",
+            "+ 0.7 volume isopropanol",
+            "centrifuge"
+          ],
+          "explanation": "Assume the sample contains very little salt. Without cations to neutralize the backbone, DNA precipitates poorly.",
+          "outcome": "poor recovery"
+        },
+        {
+          "label": "Too little alcohol",
+          "blocks": [
+            "DNA + 0.3 M sodium acetate",
+            "+ 0.2 volume isopropanol",
+            "centrifuge"
+          ],
+          "explanation": "The alcohol fraction is too low to drive DNA out of solution.",
+          "outcome": "poor recovery"
+        },
+        {
+          "label": "Isopropanol on ice",
+          "blocks": [
+            "DNA + salt",
+            "+ 0.7 volume isopropanol",
+            "chilled on ice for a long time"
+          ],
+          "explanation": "DNA still precipitates, but cold isopropanol favours salt coming down with it.",
+          "outcome": "salt co-precipitates"
+        },
+        {
+          "label": "Ethanol instead",
+          "blocks": [
+            "DNA + 0.3 M sodium acetate",
+            "+ 2–2.5 volumes ethanol",
+            "centrifuge"
+          ],
+          "explanation": "Ethanol also works, needing roughly three times the alcohol volume; check the total still fits the tube.",
+          "outcome": "DNA pellets"
+        }
+      ],
+      "exercise": {
+        "question": "You must precipitate DNA from 700 µL in a 1.5 mL tube. Which alcohol addition fits?",
+        "options": [
+          "2.5 volumes of ethanol",
+          "0.7 volume of isopropanol",
+          "Either: the volume added makes no difference"
+        ],
+        "correct": 1,
+        "explanation": "0.7 × 700 µL ≈ 490 µL, about 1.2 mL in total. 2.5 × 700 µL = 1750 µL would overflow the tube on its own."
+      },
+      "check": {
+        "question": "Why is isopropanol precipitation usually done at room temperature?",
+        "options": [
+          "DNA is unstable in the cold",
+          "Cold isopropanol increases salt co-precipitation",
+          "Isopropanol freezes on ice"
+        ],
+        "correct": 1,
+        "explanation": "Salts are less soluble in isopropanol, especially when it is cold, so they can pellet with the DNA."
+      },
+      "check2": {
+        "question": "What role does the sodium acetate play?",
+        "options": [
+          "Its Na⁺ ions neutralize the DNA phosphate backbone",
+          "It digests contaminating proteins",
+          "It redissolves the pellet"
+        ],
+        "correct": 0,
+        "explanation": "Neutralizing the negative charge lets DNA molecules aggregate once alcohol lowers the dielectric constant."
+      }
+    },
+    {
+      "id": "ethanol-wash",
+      "variants": [
+        {
+          "label": "70% ethanol, brief air-dry",
+          "blocks": [
+            "pellet + residual salt",
+            "wash: 70% ethanol, spin",
+            "remove wash, air-dry briefly",
+            "dissolve in TE buffer"
+          ],
+          "explanation": "Salt dissolves in the aqueous fraction, DNA stays pelleted, and only a little ethanol needs to evaporate.",
+          "outcome": "clean DNA"
+        },
+        {
+          "label": "Wash with water",
+          "blocks": [
+            "pellet",
+            "wash: water",
+            "spin, discard liquid"
+          ],
+          "explanation": "DNA dissolves in water, so this “wash” pours the DNA away with the salt.",
+          "outcome": "DNA lost"
+        },
+        {
+          "label": "Wash with 100% ethanol",
+          "blocks": [
+            "pellet + residual salt",
+            "wash: 100% ethanol",
+            "air-dry"
+          ],
+          "explanation": "With almost no water present, salt is poorly removed. The DNA is kept, but purity barely improves.",
+          "outcome": "salt remains"
+        },
+        {
+          "label": "Wash skipped",
+          "blocks": [
+            "isopropanol pellet",
+            "no wash",
+            "air-dry"
+          ],
+          "explanation": "Salt and slow-evaporating isopropanol stay with the DNA.",
+          "outcome": "salt remains"
+        },
+        {
+          "label": "Not dried",
+          "blocks": [
+            "wash: 70% ethanol",
+            "dissolve immediately",
+            "ethanol left in the tube"
+          ],
+          "explanation": "Residual ethanol can inhibit enzymes such as polymerases and make a loaded sample float out of the gel well.",
+          "outcome": "ethanol carryover"
+        },
+        {
+          "label": "Over-dried",
+          "blocks": [
+            "wash: 70% ethanol",
+            "dried far too long",
+            "add TE buffer"
+          ],
+          "explanation": "An over-dried pellet, especially of large genomic DNA, can be slow and difficult to redissolve.",
+          "outcome": "hard to dissolve"
+        }
+      ],
+      "exercise": {
+        "question": "Why wash the pellet with 70% rather than 100% ethanol?",
+        "options": [
+          "DNA dissolves in 100% ethanol",
+          "The water fraction dissolves salt while DNA stays insoluble",
+          "70% ethanol leaves no residue at all"
+        ],
+        "correct": 1,
+        "explanation": "The wash needs enough water to dissolve salt, but enough ethanol to keep DNA out of solution."
+      },
+      "check": {
+        "question": "A sample floats out of the well when loaded on an agarose gel. What is the most likely cause?",
+        "options": [
+          "Residual ethanol from incomplete drying",
+          "Too much RNase A",
+          "The DNA is too pure"
+        ],
+        "correct": 0,
+        "explanation": "Ethanol is less dense than the loading mixture, so leftover ethanol lifts the sample out of the well."
+      },
+      "check2": {
+        "question": "Which reading most suggests salt or another contaminant carried over from the wash?",
+        "options": [
+          "A260/A280 of about 1.8",
+          "A260/A230 well below 1.8",
+          "A260/A230 of about 2.1"
+        ],
+        "correct": 1,
+        "explanation": "Many contaminants absorb near 230 nm, lowering A260/A230. A ratio flags a problem; it does not identify the contaminant."
+      }
     }
   ],
   "questions": [
@@ -1968,5 +2236,5 @@
     }
   ],
   "engine_sha256": "4020c786c78ac56e3a9fc7933c57710df241d94505945f7038a7fef9afcac2a5",
-  "sha256": "9d0ced693bfd5c859ff4816224e1ab66f6286fa3cc6b2cd42e7fcdbe346264a6"
+  "sha256": "a5c65a062667b7c024ecef466783eb1a25f69221b3f91c1eb0d497b8d73abf39"
 }

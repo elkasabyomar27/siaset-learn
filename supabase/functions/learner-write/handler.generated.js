@@ -40,90 +40,66 @@ var phase5 = [
   { id: "regulation", objectives: ["Identify element and organism-specific regulation.", "Separate molecular permission from event probability."], terms: ["transposase", "antisense RNA", "RNA-OUT", "DDM1", "silencing"], references: ["acds", "is10-antisense", "is10-promoters", "ddm1"], concept: "Regulation is system-specific. Ac protein can complement compatible Ds ends in maize. In bacterial IS10, promoter architecture controls transcription and RNA-OUT can inhibit transposase translation. In Arabidopsis, DDM1-associated chromatin and methylation participate in silencing selected elements such as CACTA1. Releasing one constraint does not guarantee movement.", variants: [v2("Maize: Ds without Ac", ["compatible Ds ends", "no transposase source"], "Assume no alternative compatible source: Ac-dependent transposition is not permitted.", "not permitted"), v2("Maize: Ac supplied", ["compatible Ds ends", "active Ac protein supplied"], "Under permissive host assumptions, the selected mobility gate is satisfied; an insertion is not guaranteed.", "permitted"), v2("Bacterial IS10: RNA-OUT", ["pIN \u2192 transposase RNA", "RNA-OUT pairing", "ribosome access inhibited"], "Assume functional antisense pairing and no compensating protein supply: transposase production is reduced relative to the unpaired condition.", "reduced"), v2("Bacterial IS10: promoter inactive", ["pIN inactive", "no other transcription source"], "Assume no residual protein or alternative source: transposase availability gate is not met.", "not permitted"), v2("Arabidopsis CACTA1: silenced", ["DDM1-associated chromatin", "methylation-associated repression"], "Selected silenced CACTA1 context: mobility reduced relative to a released state. This is not bacterial regulation.", "reduced"), v2("Arabidopsis: ddm1 context", ["silencing constraint relaxed", "other prerequisites unknown"], "CACTA1 mobilization is documented in ddm1 backgrounds, but a particular copy\u2019s next event cannot be predicted from this condition alone.", "undetermined")], exercise: q2("RNA-OUT pairing is functional in bacterial IS10. What is the supported qualitative direction?", ["Guaranteed insertion", "Reduced transposase production", "All plant TEs silenced"], 1, "Antisense pairing inhibits translation in this documented system."), check: q2("Does supplied Ac convert Ds into an autonomous element?", ["Yes", "No"], 1, "Protein supplied in trans does not change Ds coding capacity."), check2: q2("Does ddm1 guarantee movement of every Arabidopsis TE?", ["Yes", "No"], 1, "Host silencing effects depend on family, copy and cellular context."), limitations: "No universal stress switch or quantitative frequency. RNA-OUT acts at translation, distinct from promoter-level transcription. Host and element mechanisms are not interchangeable." }
 ];
 
-// frontend/src/features/transposable-elements/curriculum/lessons.js
-var question = (question2, options, correct, explanation) => ({ question: question2, options, correct, explanation });
-var variant = (label, blocks, explanation) => ({ label, blocks, explanation });
-var lessons = [
+// frontend/src/features/transposable-elements/curriculum/extraction.js
+var q3 = (question2, options, correct, explanation) => ({ question: question2, options, correct, explanation });
+var v3 = (label, blocks, explanation, outcome) => ({ label, blocks, explanation, outcome });
+var extraction = [
   {
-    id: "introduction",
-    objectives: ["Infer autonomy from encoded functions.", "Separate autonomy from present mobility."],
-    terms: ["autonomous", "non-autonomous", "in trans"],
-    references: ["acds"],
-    concept: "Transposable elements can change genomic location. Autonomous elements encode their own element-specific movement machinery. Non-autonomous elements depend on compatible machinery supplied in trans. Both still require appropriate cellular conditions.",
-    variants: [variant("Intact Ac", ["end", "Ac transposase gene", "end"], "Ac encodes its transposase and is autonomous."), variant("Ds alone", ["end", "Ds: no functional transposase", "end"], "This representative Ds cannot supply transposase."), variant("Ds with Ac", ["end", "Ds + Ac protein in trans", "end"], "Compatible Ac protein can support movement. Ds remains non-autonomous.")],
-    exercise: question("Ds moves when Ac protein is supplied. What is Ds?", ["Autonomous now", "Non-autonomous, complemented in trans", "An RNA element"], 1, "Supplying protein changes mobility conditions, not the genetic capacity encoded by Ds."),
-    check: question("Does an intact transposase gene guarantee an insertion now?", ["Yes", "No: compatible ends, protein activity and host conditions also matter"], 1, "Autonomy describes capacity, not a guaranteed event."),
-    limitations: "Representative compatible Ac/Ds system only. No insertion frequency, host factors or preferences are calculated."
+    id: "extraction-principles",
+    objectives: ["Explain the purpose of each stage: lysis, protein and RNA removal, and DNA recovery.", "Match common reagents to what they do to cells, proteins and nucleic acids.", "Predict how skipping a stage affects yield or purity."],
+    terms: ["lysis", "SDS", "EDTA", "proteinase K", "RNase A", "salting out", "yield", "purity"],
+    references: ["miller1988", "green-ethanol"],
+    concept: "Extracting DNA means releasing it from cells and separating it from everything else the cell contains. A lysis buffer uses a detergent such as SDS to disrupt lipid membranes and denature proteins, while EDTA chelates the Mg\xB2\u207A ions that DNA-degrading nucleases (DNases) need. Proteinase K digests proteins, including nucleases, and RNase A degrades RNA. Proteins are then removed: for example by \u201Csalting out\u201D with concentrated NaCl and centrifugation, by phenol\u2013chloroform extraction, or by binding the DNA to silica. Finally the DNA is recovered from the cleared aqueous solution, often by alcohol precipitation and a wash, and dissolved in buffer.",
+    variants: [
+      v3("Complete protocol", ["lysis: detergent + EDTA", "proteinase K + RNase A digestion", "salt out proteins, centrifuge", "recover DNA: alcohol precipitation + wash"], "Every stage is present: membranes are opened, nucleases are held back, proteins and RNA are removed, and DNA is recovered from the cleared supernatant.", "good yield and purity"),
+      v3("No detergent", ["cells in buffer, no detergent", "proteinase K added", "centrifuge, keep supernatant"], "Assume no other lysis method (such as grinding or bead beating). Many cells stay intact, and their DNA is discarded with the cell pellet.", "low yield"),
+      v3("Protein removal skipped", ["lysis: detergent + EDTA", "no proteinase K, no salting out", "alcohol precipitation"], "Proteins stay in solution and can come down with the DNA; any surviving nucleases can also act on it later.", "protein contamination"),
+      v3("No EDTA, nucleases active", ["lysis without EDTA", "Mg\xB2\u207A available", "endogenous DNases active"], "Assume active cellular DNases and free divalent cations: DNA can be fragmented before the nucleases are digested or removed.", "degraded DNA"),
+      v3("No RNase A", ["lysis: detergent + EDTA", "proteinase K, no RNase", "alcohol precipitation"], "Alcohol precipitates RNA as well as DNA, so RNA co-purifies and inflates a concentration estimated from absorbance at 260 nm.", "RNA contamination")
+    ],
+    exercise: q3("A lysate has been cleared of proteins and RNA. Which step recovers the DNA from this aqueous solution?", ["Adding more detergent", "Alcohol precipitation in the presence of salt", "Adding RNase A"], 1, "Salt cations neutralize the phosphate backbone and alcohol lowers DNA solubility, so DNA comes out of solution and can be pelleted."),
+    check: q3("What does EDTA contribute to a lysis buffer?", ["It digests proteins", "It chelates Mg\xB2\u207A so DNases are inhibited", "It dissolves lipid membranes"], 1, "DNases need divalent cations such as Mg\xB2\u207A. Binding them up protects the DNA; the detergent, not EDTA, opens membranes."),
+    check2: q3("Why is RNase A added when extracting genomic DNA?", ["RNA would also precipitate and contaminate the DNA", "RNase A breaks open the nucleus", "RNase A removes salt"], 0, "Alcohol precipitation does not tell DNA from RNA, so RNA co-purifies unless it is degraded."),
+    limitations: "A generic salting-out workflow for cells without tough walls. Reagent concentrations, incubation times, tissue-specific lysis (plant cell walls, polysaccharides, Gram-positive bacteria) and kit chemistries vary. Outcomes are qualitative teaching categories, not predicted yields."
   },
   {
-    id: "discovery",
-    objectives: ["Connect McClintock\u2019s maize observations to mobile DNA.", "Predict representative Ds dependence on Ac."],
-    terms: ["maize", "Ac", "Ds", "mutable locus"],
-    references: ["mcclintock1950", "acds"],
-    concept: "Barbara McClintock connected changing chromosome behavior and mutable loci in maize to controlling elements. Ac (Activator) and Ds (Dissociation) became a foundational mobile-DNA system. Ds derivatives are structurally diverse; this lesson selects a non-autonomous derivative with compatible ends.",
-    variants: [variant("Maize observations", ["chromosome", "mutable locus", "chromosome"], "Genetic and cytological observations supported the controlling-element interpretation; this is not a reconstructed experiment."), variant("Ac absent", ["Ds ends", "no compatible transposase", "Ds ends"], "The selected Ds cannot undergo Ac-dependent movement without compatible transposase."), variant("Ac present", ["Ds ends", "Ac transposase available", "Ds ends"], "Movement becomes possible, not certain.")],
-    exercise: question("Remove Ac and every other compatible transposase source. Predict Ds mobility.", ["Ds self-mobilizes", "Ac-dependent movement is unsupported", "Ds becomes Class I"], 1, "The selected Ds cannot encode functional transposase."),
-    check: question("Why qualify claims about Ds?", ["All copies are identical", "Different Ds derivatives have different structures"], 1, "A single schematic cannot explain every Ds-associated chromosome or phenotype outcome."),
-    limitations: "No kernel color, timing, chromosome breakage or excision footprint is simulated. Historical observations are not generated experimental evidence."
+    id: "isopropanol-precipitation",
+    objectives: ["Explain why salt and alcohol together bring DNA out of solution.", "Choose an isopropanol volume and temperature that recover DNA without excess salt.", "Compare isopropanol with ethanol precipitation."],
+    terms: ["precipitation", "monovalent cation", "sodium acetate", "isopropanol", "0.6\u20130.7 volume", "pellet", "co-precipitation", "supernatant"],
+    references: ["green-isopropanol", "green-ethanol"],
+    concept: "DNA dissolves in water because its negatively charged phosphate backbone is surrounded by water molecules. Monovalent cations from added salt (for example sodium acetate at about 0.3 M final) neutralize that charge, and alcohol lowers the dielectric constant of the solution so the cations stay bound and the DNA aggregates. DNA is less soluble in isopropanol than in ethanol, so 0.6\u20130.7 volume of isopropanol is enough, compared with 2\u20132.5 volumes of ethanol: useful when the sample volume is large. Salts are also less soluble in isopropanol, so the precipitation is usually done at room temperature to limit salt co-precipitation. Centrifugation collects the DNA as a pellet that is often glassy and hard to see; the supernatant is removed carefully and a 70% ethanol wash follows.",
+    variants: [
+      v3("Salt + 0.7 vol isopropanol", ["aqueous DNA + 0.3 M sodium acetate", "+ 0.7 volume isopropanol, mix", "room temperature", "centrifuge \u2192 pellet"], "Both requirements are met: the backbone charge is neutralized and the alcohol fraction is high enough. Room temperature limits salt co-precipitation.", "DNA pellets"),
+      v3("No salt added", ["DNA in low-salt water", "+ 0.7 volume isopropanol", "centrifuge"], "Assume the sample contains very little salt. Without cations to neutralize the backbone, DNA precipitates poorly.", "poor recovery"),
+      v3("Too little alcohol", ["DNA + 0.3 M sodium acetate", "+ 0.2 volume isopropanol", "centrifuge"], "The alcohol fraction is too low to drive DNA out of solution.", "poor recovery"),
+      v3("Isopropanol on ice", ["DNA + salt", "+ 0.7 volume isopropanol", "chilled on ice for a long time"], "DNA still precipitates, but cold isopropanol favours salt coming down with it.", "salt co-precipitates"),
+      v3("Ethanol instead", ["DNA + 0.3 M sodium acetate", "+ 2\u20132.5 volumes ethanol", "centrifuge"], "Ethanol also works, needing roughly three times the alcohol volume; check the total still fits the tube.", "DNA pellets")
+    ],
+    exercise: q3("You must precipitate DNA from 700 \xB5L in a 1.5 mL tube. Which alcohol addition fits?", ["2.5 volumes of ethanol", "0.7 volume of isopropanol", "Either: the volume added makes no difference"], 1, "0.7 \xD7 700 \xB5L \u2248 490 \xB5L, about 1.2 mL in total. 2.5 \xD7 700 \xB5L = 1750 \xB5L would overflow the tube on its own."),
+    check: q3("Why is isopropanol precipitation usually done at room temperature?", ["DNA is unstable in the cold", "Cold isopropanol increases salt co-precipitation", "Isopropanol freezes on ice"], 1, "Salts are less soluble in isopropanol, especially when it is cold, so they can pellet with the DNA."),
+    check2: q3("What role does the sodium acetate play?", ["Its Na\u207A ions neutralize the DNA phosphate backbone", "It digests contaminating proteins", "It redissolves the pellet"], 0, "Neutralizing the negative charge lets DNA molecules aggregate once alcohol lowers the dielectric constant."),
+    limitations: "Typical ratios from standard protocols. Optimal salt, alcohol volume, incubation and centrifugation depend on DNA amount and fragment size; very dilute or very short DNA may need a carrier or longer spins. Not a quantitative yield model."
   },
   {
-    id: "anatomy",
-    objectives: ["Identify ends, coding regions and orientation.", "Distinguish TIRs from TSDs."],
-    terms: ["TIR", "TSD", "orientation", "transposase", "cargo"],
-    references: ["tn5-ends", "tn5-tsd"],
-    concept: "In a representative TIR-bearing DNA element, terminal recognition regions and internal genes belong to the element. TSDs are host-derived direct repeats outside the insertion. Transposase genes encode movement machinery; accessory cargo serves other functions.",
-    variants: [variant("Boundaries", ["TSD \u2192", "TIR \u2192", "transposase \u2192", "\u2190 TIR", "TSD \u2192"], "The outer TSDs are host-derived. Opposing terminal arrows represent inverted end motifs."), variant("Genes", ["TIR \u2192", "transposase \u2192", "cargo \u2192", "\u2190 TIR"], "Coding arrows show schematic orientation; cargo and transposase have different roles."), variant("Insertion junction", ["host", "TSD \u2192", "element \u2192", "TSD \u2192", "host"], "Both TSD copies trace to one target site, not two elements.")],
-    exercise: question("Which regions move as part of this element?", ["Host TSDs", "Terminal ends and internal genes", "All nearby host DNA"], 1, "TIRs lie inside element boundaries; TSDs lie outside."),
-    check: question("Two flanking direct host repeats demonstrate what?", ["Two element copies", "Target-site duplication"], 1, "Count complete elements independently of the target repeats."),
-    limitations: "Generic TIR-bearing architecture, not every DNA element. The Tn5 19 bp recognition region is not a perfect 19 bp inverted repeat. No nucleotide sequence or scale is asserted."
-  },
-  {
-    id: "classification",
-    objectives: ["Classify pathways by their intermediates.", "Explain why Class II does not imply cut-and-paste."],
-    terms: ["Class I", "Class II", "RNA intermediate", "reverse transcription"],
-    references: ["ty", "tn5-conservative", "kitts1982"],
-    concept: "Class I movement uses an RNA intermediate and reverse transcription to produce DNA. Class II movement is DNA-based and includes diverse pathways. Conservative Tn5 and replicative Tn3 are both Class II; the classification alone does not determine copy-number outcome.",
-    variants: [variant("Ty: Class I", ["DNA", "RNA", "reverse transcription", "new DNA"], "Yeast Ty provides an experimentally supported RNA-intermediate example."), variant("Tn5: Class II", ["donor DNA", "element relocation", "target DNA"], "The selected conservative pathway relocates one element."), variant("Tn3: Class II", ["donor + target DNA", "replication", "cointegrate"], "A DNA-based pathway can increase element copy number.")],
-    exercise: question("An element uses RNA followed by reverse transcription. Classify it.", ["Class II because its product is DNA", "Class I", "Cannot classify"], 1, "The intermediate and reverse-transcription step identify Class I."),
-    check: question("Does DNA-based movement always require conservative excision?", ["Yes", "No, replicative pathways also exist"], 1, "Tn3 is a counterexample to a universal cut-and-paste claim."),
-    limitations: "Conceptual pathways, not additional calculated engines. Ty does not stand for every LTR or non-LTR mechanism."
-  },
-  {
-    id: "dna-diversity",
-    objectives: ["Compare conservative and replicative copy outcomes.", "Separate transposition from resolution."],
-    terms: ["conservative", "replicative", "cointegrate", "res", "TnpR"],
-    references: ["tn5-conservative", "kitts1982", "bennett1983", "kostriken1981"],
-    concept: "DNA transposons do not share one universal mechanism. The selected Tn5 model conserves one element copy. The documented Tn3 interplasmid pathway creates a two-copy cointegrate. TnpR-mediated resolution is a separate recombination operation that partitions, rather than deletes, those copies.",
-    variants: [variant("Tn5", ["donor: 1", "target: 0", "after: target 1"], "One copy overall, with target-side 9 bp TSDs; donor repair is unresolved."), variant("Tn3 cointegrate", ["both backbones", "one circle", "Tn3 \u2192 / Tn3 \u2192"], "Replication creates two directly oriented copies in one circle."), variant("Tn3 resolution", ["cointegrate: 2", "res + TnpR", "replicons: 1 + 1"], "Two copies remain; target-side 5 bp TSDs persist. Physical unlinking is not calculated.")],
-    exercise: question("One circle contains both backbones and two direct Tn3 copies. What occurred?", ["Resolution removed a copy", "Replicative cointegrate formation", "Conservative Tn5 excision"], 1, "The selected replicative transition joins backbones and increases copy number."),
-    check: question("How many Tn3 copies remain after resolution?", ["Two overall", "One overall"], 0, "Resolution does not reverse replication."),
-    limitations: "The selected cointegrate route is not obligatory for every Tn3 event. Diagrams here are explanatory; launch the laboratories for calculated states."
-  },
-  {
-    id: "insertion-sequences",
-    objectives: ["Identify terminal regions and transposition-related genes.", "Distinguish movement machinery from accessory cargo."],
-    terms: ["IS", "IS10", "terminal region", "transposition gene"],
-    references: ["is10-primary", "tn5-ends"],
-    concept: "Insertion sequences are compact elements whose genes primarily support transposition and its regulation. A representative IS10 contains terminal recognition regions and transposition-related coding DNA. The accessory resistance region in the composite examples is distinct from these movement functions. IS families differ in organization and mechanism.",
-    variants: [variant("IS10", ["terminal end", "transposition gene \u2192", "terminal end"], "Simplified IS10 architecture; regulatory and possible overlapping coding details are omitted."), variant("Composite comparison", ["IS module", "resistance cargo", "IS module"], "Cargo bracketed by IS modules is a composite architecture, not a single simple IS."), variant("Functional asymmetry", ["IS10-L", "cargo", "IS10-R"], "Native Tn10 modules are not functionally equivalent: IS10-R supplies normal movement functions.")],
-    exercise: question("Which region directly supplies movement machinery?", ["Transposition-related gene", "Resistance cargo", "Host TSD"], 0, "Resistance cargo has a different function from transposition genes."),
-    check: question("Can one IS diagram establish every IS family\u2019s mechanism?", ["Yes", "No, family-specific evidence is needed"], 1, "Coding organization, ends and mechanisms vary."),
-    limitations: "IS10 is a representative example, not a universal template. No IS movement or regulation is calculated."
-  },
-  {
-    id: "composite",
-    objectives: ["Compare Tn5, Tn10 and Tn9 architectures.", "Separate IS modules, cargo, terminal motifs and TSDs."],
-    terms: ["composite transposon", "IS50", "IS10", "IS1", "accessory cargo"],
-    references: ["tn5-ends", "is10-primary", "tn9-primary"],
-    concept: "Composite transposons can contain accessory genes between flanking IS modules. Classical Tn5 and Tn10 have inverted IS50 and IS10 modules, respectively. Tn9 has directly repeated IS1 modules around chloramphenicol-resistance cargo. Whole-module orientation differs from short terminal motifs within each IS; architecture alone does not establish a shared pathway.",
-    variants: [variant("Tn5", ["IS50-L \u2192", "resistance cargo", "\u2190 IS50-R"], "Inverted IS50 modules; this expands anatomy without changing the abstract engine."), variant("Tn10", ["IS10-L \u2192", "tetracycline cargo", "\u2190 IS10-R"], "Inverted IS10 modules with unequal functional capacity."), variant("Tn9", ["IS1 \u2192", "chloramphenicol cargo", "IS1 \u2192"], "Direct IS1 repeats in classical Tn9; these are not host-derived TSDs.")],
-    exercise: question("Both Tn9 IS1 arrows point the same way. What follows?", ["Direct IS modules, not host TSDs", "They are short TIR motifs", "Tn9 must use the Tn5 pathway"], 0, "Whole IS modules flank cargo. Their orientation does not establish a transposition mechanism."),
-    check: question("Does resistance cargo itself encode the movement machinery in these examples?", ["Yes", "No, that role is associated with the IS modules"], 1, "Cargo and transposition functions are distinct; intact ends and functional machinery still matter."),
-    limitations: "Classical symbolic architectures only. Neither flanking module is assumed equally functional. Tn9 is an anatomy example, not an implemented conservative or replicative simulation."
+    id: "ethanol-wash",
+    objectives: ["Explain why a DNA pellet is washed with 70% ethanol.", "Predict the effect of the wrong wash solution or drying time.", "Connect leftover contaminants to purity readings and downstream problems."],
+    terms: ["70% ethanol", "residual salt", "residual alcohol", "air-drying", "over-drying", "resuspension", "TE buffer", "A260/A280", "A260/A230"],
+    references: ["green-isopropanol", "desjardins2010"],
+    concept: "After precipitation the pellet still holds salt and traces of isopropanol. Washing with 70% ethanol dissolves salt in its water fraction while the DNA stays insoluble, and it replaces the less volatile isopropanol with ethanol that evaporates more readily. The tube is spun again, the wash removed carefully, and the pellet air-dried briefly. Leftover ethanol can inhibit enzymes and make a sample float out of a gel well; over-drying makes large DNA slow to redissolve. The DNA is then dissolved in TE buffer or water. Absorbance ratios give a quick purity check: an A260/A280 of about 1.8 is typical of pure DNA, and an A260/A230 well below the usual 1.8\u20132.2 suggests carryover of contaminants that absorb near 230 nm.",
+    variants: [
+      v3("70% ethanol, brief air-dry", ["pellet + residual salt", "wash: 70% ethanol, spin", "remove wash, air-dry briefly", "dissolve in TE buffer"], "Salt dissolves in the aqueous fraction, DNA stays pelleted, and only a little ethanol needs to evaporate.", "clean DNA"),
+      v3("Wash with water", ["pellet", "wash: water", "spin, discard liquid"], "DNA dissolves in water, so this \u201Cwash\u201D pours the DNA away with the salt.", "DNA lost"),
+      v3("Wash with 100% ethanol", ["pellet + residual salt", "wash: 100% ethanol", "air-dry"], "With almost no water present, salt is poorly removed. The DNA is kept, but purity barely improves.", "salt remains"),
+      v3("Wash skipped", ["isopropanol pellet", "no wash", "air-dry"], "Salt and slow-evaporating isopropanol stay with the DNA.", "salt remains"),
+      v3("Not dried", ["wash: 70% ethanol", "dissolve immediately", "ethanol left in the tube"], "Residual ethanol can inhibit enzymes such as polymerases and make a loaded sample float out of the gel well.", "ethanol carryover"),
+      v3("Over-dried", ["wash: 70% ethanol", "dried far too long", "add TE buffer"], "An over-dried pellet, especially of large genomic DNA, can be slow and difficult to redissolve.", "hard to dissolve")
+    ],
+    exercise: q3("Why wash the pellet with 70% rather than 100% ethanol?", ["DNA dissolves in 100% ethanol", "The water fraction dissolves salt while DNA stays insoluble", "70% ethanol leaves no residue at all"], 1, "The wash needs enough water to dissolve salt, but enough ethanol to keep DNA out of solution."),
+    check: q3("A sample floats out of the well when loaded on an agarose gel. What is the most likely cause?", ["Residual ethanol from incomplete drying", "Too much RNase A", "The DNA is too pure"], 0, "Ethanol is less dense than the loading mixture, so leftover ethanol lifts the sample out of the well."),
+    check2: q3("Which reading most suggests salt or another contaminant carried over from the wash?", ["A260/A280 of about 1.8", "A260/A230 well below 1.8", "A260/A230 of about 2.1"], 1, "Many contaminants absorb near 230 nm, lowering A260/A230. A ratio flags a problem; it does not identify the contaminant."),
+    limitations: "Qualitative outcomes only. Real purity ratios depend on the instrument, blank, pH and concentration, and cannot identify a contaminant with certainty. Drying times depend on pellet size and method."
   }
 ];
-lessons.push(...phase5, phase6);
-var lessonById = (id) => lessons.find((l) => l.id === id);
 
 // frontend/src/features/transposable-elements/curriculum/topics.json
 var topics_default = [
@@ -751,6 +727,252 @@ var topics_default = [
   }
 ];
 
+// frontend/src/features/transposable-elements/curriculum/extractionTopics.json
+var extractionTopics_default = [
+  {
+    id: "extraction-principles",
+    order: 16,
+    title: "DNA Extraction",
+    learningObjectives: [
+      "Explain the purpose of each stage: lysis, protein and RNA removal, and DNA recovery.",
+      "Match common reagents to what they do to cells, proteins and nucleic acids.",
+      "Predict how skipping a stage affects yield or purity."
+    ],
+    essentialTerminology: [
+      "lysis",
+      "SDS",
+      "EDTA",
+      "proteinase K",
+      "RNase A",
+      "salting out",
+      "yield",
+      "purity"
+    ],
+    mechanismProfiles: [],
+    plannedActivities: [
+      "Place each reagent in its protocol stage",
+      "Predict the outcome when a stage is skipped"
+    ],
+    assessmentObjectives: [
+      "Which step recovers DNA from a cleared lysate?",
+      "What does EDTA contribute to a lysis buffer?"
+    ],
+    references: [
+      "miller1988",
+      "green-ethanol"
+    ],
+    status: "implemented",
+    lessonId: "extraction-principles",
+    learning: {
+      kind: "lesson"
+    },
+    assessment: {
+      includeEvidence: true
+    }
+  },
+  {
+    id: "isopropanol-precipitation",
+    order: 17,
+    title: "Isopropanol Precipitation",
+    learningObjectives: [
+      "Explain why salt and alcohol together bring DNA out of solution.",
+      "Choose an isopropanol volume and temperature that recover DNA without excess salt.",
+      "Compare isopropanol with ethanol precipitation."
+    ],
+    essentialTerminology: [
+      "precipitation",
+      "monovalent cation",
+      "sodium acetate",
+      "isopropanol",
+      "0.6\u20130.7 volume",
+      "pellet",
+      "co-precipitation",
+      "supernatant"
+    ],
+    mechanismProfiles: [],
+    plannedActivities: [
+      "Set up a precipitation tube and test each requirement",
+      "Predict the outcome of each precipitation set-up"
+    ],
+    assessmentObjectives: [
+      "Which alcohol fits a 700 \xB5L sample in a 1.5 mL tube?",
+      "Why is isopropanol precipitation usually done at room temperature?"
+    ],
+    references: [
+      "green-isopropanol",
+      "green-ethanol"
+    ],
+    status: "implemented",
+    lessonId: "isopropanol-precipitation",
+    learning: {
+      kind: "lesson"
+    },
+    assessment: {
+      includeEvidence: true
+    }
+  },
+  {
+    id: "ethanol-wash",
+    order: 18,
+    title: "Ethanol Washing",
+    learningObjectives: [
+      "Explain why a DNA pellet is washed with 70% ethanol.",
+      "Predict the effect of the wrong wash solution or drying time.",
+      "Connect leftover contaminants to purity readings and downstream problems."
+    ],
+    essentialTerminology: [
+      "70% ethanol",
+      "residual salt",
+      "residual alcohol",
+      "air-drying",
+      "over-drying",
+      "resuspension",
+      "TE buffer",
+      "A260/A280",
+      "A260/A230"
+    ],
+    mechanismProfiles: [],
+    plannedActivities: [
+      "Wash and dry a pellet, then read the quality report",
+      "Predict the outcome of each wash and drying choice"
+    ],
+    assessmentObjectives: [
+      "Why wash with 70% rather than 100% ethanol?",
+      "Which purity reading suggests salt carryover?"
+    ],
+    references: [
+      "green-isopropanol",
+      "desjardins2010"
+    ],
+    status: "implemented",
+    lessonId: "ethanol-wash",
+    learning: {
+      kind: "lesson"
+    },
+    assessment: {
+      includeEvidence: true
+    }
+  }
+];
+
+// frontend/src/features/transposable-elements/curriculum/modules.js
+var modules = [
+  {
+    id: "transposable-elements",
+    field: "genetics",
+    title: "Transposable Elements",
+    summary: "How mobile DNA was discovered, how it moves, and what an insertion can change.",
+    basePath: "/learn/transposable-elements",
+    topics: topics_default,
+    chapters: [
+      { id: "recognize", title: "Recognize an element", question: "What is the evidence for mobility, which DNA belongs to the element, and what moves through which intermediate?", topics: ["introduction", "discovery", "anatomy", "classification"] },
+      { id: "mechanism", title: "Follow a mechanism", question: "What happens to copies and replicons during the two worked pathways?", topics: ["dna-diversity", "conservative", "replicative"] },
+      { id: "architecture", title: "Read genetic architecture", question: "How are movement functions and cargo organized into modules?", topics: ["insertion-sequences", "composite"] },
+      { id: "insertion", title: "Interpret an insertion", question: "Which structural, phenotypic, transcriptional and junction-level claims follow from the evidence?", topics: ["genomic-consequences", "phenotypes", "expression", "tsd"] },
+      { id: "context", title: "Place movement in context", question: "What permits movement, and when does DNA enter a different cell?", topics: ["regulation", "bacterial-hgt"] }
+    ]
+  },
+  {
+    id: "dna-extraction",
+    field: "molecular-biology",
+    title: "DNA Extraction & Purification",
+    summary: "Free DNA from cells, pull it out of solution with isopropanol, and wash it clean.",
+    basePath: "/learn/dna-extraction",
+    topics: extractionTopics_default,
+    chapters: [
+      { id: "isolate", title: "From cell to clean DNA", question: "How do we release DNA, bring it out of solution, and remove what came with it?", topics: ["extraction-principles", "isopropanol-precipitation", "ethanol-wash"] }
+    ]
+  }
+];
+var moduleByTopic = new Map(modules.flatMap((module) => module.topics.map((topic) => [topic.id, module])));
+var allTopics = modules.flatMap((module) => module.topics).sort((a, b) => a.order - b.order);
+var allChapters = modules.flatMap((module) => module.chapters.map((chapter) => ({ ...chapter, module: module.id })));
+
+// frontend/src/features/transposable-elements/curriculum/lessons.js
+var question = (question2, options, correct, explanation) => ({ question: question2, options, correct, explanation });
+var variant = (label, blocks, explanation) => ({ label, blocks, explanation });
+var lessons = [
+  {
+    id: "introduction",
+    objectives: ["Infer autonomy from encoded functions.", "Separate autonomy from present mobility."],
+    terms: ["autonomous", "non-autonomous", "in trans"],
+    references: ["acds"],
+    concept: "Transposable elements can change genomic location. Autonomous elements encode their own element-specific movement machinery. Non-autonomous elements depend on compatible machinery supplied in trans. Both still require appropriate cellular conditions.",
+    variants: [variant("Intact Ac", ["end", "Ac transposase gene", "end"], "Ac encodes its transposase and is autonomous."), variant("Ds alone", ["end", "Ds: no functional transposase", "end"], "This representative Ds cannot supply transposase."), variant("Ds with Ac", ["end", "Ds + Ac protein in trans", "end"], "Compatible Ac protein can support movement. Ds remains non-autonomous.")],
+    exercise: question("Ds moves when Ac protein is supplied. What is Ds?", ["Autonomous now", "Non-autonomous, complemented in trans", "An RNA element"], 1, "Supplying protein changes mobility conditions, not the genetic capacity encoded by Ds."),
+    check: question("Does an intact transposase gene guarantee an insertion now?", ["Yes", "No: compatible ends, protein activity and host conditions also matter"], 1, "Autonomy describes capacity, not a guaranteed event."),
+    limitations: "Representative compatible Ac/Ds system only. No insertion frequency, host factors or preferences are calculated."
+  },
+  {
+    id: "discovery",
+    objectives: ["Connect McClintock\u2019s maize observations to mobile DNA.", "Predict representative Ds dependence on Ac."],
+    terms: ["maize", "Ac", "Ds", "mutable locus"],
+    references: ["mcclintock1950", "acds"],
+    concept: "Barbara McClintock connected changing chromosome behavior and mutable loci in maize to controlling elements. Ac (Activator) and Ds (Dissociation) became a foundational mobile-DNA system. Ds derivatives are structurally diverse; this lesson selects a non-autonomous derivative with compatible ends.",
+    variants: [variant("Maize observations", ["chromosome", "mutable locus", "chromosome"], "Genetic and cytological observations supported the controlling-element interpretation; this is not a reconstructed experiment."), variant("Ac absent", ["Ds ends", "no compatible transposase", "Ds ends"], "The selected Ds cannot undergo Ac-dependent movement without compatible transposase."), variant("Ac present", ["Ds ends", "Ac transposase available", "Ds ends"], "Movement becomes possible, not certain.")],
+    exercise: question("Remove Ac and every other compatible transposase source. Predict Ds mobility.", ["Ds self-mobilizes", "Ac-dependent movement is unsupported", "Ds becomes Class I"], 1, "The selected Ds cannot encode functional transposase."),
+    check: question("Why qualify claims about Ds?", ["All copies are identical", "Different Ds derivatives have different structures"], 1, "A single schematic cannot explain every Ds-associated chromosome or phenotype outcome."),
+    limitations: "No kernel color, timing, chromosome breakage or excision footprint is simulated. Historical observations are not generated experimental evidence."
+  },
+  {
+    id: "anatomy",
+    objectives: ["Identify ends, coding regions and orientation.", "Distinguish TIRs from TSDs."],
+    terms: ["TIR", "TSD", "orientation", "transposase", "cargo"],
+    references: ["tn5-ends", "tn5-tsd"],
+    concept: "In a representative TIR-bearing DNA element, terminal recognition regions and internal genes belong to the element. TSDs are host-derived direct repeats outside the insertion. Transposase genes encode movement machinery; accessory cargo serves other functions.",
+    variants: [variant("Boundaries", ["TSD \u2192", "TIR \u2192", "transposase \u2192", "\u2190 TIR", "TSD \u2192"], "The outer TSDs are host-derived. Opposing terminal arrows represent inverted end motifs."), variant("Genes", ["TIR \u2192", "transposase \u2192", "cargo \u2192", "\u2190 TIR"], "Coding arrows show schematic orientation; cargo and transposase have different roles."), variant("Insertion junction", ["host", "TSD \u2192", "element \u2192", "TSD \u2192", "host"], "Both TSD copies trace to one target site, not two elements.")],
+    exercise: question("Which regions move as part of this element?", ["Host TSDs", "Terminal ends and internal genes", "All nearby host DNA"], 1, "TIRs lie inside element boundaries; TSDs lie outside."),
+    check: question("Two flanking direct host repeats demonstrate what?", ["Two element copies", "Target-site duplication"], 1, "Count complete elements independently of the target repeats."),
+    limitations: "Generic TIR-bearing architecture, not every DNA element. The Tn5 19 bp recognition region is not a perfect 19 bp inverted repeat. No nucleotide sequence or scale is asserted."
+  },
+  {
+    id: "classification",
+    objectives: ["Classify pathways by their intermediates.", "Explain why Class II does not imply cut-and-paste."],
+    terms: ["Class I", "Class II", "RNA intermediate", "reverse transcription"],
+    references: ["ty", "tn5-conservative", "kitts1982"],
+    concept: "Class I movement uses an RNA intermediate and reverse transcription to produce DNA. Class II movement is DNA-based and includes diverse pathways. Conservative Tn5 and replicative Tn3 are both Class II; the classification alone does not determine copy-number outcome.",
+    variants: [variant("Ty: Class I", ["DNA", "RNA", "reverse transcription", "new DNA"], "Yeast Ty provides an experimentally supported RNA-intermediate example."), variant("Tn5: Class II", ["donor DNA", "element relocation", "target DNA"], "The selected conservative pathway relocates one element."), variant("Tn3: Class II", ["donor + target DNA", "replication", "cointegrate"], "A DNA-based pathway can increase element copy number.")],
+    exercise: question("An element uses RNA followed by reverse transcription. Classify it.", ["Class II because its product is DNA", "Class I", "Cannot classify"], 1, "The intermediate and reverse-transcription step identify Class I."),
+    check: question("Does DNA-based movement always require conservative excision?", ["Yes", "No, replicative pathways also exist"], 1, "Tn3 is a counterexample to a universal cut-and-paste claim."),
+    limitations: "Conceptual pathways, not additional calculated engines. Ty does not stand for every LTR or non-LTR mechanism."
+  },
+  {
+    id: "dna-diversity",
+    objectives: ["Compare conservative and replicative copy outcomes.", "Separate transposition from resolution."],
+    terms: ["conservative", "replicative", "cointegrate", "res", "TnpR"],
+    references: ["tn5-conservative", "kitts1982", "bennett1983", "kostriken1981"],
+    concept: "DNA transposons do not share one universal mechanism. The selected Tn5 model conserves one element copy. The documented Tn3 interplasmid pathway creates a two-copy cointegrate. TnpR-mediated resolution is a separate recombination operation that partitions, rather than deletes, those copies.",
+    variants: [variant("Tn5", ["donor: 1", "target: 0", "after: target 1"], "One copy overall, with target-side 9 bp TSDs; donor repair is unresolved."), variant("Tn3 cointegrate", ["both backbones", "one circle", "Tn3 \u2192 / Tn3 \u2192"], "Replication creates two directly oriented copies in one circle."), variant("Tn3 resolution", ["cointegrate: 2", "res + TnpR", "replicons: 1 + 1"], "Two copies remain; target-side 5 bp TSDs persist. Physical unlinking is not calculated.")],
+    exercise: question("One circle contains both backbones and two direct Tn3 copies. What occurred?", ["Resolution removed a copy", "Replicative cointegrate formation", "Conservative Tn5 excision"], 1, "The selected replicative transition joins backbones and increases copy number."),
+    check: question("How many Tn3 copies remain after resolution?", ["Two overall", "One overall"], 0, "Resolution does not reverse replication."),
+    limitations: "The selected cointegrate route is not obligatory for every Tn3 event. Diagrams here are explanatory; launch the laboratories for calculated states."
+  },
+  {
+    id: "insertion-sequences",
+    objectives: ["Identify terminal regions and transposition-related genes.", "Distinguish movement machinery from accessory cargo."],
+    terms: ["IS", "IS10", "terminal region", "transposition gene"],
+    references: ["is10-primary", "tn5-ends"],
+    concept: "Insertion sequences are compact elements whose genes primarily support transposition and its regulation. A representative IS10 contains terminal recognition regions and transposition-related coding DNA. The accessory resistance region in the composite examples is distinct from these movement functions. IS families differ in organization and mechanism.",
+    variants: [variant("IS10", ["terminal end", "transposition gene \u2192", "terminal end"], "Simplified IS10 architecture; regulatory and possible overlapping coding details are omitted."), variant("Composite comparison", ["IS module", "resistance cargo", "IS module"], "Cargo bracketed by IS modules is a composite architecture, not a single simple IS."), variant("Functional asymmetry", ["IS10-L", "cargo", "IS10-R"], "Native Tn10 modules are not functionally equivalent: IS10-R supplies normal movement functions.")],
+    exercise: question("Which region directly supplies movement machinery?", ["Transposition-related gene", "Resistance cargo", "Host TSD"], 0, "Resistance cargo has a different function from transposition genes."),
+    check: question("Can one IS diagram establish every IS family\u2019s mechanism?", ["Yes", "No, family-specific evidence is needed"], 1, "Coding organization, ends and mechanisms vary."),
+    limitations: "IS10 is a representative example, not a universal template. No IS movement or regulation is calculated."
+  },
+  {
+    id: "composite",
+    objectives: ["Compare Tn5, Tn10 and Tn9 architectures.", "Separate IS modules, cargo, terminal motifs and TSDs."],
+    terms: ["composite transposon", "IS50", "IS10", "IS1", "accessory cargo"],
+    references: ["tn5-ends", "is10-primary", "tn9-primary"],
+    concept: "Composite transposons can contain accessory genes between flanking IS modules. Classical Tn5 and Tn10 have inverted IS50 and IS10 modules, respectively. Tn9 has directly repeated IS1 modules around chloramphenicol-resistance cargo. Whole-module orientation differs from short terminal motifs within each IS; architecture alone does not establish a shared pathway.",
+    variants: [variant("Tn5", ["IS50-L \u2192", "resistance cargo", "\u2190 IS50-R"], "Inverted IS50 modules; this expands anatomy without changing the abstract engine."), variant("Tn10", ["IS10-L \u2192", "tetracycline cargo", "\u2190 IS10-R"], "Inverted IS10 modules with unequal functional capacity."), variant("Tn9", ["IS1 \u2192", "chloramphenicol cargo", "IS1 \u2192"], "Direct IS1 repeats in classical Tn9; these are not host-derived TSDs.")],
+    exercise: question("Both Tn9 IS1 arrows point the same way. What follows?", ["Direct IS modules, not host TSDs", "They are short TIR motifs", "Tn9 must use the Tn5 pathway"], 0, "Whole IS modules flank cargo. Their orientation does not establish a transposition mechanism."),
+    check: question("Does resistance cargo itself encode the movement machinery in these examples?", ["Yes", "No, that role is associated with the IS modules"], 1, "Cargo and transposition functions are distinct; intact ends and functional machinery still matter."),
+    limitations: "Classical symbolic architectures only. Neither flanking module is assumed equally functional. Tn9 is an anatomy example, not an implemented conservative or replicative simulation."
+  }
+];
+lessons.push(...phase5, phase6, ...extraction);
+var lessonById = (id) => lessons.find((l) => l.id === id);
+
 // frontend/src/features/transposable-elements/lessonProgress.js
 function updateProgress(progress, id, kind, value) {
   const lesson = lessonById(id);
@@ -1146,13 +1368,15 @@ function buildQuestions(topics, lessonBank = lessons) {
 }
 var questions = buildQuestions(topics_default);
 var order = topics_default.map((topic) => topic.id);
+var moduleBanks = Object.fromEntries(modules.slice(1).map((module) => [module.id, buildQuestions(module.topics)]));
+var allQuestions = [...questions, ...Object.values(moduleBanks).flat()];
 function scoreAssessment(answers) {
   if (!answers || typeof answers !== "object" || Array.isArray(answers)) throw new Error("Answer map required");
   for (const [id, value] of Object.entries(answers)) {
-    const q3 = questions.find((q4) => q4.id === id);
-    if (!q3 || !Number.isInteger(value) || value < 0 || value >= q3.options.length) throw new Error("Invalid assessment answer");
+    const q4 = questions.find((q5) => q5.id === id);
+    if (!q4 || !Number.isInteger(value) || value < 0 || value >= q4.options.length) throw new Error("Invalid assessment answer");
   }
-  const items = questions.map((q3) => ({ id: q3.id, topicId: q3.topicId, correct: answers[q3.id] === q3.correct, answered: Object.hasOwn(answers, q3.id) }));
+  const items = questions.map((q4) => ({ id: q4.id, topicId: q4.topicId, correct: answers[q4.id] === q4.correct, answered: Object.hasOwn(answers, q4.id) }));
   return { correct: items.filter((i) => i.correct).length, total: items.length, answered: items.filter((i) => i.answered).length, items, topics: order.map((topicId) => ({ topicId, correct: items.filter((i) => i.topicId === topicId && i.correct).length, total: items.filter((i) => i.topicId === topicId).length })) };
 }
 
@@ -1170,7 +1394,7 @@ function validLabEvidence(record) {
 }
 
 // server/validate.js
-var CONTRACT_VERSION = "siaset-v1";
+var CONTRACT_VERSION = "siaset-v2";
 var MAX_BYTES = 65536;
 var uuid = (value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 var decimal = (value) => typeof value === "string" && /^(0|[1-9][0-9]{0,17})$/.test(value);
