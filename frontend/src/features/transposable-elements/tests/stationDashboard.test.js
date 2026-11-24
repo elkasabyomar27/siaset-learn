@@ -6,12 +6,13 @@ import {MemoryRouter} from 'react-router';
 import {createServer} from 'vite';
 import {fileURLToPath} from 'node:url';
 
-let server, picker, dashboard, results;
+let server, picker, dashboard, results, student;
 before(async () => {
   server = await createServer({root: fileURLToPath(new URL('../../../../', import.meta.url)), server: {middlewareMode: true, hmr: false}, appType: 'custom'});
   picker = await server.ssrLoadModule('/src/classroom/StationPicker.jsx');
   dashboard = await server.ssrLoadModule('/src/classroom/StationDashboard.jsx');
   results = await server.ssrLoadModule('/src/classroom/stationResults.js');
+  student = await server.ssrLoadModule('/src/classroom/MyClasses.jsx');
 });
 after(async () => { await server?.close(); });
 
@@ -79,4 +80,22 @@ test('rpc error', () => {
 test('cells are buttons with accessible names', () => {
   const out = view('ready', fixture);
   assert.match(out, /<button[^>]*aria-label="Amira, 13 Target-Site Duplication: In progress"/);
+});
+
+const card = stations => html(createElement(student.AssignedStations, {stations, progress: {}, labs: {}}));
+
+test('student card lists assigned stations with own status and links', () => {
+  const out = card(['tsd']);
+  assert.match(out, /13 · Target-Site Duplication/);
+  assert.match(out, />New</);
+  assert.match(out, /href="\/learn\/transposable-elements\/tsd"/);
+});
+
+test('privacy line', () => {
+  assert.ok(card(['tsd']).includes('Your teacher can see your progress and answers on these stations.'));
+});
+
+test('file-only assignment', () => {
+  const out = card([]);
+  assert.equal(out, '');
 });
