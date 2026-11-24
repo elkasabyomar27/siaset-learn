@@ -5,16 +5,20 @@ export function routePresentation(pathname, search = '') {
   pathname = pathname.replace(/\/+$/, '') || '/';
   const learn = '/learn/transposable-elements';
   const lab = '/lab/transposable-elements';
-  if (pathname === '/') return {title: 'Overview', section: null, identity: '/'};
+  if (pathname === '/') return {title: 'Virtual lab', section: null, identity: '/'};
   if (pathname === lab) {
     const experiment = experimentFromParams(new URLSearchParams(search));
     return {title: `${experiment === 'tn3' ? 'Tn3 replicative' : 'Tn5 conservative'} guided laboratory`, section: 'labs', identity: `${lab}?experiment=${experiment}`};
   }
   const pages = {
+    '/lab': ['Lab room', null],
+    '/stations': ['Station finder', 'curriculum'],
+    '/practice': ['Practice', 'assessment'],
+    '/notebook': ['Your notebook', 'progress'],
     '/account': ['Your account', null],
     '/auth/callback': ['Verify sign-in', null],
     '/auth/recovery': ['Password recovery', null],
-    [learn]: ['Curriculum', 'curriculum'],
+    [learn]: ['Station finder', 'curriculum'],
     [`${lab}/sandbox`]: ['Sandbox', 'sandbox'],
     [`${learn}/assessment`]: ['Cumulative assessment', 'assessment'],
     [`${learn}/progress`]: ['Your learning progress', 'progress'],
