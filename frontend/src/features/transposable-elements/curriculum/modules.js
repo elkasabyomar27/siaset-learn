@@ -4,9 +4,17 @@ import extractionTopics from './extractionTopics.json' with { type: 'json' };
 // The curriculum is a list of modules. Topic ids are unique across modules (they key saved
 // progress), and `order` continues across modules so the whole path reads 01…N.
 // The transposable-element module keeps its original 15 topics, routes and assessment bank.
+// Fields group modules across the whole lab. A module names its field; fields own no topics.
+// Add a field here and point new modules at it; every lab page groups and filters by field.
+export const fields = [
+  { id: 'genetics', title: 'Genetics', summary: 'How genes are built, move and change what a cell can do.' },
+  { id: 'molecular-biology', title: 'Molecular Biology', summary: 'Bench methods for getting molecules out of cells and cleaning them up.' },
+];
+
 export const modules = [
   {
     id: 'transposable-elements',
+    field: 'genetics',
     title: 'Transposable Elements',
     summary: 'How mobile DNA was discovered, how it moves, and what an insertion can change.',
     basePath: '/learn/transposable-elements',
@@ -21,6 +29,7 @@ export const modules = [
   },
   {
     id: 'dna-extraction',
+    field: 'molecular-biology',
     title: 'DNA Extraction & Purification',
     summary: 'Free DNA from cells, pull it out of solution with isopropanol, and wash it clean.',
     basePath: '/learn/dna-extraction',
@@ -37,6 +46,10 @@ export const allTopics = modules.flatMap(module => module.topics).sort((a, b) =>
 export const allChapters = modules.flatMap(module => module.chapters.map(chapter => ({ ...chapter, module: module.id })));
 export const moduleById = id => modules.find(module => module.id === id);
 export const moduleForTopic = id => moduleByTopic.get(id);
+export const fieldById = id => fields.find(field => field.id === id);
+export const fieldForModule = module => fieldById(module?.field);
+export const fieldForTopic = id => fieldForModule(moduleForTopic(id));
+export const modulesInField = id => modules.filter(module => module.field === id);
 /** 1-based position of a topic inside its own module. */
 export const positionInModule = id => {
   const module = moduleForTopic(id);

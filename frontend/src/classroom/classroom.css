@@ -81,7 +81,7 @@
 .bank-list{max-height:320px;overflow:auto;border:1px solid var(--color-border);border-radius:var(--radius-md)}
 .bank-list>div{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--color-border);font-size:14px}
 /* live quiz colours (shared by editor and game) */
-.option-red{--opt:#C8364A}.option-blue{--opt:#1E6FC8}.option-gold{--opt:#B57A07}.option-green{--opt:#1B8A4C}
+.option-red{--opt:#9B3440}.option-blue{--opt:#10283F}.option-gold{--opt:#F5B75E}.option-green{--opt:#166653}
 /* live game */
 .live-page{max-width:none;padding:0;margin:0}
 .live-stage{min-height:calc(100vh - 66px);display:flex;flex-direction:column;background:linear-gradient(160deg,#10283F,#176D80);color:#fff;padding:16px clamp(16px,3vw,40px) 30px}
@@ -125,7 +125,7 @@ button.live-option:active{transform:translateY(3px);box-shadow:0 2px 0 #0003}
 .player .live-top .score{font-weight:800;background:#fff;color:#10283F;padding:4px 12px;border-radius:999px}
 .answer-buttons{grid-auto-rows:minmax(110px,1fr)}
 .live-wait h2{font-size:clamp(28px,6vw,48px);margin:0}
-.live-wait.result.is-right{background:#1B8A4C}.live-wait.result.is-wrong{background:#C8364A}
+.live-wait.result.is-right{background:#166653}.live-wait.result.is-wrong{background:#9B3440}
 .live-wait.result{margin:-16px calc(-1*clamp(16px,3vw,40px)) -30px;padding:30px}
 .live-wait .points{font-size:42px;font-weight:800;margin:0}
 @media(max-width:860px){.class-columns{grid-template-columns:1fr}.submission-row{grid-template-columns:1fr}.grade-form{grid-template-columns:1fr 1fr}.grade-form button{grid-column:1/-1}.teacher-review dl{grid-template-columns:1fr}.teacher-review dd{margin-bottom:8px}}

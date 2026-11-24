@@ -29,22 +29,32 @@ test('route titles and navigation distinguish lessons, tools, fallback routes an
   assert.equal(routePresentation('/learn/transposable-elements/missing').section, null);
 });
 
-test('the sidebar is the single navigation and marks exactly one current destination per route', async () => {
+test('the lab header is the single navigation and marks exactly one current destination per route', async () => {
   const {default: WorkspaceShell} = await server.ssrLoadModule('/src/ui/WorkspaceShell.jsx');
   const {AuthProvider} = await server.ssrLoadModule('/src/auth/AuthProvider.jsx');
+  const render = path => renderToStaticMarkup(createElement(MemoryRouter, {initialEntries: [path]}, createElement(AuthProvider, null, createElement(WorkspaceShell, null, 'page'))));
   for (const [path, label] of [
-    ['/', 'Overview'],
-    ['/learn/transposable-elements', 'Curriculum'],
-    ['/learn/transposable-elements/introduction', 'Curriculum'],
-    ['/lab/transposable-elements?experiment=tn3', 'Guided labs'],
-    ['/lab/transposable-elements/sandbox', 'Sandbox'],
-    ['/learn/transposable-elements/assessment', 'Assessment'],
-    ['/learn/transposable-elements/progress', 'Progress'],
+    ['/lab', 'Lab room'],
+    ['/stations', 'Station finder'],
+    ['/learn/transposable-elements', 'Station finder'],
+    ['/learn/transposable-elements/introduction', 'Lab room'],
+    ['/lab/transposable-elements?experiment=tn3', 'Lab room'],
+    ['/lab/transposable-elements/sandbox', 'Lab room'],
+    ['/practice', 'Practice'],
+    ['/learn/transposable-elements/assessment', 'Practice'],
+    ['/notebook', 'Notebook'],
+    ['/learn/transposable-elements/progress', 'Notebook'],
+    ['/classes', 'Classroom'],
+    ['/teach', 'Classroom'],
   ]) {
-    const html = renderToStaticMarkup(createElement(MemoryRouter, {initialEntries: [path]}, createElement(AuthProvider, null, createElement(WorkspaceShell, null, 'page'))));
+    const html = render(path);
     const current = html.match(/<a[^>]*aria-current="page"[^>]*>/g) || [];
     assert.equal(current.length, 1, path);
     assert.match(current[0], new RegExp(`aria-label="${label}"`), path);
     assert.equal(/class="feature-nav"|class="section-switcher/.test(html), false, path);
   }
+  // The public landing page carries its own section links and no current lab destination.
+  const landing = render('/');
+  assert.equal((landing.match(/aria-current="page"/g) || []).length, 0);
+  assert.match(landing, /href="#fields"/);
 });
