@@ -11,6 +11,7 @@ const TABLE = {
       : ['target-tsd-left', 'target-tsd-right'].includes(g.target) ? {type: 'inspect', feature: g.target} : null,
   },
   tn3: {
+    // `drop tnpR` / `drop target-circle`: emit only for drops that landed on the res / donor zone.
     drop: g => g.target === 'target-circle' && Number.isFinite(g.angle) ? {type: 'dock-target', angle: g.angle}
       : g.target === 'tnpR' ? {type: 'enzyme', available: true} : null,
     hold: g => g.target === 'fork' ? {type: 'replicate'} : null,
@@ -20,6 +21,7 @@ const TABLE = {
 };
 
 export function storyIntent(scenario, gesture) {
-  const rule = Object.hasOwn(TABLE, scenario) && gesture ? TABLE[scenario][gesture.kind] : null;
+  const table = Object.hasOwn(TABLE, scenario) ? TABLE[scenario] : null;
+  const rule = table && gesture && Object.hasOwn(table, gesture.kind) ? table[gesture.kind] : null;
   return rule ? rule(gesture) || null : null;
 }

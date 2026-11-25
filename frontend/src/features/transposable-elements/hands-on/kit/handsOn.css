@@ -8,7 +8,7 @@
 .ho-stage:focus-visible { outline: 3px solid var(--color-focus-on-dark); outline-offset: 3px; }
 .ho-stage button, .ho-stage [role="button"], .ho-stage [tabindex] { min-height: 44px; min-width: 44px; }
 /* Kit SVG targets draw their own focus ring (below); everything else gets the outline. */
-.ho-stage :focus-visible:not(.ho-hold, .ho-swipe, .ho-drag, .ho-track) { outline: 3px solid var(--color-focus-on-dark); outline-offset: 2px; }
+.ho-stage :focus-visible:not(.ho-hold, .ho-swipe, .ho-drag, .ho-track, .ho-tap) { outline: 3px solid var(--color-focus-on-dark); outline-offset: 2px; }
 
 /* 3/4 bench: the floor leans back, items stand on it */
 .ho-bench { position: relative; }
@@ -52,13 +52,14 @@
    set the >= 44 px touch area. Focus is drawn on the hit element: outlines on SVG
    groups are unreliable across browsers. */
 .ho-svg { display: block; max-width: 100%; height: auto; overflow: visible; }
-.ho-hold, .ho-swipe, .ho-drag, .ho-track { cursor: pointer; }
+.ho-hold, .ho-swipe, .ho-drag, .ho-track, .ho-tap { cursor: pointer; }
 /* Beats the app-wide [role=button]:focus-visible outline, so the dashed ring is the only indicator. */
-g:is(.ho-hold, .ho-swipe, .ho-drag, .ho-track)[role="button"]:focus-visible { outline: none; }
+/* :focus too: Chrome paints a UA outline on a mouse-focused SVG group even when it is not :focus-visible. */
+g:is(.ho-hold, .ho-swipe, .ho-drag, .ho-track, .ho-tap)[role="button"]:is(:focus, :focus-visible) { outline: none; }
 .ho-drag { cursor: grab; }
 .ho-hit { fill: transparent; stroke: transparent; }
 .ho-track-hit { fill: none; }
-.ho-hold:focus-visible .ho-hit, .ho-swipe:focus-visible .ho-hit, .ho-drag:focus-visible .ho-hit {
+.ho-hold:focus-visible .ho-hit, .ho-swipe:focus-visible .ho-hit, .ho-drag:focus-visible .ho-hit, .ho-tap:focus-visible .ho-hit {
   stroke: var(--color-focus-on-dark); stroke-width: 3; stroke-dasharray: 6 4;
 }
 .ho-focus-ring { fill: none; stroke: none; pointer-events: none; }

@@ -36,7 +36,6 @@ function StoryLab({ scenario, changeScenario }) {
   const activeRefs = references.filter(r => referenceIds.includes(r.id));
   const dispatch = action => setS(prev => storyAction(prev, action.angle === undefined ? action : {...action, boundary: boundaryFromAngle(action.angle)}));
   const state = s.history.state;
-  const free = scenario === 'tn5' && s.cut.length === 2 && s.stage === 1;
 
   function save() {
     setSaved(progressRepository.recordLab(s.history, s.stage, s.answers)
@@ -62,19 +61,17 @@ function StoryLab({ scenario, changeScenario }) {
       <h2>{step.title}</h2><p>{step.task}</p>
       {guided.checkpoint && !(guided.checkpoint === 'tn3' && s.stage > 1) && <Checkpoint id={guided.checkpoint} answer={s.answers[guided.checkpoint]} onAnswer={value => dispatch({type: 'answer', checkpoint: guided.checkpoint, value})} />}
       <div className="sl-actions">
-        {scenario === 'tn5' && s.stage === 0 && ['left', 'right'].map(end => <button key={end} type="button" className="outline-button" disabled={s.bound.includes(end)} onClick={() => dispatch({type: 'bind', end})}>{s.bound.includes(end) ? `✓ ${end} end bound` : `Bind ${end} end`}</button>)}
-        {scenario === 'tn5' && s.stage === 1 && !free && ['left', 'right'].map(end => <button key={end} type="button" className="outline-button" disabled={s.cut.includes(end) || s.answers.tn5 !== 0} onClick={() => dispatch({type: 'cut', end})}>{s.cut.includes(end) ? `✓ ${end} end cut` : `✂ Cut ${end} end`}</button>)}
-        {((scenario === 'tn5' && free) || (scenario === 'tn3' && s.stage === 0)) && <><label className="sl-site">Ring position <input type="range" min="0" max="359" value={site} onChange={e => setSite(Number(e.target.value))} /><b>{boundaryFromAngle(site)}</b></label>
-          <button type="button" className="primary-button" onClick={() => dispatch({type: scenario === 'tn5' ? 'insert' : 'dock-target', angle: site})}>{scenario === 'tn5' ? 'Insert Tn5 here' : 'Join target here'} →</button><small className="sl-or">or tap the ring in the scene</small></>}
-        {scenario === 'tn5' && s.stage === 2 && <button type="button" className="primary-button" onClick={() => dispatch({type: 'continue'})}>Inspect the insertion →</button>}
-        {scenario === 'tn5' && s.stage === 3 && ['target-tsd-left', 'target-tsd-right'].map(id => <button key={id} type="button" className="outline-button" disabled={s.inspected.includes(id)} onClick={() => dispatch({type: 'inspect', feature: id})}>{s.inspected.includes(id) ? '✓ ' : ''}{id.endsWith('left') ? 'Left' : 'Right'} repeat</button>)}
+        {/* Tn5 is done entirely in the scene. Tn3's controls stay until its scene moves onto the kit. */}
+        {scenario === 'tn3' && s.stage === 0 && <><label className="sl-site">Ring position <input type="range" min="0" max="359" value={site} onChange={e => setSite(Number(e.target.value))} /><b>{boundaryFromAngle(site)}</b></label>
+          <button type="button" className="primary-button" onClick={() => dispatch({type: 'dock-target', angle: site})}>Join target here →</button><small className="sl-or">or tap the ring in the scene</small></>}
         {scenario === 'tn3' && s.stage === 2 && <button type="button" className="primary-button" onClick={() => dispatch({type: 'replicate'})}>Start replication →</button>}
         {scenario === 'tn3' && s.stage === 3 && ['copy-1', 'copy-2'].map(id => <button key={id} type="button" className="outline-button" disabled={s.inspected.includes(id)} onClick={() => dispatch({type: 'inspect', feature: id})}>{s.inspected.includes(id) ? '✓ ' : ''}Tn3 {id === 'copy-1' ? 'copy 1' : 'copy 2'}</button>)}
         {scenario === 'tn3' && s.stage === 4 && <><button type="button" className="outline-button" aria-pressed={s.tnpR} onClick={() => dispatch({type: 'enzyme', available: !s.tnpR})}>{s.tnpR ? '✓ TnpR docked on res' : 'Dock TnpR on res'}</button><button type="button" className="primary-button" onClick={() => dispatch({type: 'resolve'})}>Resolve →</button></>}
         {isComplete(s) && <button type="button" className="primary-button" onClick={save}>Save completed lab</button>}
         <button type="button" className="account-text-button sl-restart" onClick={() => { setS(newStory(scenario)); setSaved(null); }}>Restart lab</button>
       </div>
-      {s.message && <div className={`sl-message${s.message.ok ? ' is-good' : ''}`} role="status">{s.message.text}</div>}
+      {/* Tn5 shows the model's message in the scene's next-step line instead. */}
+      {s.message && scenario !== 'tn5' && <div className={`sl-message${s.message.ok ? ' is-good' : ''}`} role="status">{s.message.text}</div>}
       {saved && <div className={`sl-message${saved.ok ? ' is-good' : ''}`} role="status">{saved.text}</div>}
       <WhatChanged change={s.change} onDismiss={() => setS(prev => ({...prev, change: null}))} />
     </section>

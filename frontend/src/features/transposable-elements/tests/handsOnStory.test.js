@@ -1,8 +1,9 @@
-import test from 'node:test';
+import test, {describe, before, after} from 'node:test';
 import assert from 'node:assert/strict';
 import { newStory, storyAction, isComplete, boundaryFromAngle } from '../storyLab.js';
 import { validLabEvidence } from '../learnerRecords.js';
 import { storyIntent } from '../hands-on/intents/story.js';
+import { startSsr } from './helpers/ssr.js';
 
 const evidence = s => ({scenario: s.scenario, stage: s.stage, answers: s.answers, events: s.history.events.slice(0, s.history.cursor)});
 const run = (s, actions) => actions.reduce(storyAction, s);
@@ -55,4 +56,63 @@ test('premature gestures still reach the model; meaningless ones map to null', (
   assert.equal(storyIntent('tn5', tap('ring')), null);
   assert.equal(storyIntent('tn3', swipe('fork')), null);
   assert.equal(storyIntent('nope', hold('fork')), null);
+});
+
+test('storyIntent ignores inherited gesture kinds', () => {
+  for (const kind of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+    assert.equal(storyIntent('tn5', {kind, target: 'end-left'}), null, kind);
+    assert.equal(storyIntent('tn3', {kind, target: 'fork'}), null, kind);
+  }
+});
+
+test('STORY task text names the gestures', async () => {
+  const {STORY} = await import('../storyLab.js');
+  assert.match(STORY.tn5[0].task, /hold/i);
+  assert.match(STORY.tn5[1].task, /swipe/i);
+  assert.match(STORY.tn5[1].task, /drag/i);
+  assert.match(STORY.tn5[3].task, /tap/i);
+  for (const step of STORY.tn5) assert.doesNotMatch(step.task, /Tap both ends/);
+});
+
+test('story-lab CSS: no global focus override; new scene CSS uses tokens and gated motion', async () => {
+  const {readFileSync} = await import('node:fs');
+  const story = readFileSync(new URL('../components/storyLab.css', import.meta.url), 'utf8');
+  // A bare [role=button]:focus-visible rule gave kit targets a second focus indicator.
+  assert.doesNotMatch(story, /(^|[},])\s*\[role=["']?button["']?\]:focus-visible/m);
+  assert.match(story, /\.sl-scene \[role=button\]:focus-visible/, 'old-markup scenes keep a focus indicator');
+  const scenes = readFileSync(new URL('../components/storyScenes.css', import.meta.url), 'utf8');
+  assert.doesNotMatch(scenes, /#[0-9a-f]{3,8}\b|rgba?\(/i, 'tokens only');
+  const outside = scenes.replace(/@media \(prefers-reduced-motion: no-preference\)\s*\{[\s\S]*$/, '');
+  assert.doesNotMatch(outside, /animation\s*:|transition\s*:/, 'motion only inside the no-preference block');
+});
+
+describe('Tn5 lab on the kit (SSR)', () => {
+  let ssr, html;
+  before(async () => {
+    ssr = await startSsr();
+    const Laboratory = (await ssr.load('/src/features/transposable-elements/Laboratory.jsx')).default;
+    html = ssr.html(Laboratory, {}, {url: '/lab/transposable-elements?experiment=tn5'});
+  });
+  after(() => ssr.close());
+
+  test('Tn5 lab has no action buttons under the scene', () => {
+    const buttons = [...html.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/g)].map(m => m[1].replace(/<[^>]+>/g, ''));
+    assert.ok(buttons.length > 0, 'page still has its commitment buttons');
+    for (const text of buttons) {
+      assert.doesNotMatch(text, /Bind (left|right) end|Cut (left|right) end|Insert Tn5 here|Inspect the insertion|(Left|Right) repeat/);
+    }
+    assert.doesNotMatch(html, /<input[^>]*type="range"/);
+    assert.match(html, /Restart lab/);
+  });
+
+  test('Tn5 scene targets are labelled', () => {
+    assert.match(html, /role="button"[^>]*aria-label="Hold to bind transposase to the left end[^"]*"/);
+    assert.match(html, /role="button"[^>]*aria-label="Hold to bind transposase to the right end[^"]*"/);
+  });
+
+  test('Tn5 scene keeps a live region and an SVG label', () => {
+    assert.match(html, /<div class="ho-next[^"]*" role="status" aria-live="polite"><\/div>/);
+    // R7: the scene SVG holds interactive targets, so it is a labelled group, not an img.
+    assert.match(html, /<svg[^>]*class="ho-svg"[^>]*role="group"[^>]*aria-label="[^"]*Tn5[^"]*"/);
+  });
 });

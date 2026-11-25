@@ -19,31 +19,22 @@
 .sl-backbone { stroke-width:9; stroke-linecap:round; fill:none; }
 .sl-donor { stroke:var(--scientific-donor); }
 .sl-target { stroke:var(--scientific-target); }
-.sl-element { fill:var(--scientific-element); }
-.sl-element-label { fill:#2c220d; font-size:14px; font-weight:700; pointer-events:none; }
 .sl-element-arc { fill:none; stroke:var(--scientific-element); stroke-width:15; stroke-linecap:butt; }
-.sl-tir { fill:var(--scientific-tir); stroke:#0b1217; stroke-width:1.5; }
 .sl-tsd { fill:none; stroke:var(--scientific-tsd); stroke-width:15; }
 .sl-res { fill:var(--scientific-res); stroke:#0b1217; stroke-width:2; }
-.sl-donor-left, .sl-donor-right, .sl-element-group, .sl-slide, .sl-tnp { transition:transform .8s cubic-bezier(.4,0,.2,1); }
+.sl-slide, .sl-tnp { transition:transform .8s cubic-bezier(.4,0,.2,1); }
 .sl-tnp circle { fill:#b78ad0; stroke:#f1e0fa; stroke-width:2; }
 .sl-tnp text { fill:#22102c; font-size:13px; font-weight:800; }
-.sl-tnp.is-idle circle { animation:sl-breathe 1.8s ease-in-out infinite; }
 .sl-tnpr circle { fill:#ff9f7a; stroke:#ffe1d4; }
-.sl-synapsis { fill:none; stroke:#b78ad0; stroke-width:2; stroke-dasharray:5 4; }
 .sl-transfer { fill:none; stroke:#ffd27a; stroke-width:1.6; stroke-dasharray:4 4; opacity:.8; }
-.sl-scissors circle { fill:#1d2a33; stroke:#5d7c8c; stroke-width:1.5; }
-.sl-scissors text { fill:#5d7c8c; font-size:15px; }
-.sl-scissors.is-done circle { fill:#3d2620; stroke:#ff9f7a; } .sl-scissors.is-done text { fill:#ff9f7a; }
 .sl-ring-glow { fill:none; stroke:#8edfc9; stroke-width:22; opacity:.12; animation:sl-ring 1.8s ease-in-out infinite; pointer-events:none; }
 .sl-ring-track { fill:none; stroke:transparent; stroke-width:34; cursor:crosshair; }
 .is-target { cursor:pointer; }
-.sl-tir.is-target, .sl-res.is-target { stroke:#fff; stroke-width:2.5; animation:sl-pulse 1.4s ease-in-out infinite; }
-.sl-scissors.is-target circle { stroke:#ff9f7a; stroke-width:2.5; animation:sl-pulse 1.4s ease-in-out infinite; }
-.sl-scissors.is-target text { fill:#ffb597; }
+.sl-res.is-target { stroke:#fff; stroke-width:2.5; animation:sl-pulse 1.4s ease-in-out infinite; }
 .sl-element-arc.is-target, .sl-tsd.is-target { animation:sl-glow 1.4s ease-in-out infinite; }
 .sl-element-arc.is-done, .sl-tsd.is-done { filter:drop-shadow(0 0 6px #fff6c8); }
-[role=button]:focus-visible { outline:none; filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 2px #8edfc9); }
+/* Old-markup scenes (Tn3) only: kit targets draw their own single focus ring (handsOn.css). */
+.sl-scene [role=button]:focus-visible { outline:none; filter:drop-shadow(0 0 4px var(--color-molecular-text)) drop-shadow(0 0 2px var(--color-focus-on-dark)); }
 .sl-pop { animation:sl-pop .6s ease both; transform-box:fill-box; transform-origin:center; }
 
 .sl-task { margin-top:14px; padding:18px 20px; border-radius:14px; border:1px solid #22313b; background:#0f171d; color:#dfe8ec; }
@@ -74,8 +65,8 @@
   .sl-caption, .sl-note { font-size:14px; }
 }
 @media (prefers-reduced-motion:reduce) {
-  .sl-donor-left, .sl-donor-right, .sl-element-group, .sl-slide, .sl-tnp { transition:none; }
-  .sl-hint, .sl-tnp.is-idle circle, .sl-ring-glow, .sl-tir.is-target, .sl-res.is-target, .sl-scissors.is-target circle, .sl-element-arc.is-target, .sl-tsd.is-target, .sl-pop { animation:none; }
+  .sl-slide, .sl-tnp { transition:none; }
+  .sl-hint, .sl-ring-glow, .sl-res.is-target, .sl-element-arc.is-target, .sl-tsd.is-target, .sl-pop { animation:none; }
 }
 
 /* Free sandbox layout */

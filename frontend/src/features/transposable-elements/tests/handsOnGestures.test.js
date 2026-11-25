@@ -233,3 +233,9 @@ test('drag: cancel (e.g. blur) ends a keyboard carry, with or without zones', ()
     assert.equal(s.done, null);
   }
 });
+
+test('swipe: a path point exactly on the line still counts as crossing it', () => {
+  let s = startSwipe({line: {x1: 174, y1: 120, x2: 202, y2: 120}});
+  for (const e of [{type: 'down', x: 188, y: 70}, {type: 'move', x: 188, y: 120}, {type: 'move', x: 188, y: 170}]) s = stepSwipe(s, e);
+  assert.deepEqual(s.done, {via: 'pointer'});
+});

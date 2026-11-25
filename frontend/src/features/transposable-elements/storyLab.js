@@ -11,10 +11,10 @@ export const FINAL_STAGE = {tn5: guidedStages.tn5.length - 1, tn3: guidedStages.
 /** Story steps shown to learners, each tied to a guided stage index. */
 export const STORY = {
   tn5: [
-    {stage: 0, title: 'Recruit transposase', task: 'Tap both ends of the gold Tn5 element to bind a transposase to each end.'},
-    {stage: 1, title: 'Predict, then cut and carry', task: 'Predict the copy number. Then cut Tn5 free at both ends and drop it onto the target ring.'},
-    {stage: 2, title: 'See what was calculated', task: 'Tn5 is now in the target. The donor is left in two broken pieces. Continue to inspect the insertion.'},
-    {stage: 3, title: 'Find the host repeats', task: 'Tap both purple repeats that now flank Tn5 in the target.'},
+    {stage: 0, title: 'Recruit transposase', task: 'Press and hold each gold end of Tn5 until the ring fills, to bind a transposase to each end.'},
+    {stage: 1, title: 'Predict, then cut and carry', task: 'Predict the copy number. Then swipe down across each end to cut Tn5 free, and drag it onto the target ring.'},
+    {stage: 2, title: 'See what was calculated', task: 'Tn5 is now in the target. The donor is left in two broken pieces. Tap the inserted Tn5 to inspect the insertion.'},
+    {stage: 3, title: 'Find the host repeats', task: 'Tap each purple repeat that now flanks Tn5 in the target.'},
     {stage: 4, title: 'Review and save', task: 'One element moved; the target site was duplicated. Save your completed lab.'},
   ],
   tn3: [
