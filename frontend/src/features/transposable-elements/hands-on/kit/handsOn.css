@@ -45,7 +45,30 @@
   stroke: var(--color-brand-accent);
   stroke-dasharray: 100; stroke-dashoffset: calc(100 - 100 * var(--ho-progress, 0));
 }
-.ho-hold-hit { fill: transparent; r: 22; }
+
+/* SVG kit targets (HoldTarget, SwipeTarget, Draggable, Track). The hit element is
+   invisible but painted, so it takes pointer events; its r/width/height attributes
+   set the >= 44 px touch area. Focus is drawn on the hit element: outlines on SVG
+   groups are unreliable across browsers. */
+.ho-svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+.ho-hold, .ho-swipe, .ho-drag, .ho-track { cursor: pointer; outline: none; }
+.ho-drag { cursor: grab; }
+.ho-hit { fill: transparent; stroke: transparent; }
+.ho-track-hit { fill: none; }
+.ho-hold:focus-visible .ho-hit, .ho-swipe:focus-visible .ho-hit, .ho-drag:focus-visible .ho-hit {
+  stroke: var(--color-focus-on-dark); stroke-width: 3; stroke-dasharray: 6 4;
+}
+.ho-track:focus-visible .ho-hit { stroke: color-mix(in srgb, var(--color-focus-on-dark) 35%, transparent); }
+.ho-halo, .ho-swipe-guide { fill: none; stroke: var(--color-brand-highlight); stroke-width: 2; pointer-events: none; }
+.ho-swipe-guide { stroke-dasharray: 5 5; stroke-linecap: round; }
+.ho-ghost { fill: none; stroke: var(--color-brand-highlight); stroke-width: 10; stroke-linecap: round; stroke-opacity: 0.55; pointer-events: none; }
+.ho-ghost-dot { fill: var(--color-brand-highlight); pointer-events: none; }
+.ho-lift { transform-box: fill-box; transform-origin: center; }
+
+/* Molecular and bench stage variants */
+.ho-molecular { background: var(--color-molecular-background); }
+.ho-bench .ho-floor { position: absolute; left: var(--space-4); right: var(--space-4); bottom: var(--space-4); height: 45%; }
+.ho-bench .ho-svg { position: relative; }
 
 /* Next-step line */
 .ho-next {
@@ -64,6 +87,12 @@
 /* Demo hand: static arrow + text under reduced motion, animated otherwise */
 .ho-hand { position: absolute; pointer-events: none; color: var(--color-brand-highlight); }
 .ho-hand-label { color: var(--color-molecular-muted); font-size: 0.9em; }
+.ho-hand-layer { color: var(--color-brand-highlight); pointer-events: none; }
+.ho-hand-halo { fill: color-mix(in srgb, currentColor 25%, transparent); stroke: currentColor; stroke-width: 2; }
+.ho-hand-tip { fill: currentColor; }
+.ho-hand-arrow line { stroke: currentColor; stroke-width: 2.5; stroke-dasharray: 6 4; }
+.ho-hand-arrow polygon { fill: currentColor; }
+text.ho-hand-label { fill: var(--color-molecular-muted); font-weight: 600; }
 
 @media (prefers-reduced-motion: no-preference) {
   .ho-expected { animation: ho-pulse 1.6s ease-in-out infinite; }
@@ -71,6 +100,13 @@
   .ho-target { transition: background-color 0.15s, border-color 0.15s; }
   .ho-hold-ring-fill { transition: stroke-dashoffset 0.08s linear; }
   .ho-hand[data-moving="true"] { animation: ho-hand-move 2.2s ease-in-out infinite; }
+  .ho-halo { animation: ho-halo 1.6s ease-in-out infinite; }
+  .ho-drag[data-dragging="false"] { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  @keyframes ho-halo {
+    0%, 100% { stroke-opacity: 0.9; stroke-width: 2; }
+    50% { stroke-opacity: 0.25; stroke-width: 6; }
+  }
 
   @keyframes ho-pulse {
     0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-highlight) 45%, transparent); }
