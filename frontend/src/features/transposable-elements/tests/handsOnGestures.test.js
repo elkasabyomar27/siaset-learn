@@ -50,32 +50,77 @@ test('hold fires once per press', () => {
   assert.equal(later.phase, 'done');
 });
 
-const vline = { x1: 188, y1: 80, x2: 188, y2: 160 };
+const seg = { x1: 170, y1: 120, x2: 206, y2: 120 };
+const path = (...pts) => pts.map(([x, y], i) => ({ type: i ? 'move' : 'down', x, y, t: i * 20 }));
 
-test('swipe across the midline within the band completes', () => {
-  const s = run(stepSwipe, startSwipe({ line: vline }), [
-    { type: 'down', x: 200, y: 60, t: 0 }, { type: 'move', x: 200, y: 120, t: 50 }, { type: 'move', x: 200, y: 180, t: 100 }]);
-  assert.ok(s.done);
+test('swipe: vertical stroke through the segment completes', () => {
+  const s = run(stepSwipe, startSwipe({ line: seg }), path([188, 60], [188, 100], [188, 180]));
+  assert.deepEqual(s.done, { via: 'pointer' });
 });
 
-test('swipe 40 units to the side does not complete', () => {
-  const s = run(stepSwipe, startSwipe({ line: vline }), [
-    { type: 'down', x: 228, y: 60, t: 0 }, { type: 'move', x: 228, y: 120, t: 50 }, { type: 'move', x: 228, y: 180, t: 100 }, { type: 'up', x: 228, y: 180, t: 120 }]);
+test('swipe: stroke at x=250 (beyond segment plus band) does not complete', () => {
+  const s = run(stepSwipe, startSwipe({ line: seg }), [...path([250, 60], [250, 100], [250, 180]), { type: 'up', x: 250, y: 180, t: 99 }]);
   assert.equal(s.done, null);
 });
 
-test('swipe crossing the line itself completes; cancel mid-path cancels', () => {
-  const crossed = run(stepSwipe, startSwipe({ line: vline }), [
-    { type: 'down', x: 100, y: 120, t: 0 }, { type: 'move', x: 150, y: 120, t: 20 }, { type: 'move', x: 260, y: 120, t: 40 }]);
-  assert.ok(crossed.done);
-  const c = run(stepSwipe, startSwipe({ line: vline }), [{ type: 'down', x: 228, y: 60, t: 0 }, { type: 'move', x: 228, y: 90, t: 10 }, { type: 'cancel', t: 20 }]);
+test('swipe: crossing within band past the end completes, beyond band does not', () => {
+  assert.ok(run(stepSwipe, startSwipe({ line: seg }), path([230, 60], [230, 180])).done);
+  assert.equal(run(stepSwipe, startSwipe({ line: seg }), path([241, 60], [241, 180])).done, null);
+});
+
+test('swipe: stroke along the segment does not complete', () => {
+  assert.equal(run(stepSwipe, startSwipe({ line: seg }), path([150, 130], [188, 130], [230, 130])).done, null);
+  assert.equal(run(stepSwipe, startSwipe({ line: seg }), path([150, 120], [188, 120], [230, 120])).done, null);
+});
+
+test('swipe: non-crossing stroke on one side does not complete', () => {
+  assert.equal(run(stepSwipe, startSwipe({ line: seg }), path([188, 60], [188, 110], [200, 90])).done, null);
+});
+
+test('swipe: cancel mid-path cancels', () => {
+  const c = run(stepSwipe, startSwipe({ line: seg }), [...path([188, 60], [188, 90]), { type: 'cancel', t: 50 }]);
   assert.equal(c.phase, 'cancelled');
   assert.equal(c.done, null);
 });
 
 test('swipe Enter key completes via key', () => {
-  const s = stepSwipe(startSwipe({ line: vline }), { type: 'key-down', key: 'Enter', t: 0 });
+  const s = stepSwipe(startSwipe({ line: seg }), { type: 'key-down', key: 'Enter', t: 0 });
   assert.deepEqual(s.done, { via: 'key' });
+});
+
+test('hold: key auto-repeat after done does not re-arm or fire again', () => {
+  let s = run(stepHold, startHold({}), [{ type: 'key-down', key: 'Enter', t: 0 }, ...ticks(0, 700)]);
+  const first = s.done;
+  s = run(stepHold, s, [{ type: 'key-down', key: 'Enter', t: 750 }, { type: 'key-down', key: 'Enter', t: 800 }, ...ticks(800, 2000)]);
+  assert.equal(s.done, first);
+  assert.equal(s.phase, 'done');
+  s = run(stepHold, s, [{ type: 'key-up', key: 'Enter', t: 2100 }, { type: 'key-down', key: 'Enter', t: 2200 }]);
+  assert.equal(s.phase, 'holding');
+  assert.equal(s.done, null);
+});
+
+test('hold: pointer up does not abort a key hold; trackStep ignores unknown keys', () => {
+  const s = run(stepHold, startHold({}), [{ type: 'key-down', key: 'Enter', t: 0 }, { type: 'up', x: 0, y: 0, t: 10 }]);
+  assert.equal(s.phase, 'holding');
+  assert.equal(trackStep(40, undefined), 40);
+  assert.equal(trackStep(40, 'Tab'), 40);
+});
+
+test('pour: cancel keeps the poured value, emits no done, and the next down resumes', () => {
+  let s = run(stepPour, startPour({ marks, rate: 0.5 }), [{ type: 'down', x: 0, y: 0, t: 0 }, ...ticks(0, 1000), { type: 'cancel', t: 1000 }]);
+  assert.equal(s.phase, 'cancelled');
+  assert.equal(s.done, null);
+  assert.ok(Math.abs(s.value - 0.5) < 1e-9);
+  s = run(stepPour, s, [{ type: 'down', x: 0, y: 0, t: 5000 }, ...ticks(5000, 5400), { type: 'up', x: 0, y: 0, t: 5400 }]);
+  assert.ok(Math.abs(s.value - 0.7) < 1e-9);
+  assert.equal(s.done.mark, 0.7);
+});
+
+test('dial: cancel mid-turn cancels without done', () => {
+  const s = run(stepDial, startDial({ center: { x: 0, y: 0 }, threshold: Math.PI }), [
+    { type: 'down', x: 1, y: 0, t: 0 }, { type: 'move', x: 0, y: 1, t: 10 }, { type: 'cancel', t: 20 }]);
+  assert.equal(s.phase, 'cancelled');
+  assert.equal(s.done, null);
 });
 
 const ring = { id: 'ring', contains: (x, y) => Math.hypot(x - 100, y - 100) <= 30 };

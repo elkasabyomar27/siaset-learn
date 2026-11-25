@@ -1,6 +1,7 @@
 const DIRS = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 };
 
 export function trackStep(value, key, { step = 10, bigStep = 45, min = 0, max = 359, wrap = true } = {}) {
+  if (typeof key !== 'string') return value;
   const big = key.startsWith('Shift+'), dir = DIRS[big ? key.slice(6) : key];
   if (!dir) return value;
   const next = value + dir * (big ? bigStep : step);
