@@ -18,6 +18,8 @@ export function demoHand(state, event) {
       const next = {...s, kind: event.kind};
       if (s.dragging) return finish({...next, show: null});
       if (!s.seen.has(event.kind)) return finish(reveal(next, event.kind, event.t));
+      // Seen kind: a step change hides the old demo and restarts the idle clock.
+      if (event.kind !== s.kind) return finish({...next, show: null, idleSince: event.t});
       return finish(next);
     }
     case 'activity':

@@ -10,7 +10,7 @@
 .ho-stage :focus-visible { outline: 3px solid var(--color-focus-on-dark); outline-offset: 2px; }
 
 /* 3/4 bench: the floor leans back, items stand on it */
-.ho-bench { perspective: 900px; }
+.ho-bench { position: relative; }
 .ho-floor {
   transform: perspective(700px) rotateX(52deg); transform-origin: 50% 100%;
   background: linear-gradient(var(--color-brand-primary), var(--color-molecular-background));
@@ -38,7 +38,7 @@
   filter: drop-shadow(0 10px 8px color-mix(in srgb, var(--color-brand-primary) 70%, transparent));
 }
 
-/* Hold progress ring (SVG circle; --ho-progress is 0..1) */
+/* Hold progress ring (SVG circle; --ho-progress is 0..1). The circle MUST set pathLength="100" for the dash math. */
 .ho-hold-ring { fill: none; stroke-width: 4; stroke-linecap: round; }
 .ho-hold-ring-track { stroke: color-mix(in srgb, var(--color-molecular-text) 25%, transparent); }
 .ho-hold-ring-fill {
@@ -71,8 +71,7 @@
   .ho-target { transition: background-color 0.15s, border-color 0.15s; }
   .ho-hold-ring-fill { transition: stroke-dashoffset 0.08s linear; }
   .ho-hand[data-moving="true"] { animation: ho-hand-move 2.2s ease-in-out infinite; }
-}
-@media (prefers-reduced-motion: no-preference) {
+
   @keyframes ho-pulse {
     0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-highlight) 45%, transparent); }
     50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-brand-highlight) 0%, transparent); }

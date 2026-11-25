@@ -26,10 +26,35 @@ test('demo hand shows once per kind, again after 8 s idle, never while dragging,
   assert.equal(s.show, null, 'a new kind waits for the drag to end');
   s = demoHand(s, {type: 'drag', active: false});
   assert.equal(s.dragging, false);
+  assert.equal(s.show, 'hold', 'the deferred kind shows when the drag ends');
   const fresh = demoHand(initialDemo({reducedMotion: true}), {type: 'need', kind: 'swipe', t: 0});
   assert.equal(fresh.show, 'swipe');
   assert.equal(fresh.still, true, 'reduced motion renders a static arrow and text');
   assert.equal(demoHand(initialDemo(), {type: 'need', kind: 'x', t: 0}).seen.has('x'), true);
+});
+
+test('demo hand: still is false without reduced motion', () => {
+  const s = demoHand(initialDemo(), {type: 'need', kind: 'drag', t: 0});
+  assert.equal(s.still, false);
+  assert.equal(initialDemo().still, false);
+});
+
+test('demo hand: a step change to a seen kind clears the old demo and resets the idle clock', () => {
+  let s = initialDemo();
+  s = demoHand(s, {type: 'need', kind: 'A', t: 0});
+  s = demoHand(s, {type: 'activity', t: 10});
+  s = demoHand(s, {type: 'need', kind: 'B', t: 20});
+  s = demoHand(s, {type: 'activity', t: 30});
+  s = demoHand(s, {type: 'tick', t: 30 + DEMO_IDLE_MS});
+  assert.equal(s.show, 'B');
+  s = demoHand(s, {type: 'need', kind: 'A', t: 9000});
+  assert.equal(s.kind, 'A');
+  assert.equal(s.show, null, 'B demo must not linger for step A');
+  assert.equal(s.idleSince, 9000);
+  s = demoHand(s, {type: 'tick', t: 9001});
+  assert.equal(s.show, null, 'no immediate replay after a step change');
+  s = demoHand(s, {type: 'tick', t: 9000 + DEMO_IDLE_MS});
+  assert.equal(s.show, 'A');
 });
 
 test('handsOn.css follows the token and motion rules', () => {
