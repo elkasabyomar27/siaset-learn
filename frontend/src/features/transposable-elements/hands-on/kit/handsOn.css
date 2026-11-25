@@ -1,0 +1,84 @@
+/* Hands-on kit: direct-manipulation stage, 3/4 bench, carried item, hold ring, demo hand. */
+.ho-stage {
+  position: relative; touch-action: none; user-select: none; -webkit-user-select: none;
+  background: var(--color-molecular-background); color: var(--color-molecular-text);
+  border: 1px solid var(--color-brand-secondary); border-radius: var(--radius-md);
+  padding: var(--space-4); overflow: hidden;
+}
+.ho-stage:focus-visible { outline: 3px solid var(--color-focus-on-dark); outline-offset: 3px; }
+.ho-stage button, .ho-stage [role="button"], .ho-stage [tabindex] { min-height: 44px; min-width: 44px; }
+.ho-stage :focus-visible { outline: 3px solid var(--color-focus-on-dark); outline-offset: 2px; }
+
+/* 3/4 bench: the floor leans back, items stand on it */
+.ho-bench { perspective: 900px; }
+.ho-floor {
+  transform: perspective(700px) rotateX(52deg); transform-origin: 50% 100%;
+  background: linear-gradient(var(--color-brand-primary), var(--color-molecular-background));
+  border: 1px solid color-mix(in srgb, var(--color-brand-accent) 30%, transparent);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--color-brand-accent) 12%, transparent);
+}
+
+/* Drop targets */
+.ho-target {
+  min-height: 44px; min-width: 44px;
+  border: 2px dashed color-mix(in srgb, var(--color-brand-accent) 55%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-brand-accent) 8%, transparent);
+}
+.ho-target[data-over="true"] {
+  border-style: solid; border-color: var(--color-brand-accent);
+  background: color-mix(in srgb, var(--color-brand-accent) 25%, transparent);
+}
+.ho-expected { border-color: var(--color-brand-highlight); }
+
+/* Carried item: lifted with a shadow */
+.ho-carried {
+  cursor: grabbing; transform: translateY(-6px) scale(1.04);
+  filter: drop-shadow(0 10px 8px color-mix(in srgb, var(--color-brand-primary) 70%, transparent));
+}
+
+/* Hold progress ring (SVG circle; --ho-progress is 0..1) */
+.ho-hold-ring { fill: none; stroke-width: 4; stroke-linecap: round; }
+.ho-hold-ring-track { stroke: color-mix(in srgb, var(--color-molecular-text) 25%, transparent); }
+.ho-hold-ring-fill {
+  stroke: var(--color-brand-accent);
+  stroke-dasharray: 100; stroke-dashoffset: calc(100 - 100 * var(--ho-progress, 0));
+}
+.ho-hold-hit { fill: transparent; r: 22; }
+
+/* Next-step line */
+.ho-next {
+  margin: var(--space-3) 0 0; min-height: 44px; display: flex; align-items: center;
+  color: var(--color-molecular-text); font-weight: 600;
+}
+
+/* Readout chip: navy chip, aqua outline */
+.ho-readout {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-3);
+  background: var(--color-brand-primary); color: var(--color-molecular-text);
+  border: 1px solid var(--color-brand-accent); border-radius: var(--radius-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Demo hand: static arrow + text under reduced motion, animated otherwise */
+.ho-hand { position: absolute; pointer-events: none; color: var(--color-brand-highlight); }
+.ho-hand-label { color: var(--color-molecular-muted); font-size: 0.9em; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ho-expected { animation: ho-pulse 1.6s ease-in-out infinite; }
+  .ho-carried { transition: transform 0.12s ease-out, filter 0.12s ease-out; }
+  .ho-target { transition: background-color 0.15s, border-color 0.15s; }
+  .ho-hold-ring-fill { transition: stroke-dashoffset 0.08s linear; }
+  .ho-hand[data-moving="true"] { animation: ho-hand-move 2.2s ease-in-out infinite; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ho-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-highlight) 45%, transparent); }
+    50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-brand-highlight) 0%, transparent); }
+  }
+  @keyframes ho-hand-move {
+    0% { transform: translate(0, 0); }
+    60%, 100% { transform: translate(var(--ho-dx, 80px), var(--ho-dy, 0)); }
+  }
+}
