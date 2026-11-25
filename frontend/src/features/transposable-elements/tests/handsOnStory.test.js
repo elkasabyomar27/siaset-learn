@@ -116,3 +116,40 @@ describe('Tn5 lab on the kit (SSR)', () => {
     assert.match(html, /<svg[^>]*class="ho-svg"[^>]*role="group"[^>]*aria-label="[^"]*Tn5[^"]*"/);
   });
 });
+
+describe('Tn5 scene in free mode (SSR)', () => {
+  let ssr, mod;
+  before(async () => { ssr = await startSsr(); mod = await ssr.load('/src/features/transposable-elements/components/StoryScenes.jsx'); });
+  after(() => ssr.close());
+
+  test('an unbound end can be cut in free mode; the model refuses it', async () => {
+    const {newBench, benchAction} = await import('../freeBench.js');
+    const bench = newBench('tn5');
+    const html = ssr.html(mod.Tn5Scene, {s: {...bench, inspected: [], answers: {}, stage: 0}, dispatch() {}, free: true});
+    for (const side of ['Left', 'Right']) {
+      assert.match(html, new RegExp(`role="button"[^>]*aria-label="${side} end of Tn5: press and hold to bind transposase, or swipe down across it to cut[.] Keyboard: hold Enter to bind, press Enter to cut"`));
+    }
+    const cut = storyIntent('tn5', {kind: 'swipe', target: 'end-left'});
+    assert.deepEqual(cut, {type: 'cut', end: 'left'});
+    const r = benchAction(bench, cut);
+    assert.equal(r.entry.ok, false);
+    assert.match(r.bench.message.text, /none is bound/);
+  });
+
+  test('ring touch band is 44 css px at any scale, capped short of the centre hint', () => {
+    for (const scale of [1, 0.73, 0.6, 0.45]) assert.ok(Math.abs(mod.ringTrackHit(1 / scale, 92) * scale - 44) < 1e-9 || mod.ringTrackHit(1 / scale, 92) === 2 * (92 - 40));
+    assert.equal(mod.ringTrackHit(1 / 0.73, 92) * 0.73, 44);
+    assert.equal(mod.ringTrackHit(4, 92), 104, 'cap: the band never reaches the centre hint');
+  });
+});
+
+test('Laboratory: Tn5 has one live region for scene feedback', async () => {
+  const ssr = await startSsr();
+  try {
+    const Laboratory = (await ssr.load('/src/features/transposable-elements/Laboratory.jsx')).default;
+    const tn5 = ssr.html(Laboratory, {}, {url: '/lab/transposable-elements?experiment=tn5'});
+    assert.doesNotMatch(tn5, /<section class="sl-task" aria-live/);
+    const tn3 = ssr.html(Laboratory, {}, {url: '/lab/transposable-elements?experiment=tn3'});
+    assert.match(tn3, /<section class="sl-task" aria-live="polite"/);
+  } finally { await ssr.close(); }
+});

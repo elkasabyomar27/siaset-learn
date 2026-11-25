@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   startHold, stepHold, startSwipe, stepSwipe, startDrag, stepDrag,
-  startPour, stepPour, startDial, stepDial, startTrack, stepTrack,
+  startPour, stepPour, startDial, stepDial, startTrack, stepTrack, startHoldSwipe, stepHoldSwipe,
 } from './gestures/index.js';
 
 // Binds a pure recognizer to DOM events. SSR-safe: window/document/DOM are touched
@@ -16,6 +16,8 @@ const RECOGNIZERS = new Map([
   [startDrag, {start: startDrag, step: stepDrag, rearm: true, sync: (s, c) => ({...s, zones: c.zones ?? []})}],
   [startPour, {start: startPour, step: stepPour, rearm: true}],
   [startDial, {start: startDial, step: stepDial, rearm: true}],
+  // Re-arms itself (each completion is a fresh `done`); key auto-repeat reaches its lock.
+  [startHoldSwipe, {start: startHoldSwipe, step: stepHoldSwipe, rearm: false, repeat: true, sync: (s, c) => ({...s, line: c.line, band: c.band ?? s.band})}],
   [startTrack, {start: startTrack, step: stepTrack, rearm: true, sync: (s, c) => ({...s, cx: c.cx ?? s.cx, cy: c.cy ?? s.cy, value: c.value ?? s.value})}],
 ]);
 

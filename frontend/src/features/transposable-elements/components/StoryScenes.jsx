@@ -2,6 +2,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { BenchStage, useStage } from '../hands-on/kit/BenchStage.jsx';
 import { HoldTarget } from '../hands-on/kit/HoldTarget.jsx';
 import { SwipeTarget } from '../hands-on/kit/SwipeTarget.jsx';
+import { HoldSwipeTarget } from '../hands-on/kit/HoldSwipeTarget.jsx';
 import { Draggable } from '../hands-on/kit/Draggable.jsx';
 import { Track } from '../hands-on/kit/Track.jsx';
 import { TapTarget } from '../hands-on/kit/TapTarget.jsx';
@@ -45,6 +46,8 @@ const NARROW_BELOW = 560; // container px under which the stacked layout is used
 const END_W = 16, RING_ZONE = 48, ARC_HALF = 16, TSD_W = 6, SWIPE_REACH = 80;
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+// Ring touch band: 44 css px (44 units / scale), but never so wide it reaches the ring's centre hint.
+export const ringTrackHit = (k, r) => Math.min(44 * k, 2 * (r - 40));
 // Closed annular sector: a filled touch area along the ring between two angles.
 function sector(cx, cy, r0, r1, a0, a1) {
   const [ox0, oy0] = polar(cx, cy, r1, a0), [ox1, oy1] = polar(cx, cy, r1, a1);
@@ -87,6 +90,8 @@ export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
   const [acted, setActed] = useState(false); // the live region stays empty until the first scene action
   const [demo, sendDemo] = useReducer(demoHand, undefined, () => initialDemo({reducedMotion: prefersReducedMotion()}));
   const focusIntent = useRef(false), keyHeld = useRef(false), pendingFocus = useRef(null);
+  const ids = useRef({map: new WeakMap(), next: 0});
+  const idOf = obj => { const {map} = ids.current; if (!map.has(obj)) map.set(obj, ++ids.current.next); return map.get(obj); };
 
   const {stage, bound, cut} = s, free = cut.length === 2, inserted = stage >= 2;
   const answered = s.answers.tn5 === checkpoints.tn5.correct;
@@ -114,8 +119,11 @@ export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
       keyHeld.current = false;
       if (pendingFocus.current) { focusNow(pendingFocus.current); pendingFocus.current = null; }
     };
+    // Focus left the window mid-press: no key-up will come, so nothing is held any more.
+    const blur = () => { keyHeld.current = false; pendingFocus.current = null; };
     window.addEventListener('keyup', up);
-    return () => window.removeEventListener('keyup', up);
+    window.addEventListener('blur', blur);
+    return () => { window.removeEventListener('keyup', up); window.removeEventListener('blur', blur); };
   }, [focusNow]);
 
   const nextEnd = side => !bound.includes(side);
@@ -160,9 +168,11 @@ export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
   const localNote = note && note.s === s ? note.text : null;
   const hint = stepHint(s, {freeMode, free, inserted, answered});
   const live = acted || localNote != null || message != null;
+  // A fresh node per model state or note, so an identical repeated refusal is announced again.
+  const liveKey = localNote != null ? `n${idOf(note)}` : `s${idOf(s)}`;
   const after = <div className="ts-next-row">
     {!live && <p className="ts-step-hint">{hint}</p>}
-    <NextStep className={live ? undefined : 'is-empty'}>{live ? localNote ?? <span>{message}{hint}</span> : null}</NextStep>
+    <NextStep className={live ? undefined : 'is-empty'}>{live ? <span key={liveKey}>{localNote ?? <>{message}{hint}</>}</span> : null}</NextStep>
     {stage === 2 && !freeMode && <button type="button" className="ts-continue" onClick={() => act({kind: 'tap', target: 'inserted'})}>Continue</button>}
   </div>;
 
@@ -210,19 +220,27 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
   // A gold end: hold to bind (stage 0; in the sandbox while unbound), then swipe down to cut.
   const end = side => {
     const x = endX(side), isBound = bound.includes(side), isCut = cut.includes(side);
-    const holdable = freeMode ? !isBound : stage === 0;
-    if (holdable) {
+    const Side = side === 'left' ? 'Left' : 'Right', band = Math.min(34 * k, endHitMax - 14);
+    const reach = <rect className="ts-swipe-reach" x={x - 14 - band} y={DY - SWIPE_REACH} width={28 + 2 * band} height={2 * SWIPE_REACH} />;
+    // Sandbox: an unbound end can be bound or cut, so the refused cut ("none is bound") stays reachable.
+    if (freeMode && !isBound && !isCut) {
+      return <HoldSwipeTarget key={`both-${side}`} className={`ts-end-${side}`} cx={x} cy={DY} line={{x1: x - 14, y1: DY, x2: x + 14, y2: DY}} band={band}
+        label={`${Side} end of Tn5: press and hold to bind transposase, or swipe down across it to cut. Keyboard: hold Enter to bind, press Enter to cut`}
+        onHold={() => act({kind: 'hold', target: `end-${side}`})} onSwipe={() => act({kind: 'swipe', target: `end-${side}`})}>
+        {reach}{tir(x, DY)}
+      </HoldSwipeTarget>;
+    }
+    if (!freeMode && stage === 0) {
       return <HoldTarget key={`hold-${side}`} className={`ts-end-${side}`} cx={x} cy={DY} hitR={Math.min(26 * k, endHitMax)} ringR={24}
-        label={isBound ? `${side === 'left' ? 'Left' : 'Right'} end of Tn5: transposase bound` : `Hold to bind transposase to the ${side} end of Tn5`}
+        label={isBound ? `${Side} end of Tn5: transposase bound` : `Hold to bind transposase to the ${side} end of Tn5`}
         expected={!freeMode && !isBound} onHold={() => act({kind: 'hold', target: `end-${side}`})}>{tir(x, DY)}</HoldTarget>;
     }
-    const expected = !freeMode && answered && !isCut, band = Math.min(34 * k, endHitMax - 14);
+    const expected = !freeMode && answered && !isCut;
     return <SwipeTarget key={`swipe-${side}`} className={`ts-end-${side}`} line={{x1: x - 14, y1: DY, x2: x + 14, y2: DY}} band={band}
-      label={isCut ? `${side === 'left' ? 'Left' : 'Right'} end of Tn5: cut` : `Cut the ${side} end of Tn5 (swipe down across it)`}
+      label={isCut ? `${Side} end of Tn5: cut` : `Cut the ${side} end of Tn5 (swipe down across it)`}
       expected={expected} onSwipe={() => act({kind: 'swipe', target: `end-${side}`})}>
       {/* Taller reach than the band: a downward stroke may start well above the DNA. */}
-      <rect className="ts-swipe-reach" x={x - 14 - band} y={DY - SWIPE_REACH} width={28 + 2 * band} height={2 * SWIPE_REACH} />
-      {tir(x, DY)}
+      {reach}{tir(x, DY)}
       {expected && <line className="ts-swipe-cue" x1={x} y1={DY - 46} x2={x} y2={DY + 46} />}
     </SwipeTarget>;
   };
@@ -239,7 +257,7 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
   const handAt = (() => {
     if (!demo.show) return null;
     if (demo.kind === 'hold') { const x = endX(bound.includes('left') ? 'right' : 'left'); return {from: {x, y: DY}}; }
-    if (demo.kind === 'swipe') { const x = endX(cut.includes('left') ? 'right' : 'left'); return {from: {x, y: DY - 48}, to: {x, y: DY + 48}, text: 'Swipe down'}; }
+    if (demo.kind === 'swipe') { const x = endX(cut.includes('left') ? 'right' : 'left'); return {from: {x, y: DY - 48}, to: {x, y: DY + 48}, text: 'Swipe down', labelAt: {x, y: DY + 74}}; } // label under the stroke, clear of the enzymes
     if (demo.kind === 'drag') { const [tx, ty] = polar(cx, cy, r, 300); return {from: {x: elCx, y: DY - lift}, to: {x: tx, y: ty}, text: 'Drag onto the ring'}; }
     if (demo.kind === 'tap' && tsdAngle != null) {
       const a = stage === 2 ? tsdAngle : tsdAngle + (s.inspected.includes('target-tsd-left') ? 1 : -1) * (ARC_HALF + TSD_W / 2);
@@ -287,7 +305,7 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
     {/* Freed Tn5: carry it to the ring (pointer), or Enter, then the ring's arrow keys (keyboard) */}
     {free && !inserted && <>
       <ellipse className="ts-ground-shadow" cx={elCx} cy={DY + 2} rx={half * 0.8} ry={7} />
-      <Track className="ts-ring-track" cx={cx} cy={cy} r={r} value={80} ghostSpan={ARC_HALF} expected={!freeMode}
+      <Track className="ts-ring-track" cx={cx} cy={cy} r={r} value={80} ghostSpan={ARC_HALF} expected={!freeMode} hitWidth={ringTrackHit(k, r)}
         label="Target ring: arrow keys choose where Tn5 inserts, Enter inserts it here"
         onPreview={deg => say(`Spot ${deg}° on the ring. Press Enter to insert Tn5 here.`)}
         onConfirm={deg => act({kind: 'drop', target: 'ring', angle: deg})} />
@@ -335,7 +353,7 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
       <text className="ts-note" x={cx} y={cy + 4} textAnchor="middle">{tsdBlock ? `${tsdBlock.bp} bp repeats` : ''}</text>
     </g>}
 
-    {handAt && <DemoHand show={demo.show} still={demo.still} from={handAt.from} to={handAt.to} text={handAt.text} />}
+    {handAt && <DemoHand show={demo.show} still={demo.still} from={handAt.from} to={handAt.to} text={handAt.text} labelAt={handAt.labelAt} />}
   </>;
 }
 

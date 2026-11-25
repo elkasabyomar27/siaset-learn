@@ -8,9 +8,9 @@ export const startSwipe = ({ line, band = SWIPE_BAND }) => ({ phase: 'idle', lin
 // lie strictly on opposite sides of the segment's line AND the point where that
 // step crosses the line falls on the segment extended by `band` at each end.
 // Strokes along the segment or that never cross it do not count.
-const sideOf = ({ x1, y1, x2, y2 }, pt) => (x2 - x1) * (pt.y - y1) - (y2 - y1) * (pt.x - x1);
+export const sideOf = ({ x1, y1, x2, y2 }, pt) => (x2 - x1) * (pt.y - y1) - (y2 - y1) * (pt.x - x1);
 
-function cuts(p, q, { x1, y1, x2, y2 }, band) {
+export function cuts(p, q, { x1, y1, x2, y2 }, band) {
   const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
   if (!len) return false;
   const side = pt => sideOf({ x1, y1, x2, y2 }, pt);

@@ -258,3 +258,58 @@ describe('kit components (SSR)', () => {
     assert.doesNotMatch(moving, /ho-hand-arrow/);
   });
 });
+
+// ---------- Task 5 fixes: hold-or-swipe target, Track hit width ----------
+test('holdSwipe: quick press cuts, held key binds and locks, pointer stroke cuts, pointer hold binds', async () => {
+  const {startHoldSwipe, stepHoldSwipe, HOLD_MS, TAP_MS} = await import('../hands-on/gestures/index.js');
+  const line = {x1: -14, y1: 0, x2: 14, y2: 0};
+  const run = (events, s = startHoldSwipe({line})) => events.reduce(stepHoldSwipe, s);
+  assert.deepEqual(run([{type: 'key-down', key: 'Enter', t: 0}, {type: 'key-up', key: 'Enter', t: TAP_MS}]).done, {kind: 'swipe', via: 'key'});
+  const mid = run([{type: 'key-down', key: 'Enter', t: 0}, {type: 'key-up', key: 'Enter', t: TAP_MS + 1}]);
+  assert.equal(mid.done, null, 'released between a press and a hold: nothing');
+  let s = run([{type: 'key-down', key: ' ', t: 0}, {type: 'tick', t: HOLD_MS}]);
+  assert.deepEqual(s.done, {kind: 'hold', via: 'key'});
+  assert.equal(s.phase, 'locked');
+  const held = s.done;
+  s = run([{type: 'key-down', key: ' ', t: HOLD_MS + 30}, {type: 'tick', t: 3 * HOLD_MS}, {type: 'key-up', key: ' ', t: 3 * HOLD_MS}], s);
+  assert.equal(s.done, held, 'auto-repeat and the release after a hold start nothing new');
+  assert.equal(s.phase, 'idle');
+  assert.deepEqual(run([{type: 'down', x: 0, y: -40, t: 0}, {type: 'move', x: 0, y: 0, t: 10}, {type: 'move', x: 0, y: 40, t: 20}]).done, {kind: 'swipe', via: 'pointer'});
+  assert.deepEqual(run([{type: 'down', x: 0, y: 0, t: 0}, {type: 'tick', t: HOLD_MS}]).done, {kind: 'hold', via: 'pointer'});
+  assert.equal(run([{type: 'down', x: 0, y: 0, t: 0}, {type: 'up', x: 0, y: 0, t: 200}, {type: 'tick', t: HOLD_MS}]).done, null);
+  const again = run([{type: 'down', x: 0, y: 0, t: 0}, {type: 'tick', t: HOLD_MS}, {type: 'up', x: 0, y: 0, t: HOLD_MS}, {type: 'down', x: 0, y: -40, t: 900}, {type: 'move', x: 0, y: 40, t: 910}]);
+  assert.deepEqual(again.done, {kind: 'swipe', via: 'pointer'}, 'accepts the next gesture without re-arming');
+});
+
+describe('Task 5 kit additions (SSR)', () => {
+  let ssr;
+  before(async () => { ssr = await startSsr(); });
+  after(() => ssr.close());
+  const load = async name => (await ssr.load(`${KIT}${name}.jsx`))[name];
+  const trackHit = html => Number(html.match(/<circle[^>]*class="ho-hit ho-track-hit"[^>]*>/)[0].match(/stroke-width="([^"]+)"/)[1]);
+
+  test('Track hitWidth widens the ring band, never below 44', async () => {
+    const Track = await load('Track');
+    const base = {label: 'Ring', cx: 0, cy: 0, r: 90, onConfirm() {}};
+    assert.equal(trackHit(ssr.html(Track, base)), 44);
+    assert.equal(trackHit(ssr.html(Track, {...base, hitWidth: 70})), 70);
+    assert.equal(trackHit(ssr.html(Track, {...base, hitWidth: 20})), 44);
+  });
+
+  test('HoldSwipeTarget is a labelled button with a 44 px hit area', async () => {
+    const html = ssr.html(await load('HoldSwipeTarget'), {label: 'Hold to bind or swipe to cut', cx: 0, cy: 0, line: {x1: -14, y1: 0, x2: 14, y2: 0}, band: 4, onHold() {}, onSwipe() {}});
+    assert.match(html, /role="button"[^>]*tabindex="0"[^>]*aria-label="Hold to bind or swipe to cut"/);
+    const hit = html.match(/<rect[^>]*class="ho-hit"[^>]*>/)[0];
+    assert.ok(attr(hit, 'width') >= 44 && attr(hit, 'height') >= 44);
+  });
+});
+
+test('DemoHand labelAt moves the text, default stays under from', async () => {
+  const ssr = await startSsr();
+  try {
+    const {DemoHand} = await ssr.load(`${KIT}DemoHand.jsx`);
+    const y = html => Number(html.match(/<text class="ho-hand-label"[^>]*\sy="([^"]+)"/)[1]);
+    assert.equal(y(ssr.html(DemoHand, {show: 'swipe', from: {x: 0, y: 10}, to: {x: 0, y: 90}})), 44);
+    assert.equal(y(ssr.html(DemoHand, {show: 'swipe', from: {x: 0, y: 10}, to: {x: 0, y: 90}, labelAt: {x: 0, y: 120}})), 120);
+  } finally { await ssr.close(); }
+});

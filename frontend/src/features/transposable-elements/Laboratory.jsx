@@ -56,7 +56,8 @@ function StoryLab({ scenario, changeScenario }) {
       <p className="sl-scene-note">Schematic scene: not to scale, no sequence. Molecular results are calculated by the lab engine.</p>
     </section>
 
-    <section className="sl-task" aria-live="polite">
+    {/* Tn5: the scene's NextStep is the one live region for scene feedback. */}
+    <section className="sl-task" aria-live={scenario === 'tn5' ? undefined : 'polite'}>
       <p className="eyebrow">STEP {s.stage + 1} OF {steps.length}{guided.explanatory ? ' · EXPLANATORY' : ''}</p>
       <h2>{step.title}</h2><p>{step.task}</p>
       {guided.checkpoint && !(guided.checkpoint === 'tn3' && s.stage > 1) && <Checkpoint id={guided.checkpoint} answer={s.answers[guided.checkpoint]} onAnswer={value => dispatch({type: 'answer', checkpoint: guided.checkpoint, value})} />}

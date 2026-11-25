@@ -9,3 +9,4 @@ export { startDrag, stepDrag } from './drag.js';
 export { trackStep, angleAt, startTrack, stepTrack } from './track.js';
 export { startPour, stepPour, nearestMark } from './pour.js';
 export { startDial, stepDial } from './dial.js';
+export { startHoldSwipe, stepHoldSwipe } from './holdSwipe.js';
