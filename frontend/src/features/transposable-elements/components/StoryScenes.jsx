@@ -13,6 +13,7 @@ import { demoHand, initialDemo } from '../hands-on/demoHand.js';
 import { angleAt } from '../hands-on/gestures/index.js';
 import { storyIntent } from '../hands-on/intents/story.js';
 import { checkpoints } from '../learning.js';
+import { boundaryFromAngle } from '../storyLab.js';
 import './storyScenes.css';
 
 // Schematic, hands-on scenes for the story labs. Interactions dispatch story actions; the engine
@@ -26,77 +27,22 @@ export function arc(cx, cy, r, a0, a1) {
   const [x0, y0] = polar(cx, cy, r, a0), [x1, y1] = polar(cx, cy, r, a1);
   return `M ${x0} ${y0} A ${r} ${r} 0 ${((a1 - a0) % 360 + 360) % 360 > 180 ? 1 : 0} 1 ${x1} ${y1}`;
 }
-function angleFromEvent(e, cx, cy) {
-  const svg = e.currentTarget.ownerSVGElement, m = svg?.getScreenCTM();
-  if (!m) return 0;
-  const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
-  return (Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI + 450) % 360;
-}
-const press = fn => ({role: 'button', tabIndex: 0, onClick: fn, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } }});
-
-function RingTrack({ cx, cy, r, label, onPick }) {
-  return <circle className="sl-ring-track" cx={cx} cy={cy} r={r} role="button" tabIndex={-1} aria-label={label} onClick={e => onPick(angleFromEvent(e, cx, cy))} />;
-}
-
-/* ---------------- Tn5: cut and paste, on the hands-on kit ---------------- */
-// Two layouts of the same scene: wide (side by side) and narrow (stacked, for phones).
-const WIDE = {W: 760, H: 340, DY: 120, DX: [40, 440], EL: [180, 300], RING: [590, 190, 92], tray: [70, 292], capD: [40, 44], capT: [530, 78], gap: 24, lift: 56};
-const NARROW = {W: 420, H: 620, DY: 112, DX: [16, 404], EL: [140, 280], RING: [210, 440, 112], tray: [40, 236], capD: [16, 40], capT: [150, 298], gap: 20, lift: 52};
+/* ---------------- Shared scene shell ---------------- */
 const NARROW_BELOW = 560; // container px under which the stacked layout is used
-const END_W = 16, RING_ZONE = 48, ARC_HALF = 16, TSD_W = 6, SWIPE_REACH = 80;
-
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-// Ring touch band: 44 css px (44 units / scale), but never so wide it reaches the ring's centre hint.
-export const ringTrackHit = (k, r) => Math.min(44 * k, 2 * (r - 40));
-// Closed annular sector: a filled touch area along the ring between two angles.
-function sector(cx, cy, r0, r1, a0, a1) {
-  const [ox0, oy0] = polar(cx, cy, r1, a0), [ox1, oy1] = polar(cx, cy, r1, a1);
-  const [ix1, iy1] = polar(cx, cy, r0, a1), [ix0, iy0] = polar(cx, cy, r0, a0), large = a1 - a0 > 180 ? 1 : 0;
-  return `M ${ox0} ${oy0} A ${r1} ${r1} 0 ${large} 1 ${ox1} ${oy1} L ${ix1} ${iy1} A ${r0} ${r0} 0 ${large} 0 ${ix0} ${iy0} Z`;
-}
 const prefersReducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-const SIDES = ['left', 'right'];
 
-function sceneLabel(s, free, inserted) {
-  if (inserted) {
-    const seen = s.inspected.length;
-    return `Tn5 now sits in the circular target between two purple host repeats${seen ? ` (${seen} of 2 inspected)` : ''}. The donor is two separate broken pieces.`;
-  }
-  if (free) return 'Tn5 has been cut free and is held by transposase above the broken donor. The circular target ring is ready.';
-  const held = s.bound.length, cut = s.cut.length;
-  return `A linear donor DNA carries the gold Tn5 element between two ends; ${held} of 2 ends hold transposase${cut ? `, ${cut} of 2 cut` : ''}. A circular target has no Tn5.`;
-}
-
-function stepHint(s, {freeMode, free, inserted, answered}) {
-  if (freeMode) return inserted ? 'Tap a purple repeat to inspect it.' : free ? 'Drag Tn5 onto the target ring. Keyboard: Enter picks it up and drops it on the ring; then the arrow keys choose the spot.' : 'Hold an end to bind transposase. Swipe down across a held end to cut it.';
-  switch (s.stage) {
-    case 0: return s.bound.length ? 'One end held. Now press and hold the other gold end.' : 'Press and hold a gold end of Tn5 until the ring fills.';
-    case 1:
-      if (free) return 'Tn5 is cut free. Drag it onto the target ring. Keyboard: Enter picks it up, Enter drops it on the ring, then the arrow keys choose the spot.';
-      if (!answered) return 'Answer the prediction below the scene, then swipe down across each end to cut.';
-      return s.cut.length ? 'One end cut. Now swipe down across the other end.' : 'Swipe down across a gold end to cut it.';
-    case 2: return 'Tn5 is in the target ring. Tap it to inspect the insertion.';
-    case 3: return s.inspected.length ? 'One repeat found. Tap the other purple repeat.' : 'Tap each purple repeat beside Tn5.';
-    default: return 'Done. Review the result, then save your lab below.';
-  }
-}
-
-// free: sandbox mode. Ends stay holdable until bound and swipeable once bound; nothing is highlighted.
-export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
+// What every story scene needs around its SVG: the container width (for the narrow layout), the
+// local note and the single live region, focus that follows the flow (waiting for a held Enter or
+// Space to be released), the demo hand, and one `act` that sends every gesture to the model.
+function useStoryShell(scenario, dispatch, {flowKey, nextFocus, needKind, needKey}) {
   const box = useRef(null);
   const [boxW, setBoxW] = useState(0);
   const [note, setNote] = useState(null); // {text, s}: a local announcement, shown only for the state it was made in
-  const [ghost, setGhost] = useState(null);
   const [acted, setActed] = useState(false); // the live region stays empty until the first scene action
   const [demo, sendDemo] = useReducer(demoHand, undefined, () => initialDemo({reducedMotion: prefersReducedMotion()}));
   const focusIntent = useRef(false), keyHeld = useRef(false), pendingFocus = useRef(null);
   const ids = useRef({map: new WeakMap(), next: 0});
   const idOf = obj => { const {map} = ids.current; if (!map.has(obj)) map.set(obj, ++ids.current.next); return map.get(obj); };
-
-  const {stage, bound, cut} = s, free = cut.length === 2, inserted = stage >= 2;
-  const answered = s.answers.tn5 === checkpoints.tn5.correct;
-  const L = boxW > 0 && boxW < NARROW_BELOW ? NARROW : WIDE;
-  const say = text => setNote({text, s});
 
   useEffect(() => {
     const el = box.current;
@@ -125,36 +71,13 @@ export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
     window.addEventListener('blur', blur);
     return () => { window.removeEventListener('keyup', up); window.removeEventListener('blur', blur); };
   }, [focusNow]);
-
-  const nextEnd = side => !bound.includes(side);
-  const nextFocus = inserted
-    ? stage === 2 && !freeMode ? '.ts-inserted' : stage === 3 ? (s.inspected.includes('target-tsd-left') ? '.ts-tsd-right' : '.ts-tsd-left') : null
-    : free ? '.ts-tn5'
-      : stage === 0 ? (nextEnd('left') ? '.ts-end-left' : '.ts-end-right')
-        : (cut.includes('left') ? '.ts-end-right' : '.ts-end-left');
-  const flowKey = `${stage}|${bound.length}|${cut.length}|${s.inspected.length}`;
   useEffect(() => {
     if (!focusIntent.current) return;
     focusIntent.current = false;
     requestFocus(nextFocus);
   }, [flowKey, nextFocus, requestFocus]);
 
-  // Every gesture goes to the model through storyIntent, refused or not.
-  const act = gesture => {
-    setActed(true);
-    focusIntent.current = !!box.current?.contains(document.activeElement);
-    const action = storyIntent('tn5', gesture);
-    if (action) dispatch(action);
-  };
-
-  // Demo hand: which gesture the current step needs, and where.
-  const [needKind, needKey] = freeMode ? [null, 'free']
-    : stage === 0 ? ['hold', `hold-${nextEnd('left') ? 'left' : 'right'}`]
-      : stage === 1 && free ? ['drag', 'drag']
-        : stage === 1 && answered ? ['swipe', `swipe-${cut.includes('left') ? 'right' : 'left'}`]
-          : stage === 2 ? ['tap', 'tap-inserted']
-            : stage === 3 ? ['tap', `tap-${s.inspected.includes('target-tsd-left') ? 'right' : 'left'}`]
-              : [null, `none-${stage}`];
+  // Demo hand: which gesture the current step needs.
   useEffect(() => { sendDemo({type: 'need', kind: needKind, t: performance.now()}); }, [needKind, needKey]);
   useEffect(() => {
     const id = setInterval(() => sendDemo({type: 'tick', t: performance.now()}), 1000);
@@ -163,23 +86,106 @@ export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
   const activity = () => sendDemo({type: 'activity', t: performance.now()});
   const onKeyDownCapture = e => { activity(); if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) keyHeld.current = true; };
 
-  const message = !freeMode && s.message
-    ? <span className={`ts-msg ${s.message.ok ? 'is-good' : 'is-refused'}`}>{s.message.ok ? '✓ ' : '✗ '}{s.message.text} </span> : null;
-  const localNote = note && note.s === s ? note.text : null;
-  const hint = stepHint(s, {freeMode, free, inserted, answered});
-  const live = acted || localNote != null || message != null;
-  // A fresh node per model state or note, so an identical repeated refusal is announced again.
-  const liveKey = localNote != null ? `n${idOf(note)}` : `s${idOf(s)}`;
-  const after = <div className="ts-next-row">
-    {!live && <p className="ts-step-hint">{hint}</p>}
-    <NextStep className={live ? undefined : 'is-empty'}>{live ? <span key={liveKey}>{localNote ?? <>{message}{hint}</>}</span> : null}</NextStep>
-    {stage === 2 && !freeMode && <button type="button" className="ts-continue" onClick={() => act({kind: 'tap', target: 'inserted'})}>Continue</button>}
-  </div>;
+  // Every gesture goes to the model through storyIntent, refused or not.
+  const act = gesture => {
+    setActed(true);
+    focusIntent.current = !!box.current?.contains(document.activeElement);
+    const action = storyIntent(scenario, gesture);
+    if (action) dispatch(action);
+  };
 
-  return <div ref={box} className="ts-scene" onPointerDownCapture={activity} onKeyDownCapture={onKeyDownCapture}>
+  // The next-step line: the step hint as plain text until the first action, then one live region
+  // carrying the model's message (✓/✗) and the hint, or a local note.
+  const nextRow = (s, {freeMode, hint, extra}) => {
+    const message = !freeMode && s.message
+      ? <span className={`ts-msg ${s.message.ok ? 'is-good' : 'is-refused'}`}>{s.message.ok ? '✓ ' : '✗ '}{s.message.text} </span> : null;
+    const localNote = note && note.s === s ? note.text : null;
+    const live = acted || localNote != null || message != null;
+    // A fresh node per model state or note, so an identical repeated refusal is announced again.
+    const liveKey = localNote != null ? `n${idOf(note)}` : `s${idOf(s)}`;
+    return <div className="ts-next-row">
+      {!live && <p className="ts-step-hint">{hint}</p>}
+      <NextStep className={live ? undefined : 'is-empty'}>{live ? <span key={liveKey}>{localNote ?? <>{message}{hint}</>}</span> : null}</NextStep>
+      {extra}
+    </div>;
+  };
+
+  const say = s => text => setNote({text, s});
+  return {box, narrow: boxW > 0 && boxW < NARROW_BELOW, say, act, demo, sendDemo, requestFocus, activity, onKeyDownCapture, nextRow};
+}
+
+/* ---------------- Tn5: cut and paste, on the hands-on kit ---------------- */
+// Two layouts of the same scene: wide (side by side) and narrow (stacked, for phones).
+const WIDE = {W: 760, H: 340, DY: 120, DX: [40, 440], EL: [180, 300], RING: [590, 190, 92], tray: [70, 292], capD: [40, 44], capT: [530, 78], gap: 24, lift: 56};
+const NARROW = {W: 420, H: 620, DY: 112, DX: [16, 404], EL: [140, 280], RING: [210, 440, 112], tray: [40, 236], capD: [16, 40], capT: [150, 298], gap: 20, lift: 52};
+const END_W = 16, RING_ZONE = 48, ARC_HALF = 16, TSD_W = 6, SWIPE_REACH = 80;
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+// Ring touch band: 44 css px (44 units / scale), but never so wide it reaches the ring's centre hint.
+export const ringTrackHit = (k, r) => Math.min(44 * k, 2 * (r - 40));
+// Closed annular sector: a filled touch area along the ring between two angles.
+function sector(cx, cy, r0, r1, a0, a1) {
+  const [ox0, oy0] = polar(cx, cy, r1, a0), [ox1, oy1] = polar(cx, cy, r1, a1);
+  const [ix1, iy1] = polar(cx, cy, r0, a1), [ix0, iy0] = polar(cx, cy, r0, a0), large = a1 - a0 > 180 ? 1 : 0;
+  return `M ${ox0} ${oy0} A ${r1} ${r1} 0 ${large} 1 ${ox1} ${oy1} L ${ix1} ${iy1} A ${r0} ${r0} 0 ${large} 0 ${ix0} ${iy0} Z`;
+}
+const SIDES = ['left', 'right'];
+
+function sceneLabel(s, free, inserted) {
+  if (inserted) {
+    const seen = s.inspected.length;
+    return `Tn5 now sits in the circular target between two purple host repeats${seen ? ` (${seen} of 2 inspected)` : ''}. The donor is two separate broken pieces.`;
+  }
+  if (free) return 'Tn5 has been cut free and is held by transposase above the broken donor. The circular target ring is ready.';
+  const held = s.bound.length, cut = s.cut.length;
+  return `A linear donor DNA carries the gold Tn5 element between two ends; ${held} of 2 ends hold transposase${cut ? `, ${cut} of 2 cut` : ''}. A circular target has no Tn5.`;
+}
+
+function stepHint(s, {freeMode, free, inserted, answered}) {
+  if (freeMode) return inserted ? 'Tap a purple repeat to inspect it.' : free ? 'Drag Tn5 onto the target ring. Keyboard: Enter picks it up and drops it on the ring; then the arrow keys choose the spot.' : 'Hold an end to bind transposase. Swipe down across a held end to cut it.';
+  switch (s.stage) {
+    case 0: return s.bound.length ? 'One end held. Now press and hold the other gold end.' : 'Press and hold a gold end of Tn5 until the ring fills.';
+    case 1:
+      if (free) return 'Tn5 is cut free. Drag it onto the target ring. Keyboard: Enter picks it up, Enter drops it on the ring, then the arrow keys choose the spot.';
+      if (!answered) return 'Answer the prediction below the scene, then swipe down across each end to cut.';
+      return s.cut.length ? 'One end cut. Now swipe down across the other end.' : 'Swipe down across a gold end to cut it.';
+    case 2: return 'Tn5 is in the target ring. Tap it to inspect the insertion.';
+    case 3: return s.inspected.length ? 'One repeat found. Tap the other purple repeat.' : 'Tap each purple repeat beside Tn5.';
+    default: return 'Done. Review the result, then save your lab below.';
+  }
+}
+
+// free: sandbox mode. Ends stay holdable until bound and swipeable once bound; nothing is highlighted.
+export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
+  const [ghost, setGhost] = useState(null);
+  const {stage, bound, cut} = s, free = cut.length === 2, inserted = stage >= 2;
+  const answered = s.answers.tn5 === checkpoints.tn5.correct;
+
+  const nextEnd = side => !bound.includes(side);
+  const nextFocus = inserted
+    ? stage === 2 && !freeMode ? '.ts-inserted' : stage === 3 ? (s.inspected.includes('target-tsd-left') ? '.ts-tsd-right' : '.ts-tsd-left') : null
+    : free ? '.ts-tn5'
+      : stage === 0 ? (nextEnd('left') ? '.ts-end-left' : '.ts-end-right')
+        : (cut.includes('left') ? '.ts-end-right' : '.ts-end-left');
+  // Demo hand: which gesture the current step needs, and where.
+  const [needKind, needKey] = freeMode ? [null, 'free']
+    : stage === 0 ? ['hold', `hold-${nextEnd('left') ? 'left' : 'right'}`]
+      : stage === 1 && free ? ['drag', 'drag']
+        : stage === 1 && answered ? ['swipe', `swipe-${cut.includes('left') ? 'right' : 'left'}`]
+          : stage === 2 ? ['tap', 'tap-inserted']
+            : stage === 3 ? ['tap', `tap-${s.inspected.includes('target-tsd-left') ? 'right' : 'left'}`]
+              : [null, `none-${stage}`];
+  const shell = useStoryShell('tn5', dispatch, {flowKey: `${stage}|${bound.length}|${cut.length}|${s.inspected.length}`, nextFocus, needKind, needKey});
+  const {act} = shell, say = shell.say(s);
+  const L = shell.narrow ? NARROW : WIDE;
+
+  const after = shell.nextRow(s, {freeMode, hint: stepHint(s, {freeMode, free, inserted, answered}),
+    extra: stage === 2 && !freeMode && <button type="button" className="ts-continue" onClick={() => act({kind: 'tap', target: 'inserted'})}>Continue</button>});
+
+  return <div ref={shell.box} className="ts-scene" onPointerDownCapture={shell.activity} onKeyDownCapture={shell.onKeyDownCapture}>
     <BenchStage variant="molecular" width={L.W} height={L.H} label={sceneLabel(s, free, inserted)} after={after}>
       <Tn5Body s={s} L={L} freeMode={freeMode} free={free} inserted={inserted} answered={answered} act={act} say={say}
-        ghost={ghost} setGhost={setGhost} demo={demo} sendDemo={sendDemo} requestFocus={requestFocus} />
+        ghost={ghost} setGhost={setGhost} demo={shell.demo} sendDemo={shell.sendDemo} requestFocus={shell.requestFocus} />
     </BenchStage>
   </div>;
 }
@@ -357,47 +363,251 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
   </>;
 }
 
-/* ---------------- Tn3: copy, join, separate ---------------- */
-const DONOR3 = [220, 180, 82], TARGET3 = [545, 180, 82], CO = [385, 180, 118];
-const COPY_SPAN = 34;
+/* ---------------- Tn3: copy, join, separate, on the hands-on kit ---------------- */
+// Wide: circles side by side, the target joins from the right. Narrow: stacked, the target joins from below.
+// face: the donor angle that faces the docked target (Tn3 sits there). Cointegrate: copy angles,
+// backbone arcs and the target-side repeats. tCap: the target caption's offset from its centre.
+const WIDE3 = {
+  W: 760, H: 340, D: [220, 180, 82], T: [570, 180, 82], face: 90, tCap: -96, forkNote: [305, 300, 'middle'],
+  CO: [385, 180, 118], copies: [270, 90], donorArc: [290, 430], targetArc: [110, 250], tsds: [[248, 253], [107, 112]], tray: [680, 290], coCap: [385, 36],
+  RES: [[290, 185, 88], [470, 185, 88]], resCap: -104, note: [380, 322],
+};
+const NARROW3 = {
+  W: 420, H: 620, D: [210, 130, 74], T: [210, 470, 74], face: 180, tCap: 96, forkNote: [246, 212, 'start'],
+  CO: [210, 300, 120], copies: [0, 180], donorArc: [200, 340], targetArc: [20, 160], tsds: [[17, 22], [158, 163]], tray: [210, 566], coCap: [210, 40],
+  RES: [[210, 160, 86], [210, 418, 86]], resCap: -100, note: [210, 596],
+};
+const EL3_HALF = 25, COPY_HALF = 17, JOIN_HALF = 10, DOCK_REACH = 50, RES_REACH = 58, TNPR_OUT = 64;
+const COPY_IDS = ['copy-1', 'copy-2'];
+const xy = ([x, y]) => ({x, y});
 
-export function Tn3Scene({ s, dispatch }) {
-  const {stage} = s, docked = stage >= 1, co = stage >= 3 && stage < 5, resolved = stage === 5;
-  const shift = docked && !co && !resolved ? -158 : 0;
-  const copyArc = (cx, cy, r, centre, id) => {
-    const seen = s.inspected.includes(id), can = stage === 3 && !seen;
-    return <path key={id} className={`sl-element-arc${can ? ' is-target' : ''}${seen ? ' is-done' : ''}`} d={arc(cx, cy, r, centre - COPY_SPAN / 2, centre + COPY_SPAN / 2)} {...(can ? press(() => dispatch({type: 'inspect', feature: id})) : {})} aria-label={can ? `Inspect Tn3 ${id === 'copy-1' ? 'copy 1' : 'copy 2'}` : undefined} />;
+function tn3Label(s, parked) {
+  const {stage} = s;
+  if (stage === 5) return 'Two separate circles, donor and target, each with one Tn3; they may remain linked.';
+  if (stage >= 3) return `One large Tn3 cointegrate circle: both backbones and two Tn3 copies pointing the same way (${s.inspected.length} of 2 inspected). TnpR is ${s.tnpR ? 'docked on a res site' : 'waiting off the DNA'}.`;
+  if (stage >= 1) return `Donor and target circles touch at target site ${s.boundary ?? 0}; Tn3’s ends are joined to the target. A replication fork waits at Tn3.`;
+  return parked ? 'The target circle touches the donor, which carries one Tn3. Choose the spot on the target ring where Tn3 joins.'
+    : 'A donor circle carries one Tn3; a separate target circle has none.';
+}
+
+function tn3Hint(s, {freeMode, answeredRes, parked}) {
+  const {stage} = s;
+  if (freeMode) return stage === 5 ? 'Resolved. Use Fresh molecules to start again.'
+    : stage >= 3 ? 'Tap a Tn3 copy to inspect it. Drag TnpR onto a res site, or off the DNA to remove it.'
+      : stage >= 1 ? 'Hold the replication fork to replicate through Tn3.'
+        : 'Drag the target circle onto the donor circle. The side that touches the donor is where Tn3 joins.';
+  switch (stage) {
+    case 0: return parked ? 'Use the arrow keys to choose the spot on the target ring, then press Enter to join Tn3 there.'
+      : 'Drag the target circle onto the donor circle; the side that touches the donor is where Tn3 joins. Keyboard: Enter picks it up, Enter docks it, then the arrow keys choose the spot.';
+    case 1: return 'The circles are joined. Answer the prediction below the scene.';
+    case 2: return 'Press and hold the replication fork until the ring fills, to copy Tn3.';
+    case 3: return s.inspected.length ? 'One copy inspected. Tap the other Tn3 copy.' : 'Tap each Tn3 copy in the cointegrate.';
+    case 4:
+      if (!answeredRes) return 'Answer the prediction below the scene, then drag TnpR onto a res site and press Resolve.';
+      return s.tnpR ? 'TnpR is on res. Press Resolve below the scene. Dragging TnpR off the DNA removes it.' : 'Drag TnpR onto a red res site in either copy. Keyboard: Enter picks it up, the arrow keys choose a site, Enter docks it.';
+    default: return 'Done. Review the result, then save your lab below.';
+  }
+}
+
+// free: sandbox mode (optional; nothing is highlighted and the model message is left to the page).
+export function Tn3Scene({ s, dispatch, free: freeMode = false }) {
+  const [ghost, setGhost] = useState(null);
+  const [parkedFor, setParkedFor] = useState(null); // the history a keyboard dock was made in: Restart un-parks
+  const [resAt, setResAt] = useState(0); // which res site TnpR sits on
+  const {stage} = s, parked = stage === 0 && parkedFor === s.history;
+  const answeredRes = s.answers.resolution === checkpoints.resolution.correct;
+
+  // Stage 1: the dragged target is gone, so focus waits on the fork; Tab goes on to the prediction.
+  const nextFocus = stage === 0 ? (parked ? null : '.t3-target') : stage <= 2 ? '.t3-fork'
+    : stage === 3 ? (s.inspected.includes('copy-1') ? '.t3-copy-2' : '.t3-copy-1') : stage === 4 ? '.t3-tnpr' : null;
+  const [needKind, needKey] = freeMode ? [null, 'free']
+    : stage === 0 && !parked ? ['drag', 'drag-target']
+      : stage === 2 ? ['hold', 'hold-fork']
+        : stage === 3 ? ['tap', `tap-${s.inspected.includes('copy-1') ? 2 : 1}`]
+          : stage === 4 && answeredRes && !s.tnpR ? ['drag', 'drag-tnpr']
+            : [null, `none-${stage}`];
+  const shell = useStoryShell('tn3', dispatch, {flowKey: `${stage}|${s.inspected.length}|${s.tnpR}|${resAt}`, nextFocus, needKind, needKey});
+  const L = shell.narrow ? NARROW3 : WIDE3;
+  const after = shell.nextRow(s, {freeMode, hint: tn3Hint(s, {freeMode, answeredRes, parked})});
+
+  return <div ref={shell.box} className="ts-scene t3-scene" onPointerDownCapture={shell.activity} onKeyDownCapture={shell.onKeyDownCapture}>
+    <BenchStage variant="molecular" width={L.W} height={L.H} label={tn3Label(s, parked)} after={after}>
+      <Tn3Body s={s} L={L} freeMode={freeMode} answeredRes={answeredRes} parked={parked} park={() => setParkedFor(s.history)}
+        resAt={resAt} setResAt={setResAt} act={shell.act} say={shell.say(s)} ghost={ghost} setGhost={setGhost}
+        demo={shell.demo} sendDemo={shell.sendDemo} requestFocus={shell.requestFocus} />
+    </BenchStage>
+  </div>;
+}
+
+function Tn3Body({ s, L, freeMode, answeredRes, parked, park, resAt, setResAt, act, say, ghost, setGhost, demo, sendDemo, requestFocus }) {
+  const {scale, ids} = useStage();
+  const {stage} = s, guided = !freeMode;
+  const k = Math.max(1, 1 / (scale || 1)); // grow touch areas when the scene is drawn small
+  const [dx, dy, dr] = L.D, [, , tr] = L.T, face = L.face, join = (face + 180) % 360;
+  const dock = xy(polar(dx, dy, dr + tr + 6, face)), home = xy(L.T), fork = xy(polar(dx, dy, dr + 3, face));
+  const [cx, cy, cr] = L.CO;
+
+  // Target circle carry: the item's centre follows the pointer from where it was grabbed.
+  const grab = useRef({x: 0, y: 0}), lastAngle = useRef(null), carrying = useRef(false);
+  const centreOf = (x, y) => ({x: x - grab.current.x, y: y - grab.current.y});
+  const nearDonor = c => Math.hypot(c.x - dx, c.y - dy) <= dr + tr + DOCK_REACH;
+  // The spot on the target ring that faces the donor is where Tn3 joins.
+  const facing = c => angleAt(dx, dy, c.x, c.y);
+  const svgPoint = e => {
+    const m = e.currentTarget.ownerSVGElement?.getScreenCTM();
+    return m ? new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse()) : null;
   };
-  const res = (cx, cy, r, angle, i) => { const [x, y] = polar(cx, cy, r, angle), can = stage === 4;
-    return <g key={i}><circle className={`sl-res${can ? ' is-target' : ''}`} cx={x} cy={y} r="7" {...(can ? press(() => dispatch({type: 'enzyme', available: !s.tnpR})) : {})} aria-label={can ? (s.tnpR ? 'Remove TnpR from res' : 'Dock TnpR on this res site') : undefined} />{stage === 4 && s.tnpR && <g className="sl-tnp sl-tnpr" style={{transform: `translate(${x}px, ${y - 24}px)`}}><circle r="12" /><text y="4" textAnchor="middle">R</text></g>}</g>; };
-  return <svg className="sl-scene" viewBox="0 0 760 340" aria-label={resolved ? 'Two separate circles, donor and target, each with one Tn3; they may remain linked.' : co ? 'One large cointegrate circle containing both backbones and two Tn3 copies pointing the same way.' : docked ? 'Donor and target circles touch; Tn3 ends will be joined to the target.' : 'A donor circle carries one Tn3; a separate target circle has none.'}>
-    {!co && !resolved && <>
-      <text className="sl-caption" x={DONOR3[0] - 50} y="72">DONOR · CIRCULAR</text>
-      <circle className="sl-backbone sl-donor" cx={DONOR3[0]} cy={DONOR3[1]} r={DONOR3[2]} fill="none" />
-      <path className="sl-element-arc" d={arc(...DONOR3, 70, 120)} />{res(...DONOR3, 95, 'd')}
-      <g style={{transform: `translateX(${shift}px)`}} className="sl-slide">
-        <text className="sl-caption" x={TARGET3[0] - 50} y="72">TARGET · CIRCULAR</text>
-        <circle className="sl-backbone sl-target" cx={TARGET3[0]} cy={TARGET3[1]} r={TARGET3[2]} fill="none" />
-        {stage === 0 && <><circle className="sl-ring-glow" cx={TARGET3[0]} cy={TARGET3[1]} r={TARGET3[2]} /><RingTrack cx={TARGET3[0]} cy={TARGET3[1]} r={TARGET3[2]} label="Choose this target site" onPick={a => dispatch({type: 'dock-target', angle: a})} /><text className="sl-hint" x={TARGET3[0]} y={TARGET3[1] + 5} textAnchor="middle">tap the ring</text></>}
-      </g>
-      {docked && <path className="sl-transfer" d={`M ${polar(...DONOR3, 70)[0]} ${polar(...DONOR3, 70)[1]} Q 330 60 ${TARGET3[0] - 158 + 10} ${TARGET3[1] - TARGET3[2] + 8} M ${polar(...DONOR3, 120)[0]} ${polar(...DONOR3, 120)[1]} Q 330 300 ${TARGET3[0] - 158 + 10} ${TARGET3[1] + TARGET3[2] - 8}`} />}
+  const onGrab = e => { const p = svgPoint(e); if (p) grab.current = {x: p.x - home.x, y: p.y - home.y}; };
+  const trackPointer = e => {
+    if (!carrying.current) return;
+    const p = svgPoint(e);
+    if (!p) return;
+    const c = centreOf(p.x, p.y), a = nearDonor(c) ? facing(c) : null;
+    lastAngle.current = a;
+    setGhost(a);
+  };
+  const donorZone = [{id: 'donor', label: 'Touching the donor circle. Press Enter to dock the target there.', contains: (x, y) => nearDonor(centreOf(x, y))}];
+
+  // TnpR: res zones (magnets just outside each copy's res site); docked, anywhere else is "off the DNA".
+  const resDot = i => xy(polar(cx, cy, cr, L.copies[i]));
+  const resSeat = i => xy(polar(cx, cy, cr + TNPR_OUT, L.copies[i]));
+  const nearRes = (i, x, y) => { const [mx, my] = polar(cx, cy, cr + TNPR_OUT / 2, L.copies[i]); return Math.hypot(x - mx, y - my) <= RES_REACH; };
+  const resZones = [0, 1].map(i => ({id: `res-${i}`, label: `Over the res site in Tn3 copy ${i + 1}. Press Enter to dock TnpR there.`, contains: (x, y) => nearRes(i, x, y), ...resSeat(i)}));
+  const offZone = {id: 'off', label: 'Off the DNA. Press Enter to remove TnpR.', contains: (x, y) => !nearRes(0, x, y) && !nearRes(1, x, y)};
+  const seat = s.tnpR ? resSeat(resAt) : xy(L.tray);
+
+  const ring = (kind, x, y, r, extra) => <g key={`${kind}-${x}-${y}`}>
+    <circle className="ts-ring-shadow" cx={x} cy={y + 6} r={r} />
+    <circle className={`ts-ring t3-ring-${kind}`} cx={x} cy={y} r={r} filter={url(ids.shade)} />
+    {extra}
+  </g>;
+  const elementArc = (x, y, r, a0, a1, key) => <path key={key} className="ts-arc ts-arc-element" d={arc(x, y, r, a0, a1)} filter={url(ids.shade)} />;
+  const res = (x, y, key) => <circle key={key} className="t3-res" cx={x} cy={y} r="6" />;
+  const donor = <>
+    <text className="ts-caption" x={dx} y={dy - dr - 14} textAnchor="middle">DONOR · CIRCULAR</text>
+    {ring('donor', dx, dy, dr)}
+    {elementArc(dx, dy, dr, face - EL3_HALF, face + EL3_HALF)}
+    {res(...polar(dx, dy, dr, face))}
+  </>;
+  // The target circle, drawn around its own centre.
+  const target = (spot) => <>
+    <text className="ts-caption" x="0" y={L.tCap} textAnchor="middle">TARGET · CIRCULAR</text>
+    {ring('target', 0, 0, tr)}
+    {spot != null && <path className="ts-ghost" d={arc(0, 0, tr, spot - JOIN_HALF, spot + JOIN_HALF)} />}
+  </>;
+  const tnprBody = <g filter={url(ids.contact)}>
+    <circle className="t3-tnpr-body" r="16" />
+    <ellipse className="t3-gloss" cx="-5" cy="-6" rx="6" ry="4" />
+    <text className="ts-enzyme-label" y="5" textAnchor="middle">R</text>
+  </g>;
+
+  const handAt = (() => {
+    if (!demo.show) return null;
+    if (demo.kind === 'drag' && stage === 0) return {from: home, to: dock, text: 'Drag onto the donor', labelAt: {x: home.x, y: home.y - Math.sign(L.tCap) * (tr + 22)}}; // clear of the caption
+    if (demo.kind === 'drag') return {from: xy(L.tray), to: resSeat(0), text: 'Drag onto res'};
+    if (demo.kind === 'hold') return {from: fork};
+    if (demo.kind === 'tap') return {from: xy(polar(cx, cy, cr, L.copies[s.inspected.includes('copy-1') ? 1 : 0]))};
+    return null;
+  })();
+  const copyHit = clamp(26 * k, 26, 40), copySpan = clamp(COPY_HALF * k, COPY_HALF + 4, 32);
+
+  return <>
+    {/* Before replication: the donor, and the target circle the learner brings to it */}
+    {stage <= 2 && donor}
+    {stage === 0 && !parked && <g onPointerDownCapture={onGrab} onPointerMoveCapture={trackPointer} onPointerUpCapture={trackPointer}>
+      <Draggable className="t3-target" x={home.x} y={home.y} zones={donorZone} expected={guided}
+        hit={{x: -tr - 12, y: -tr - 12, width: 2 * tr + 24, height: 2 * tr + 24}}
+        label="Drag the target circle onto the donor circle to dock it, or press Enter to pick it up"
+        carriedLabel="Carrying the target circle. Press Enter to dock it on the donor, Escape to put it back"
+        onCarry={active => { carrying.current = active; sendDemo({type: 'drag', active}); if (active) say('Carrying the target circle. Bring it to touch the donor.'); else setGhost(null); }}
+        onAnnounce={text => text && say(text)}
+        onCancel={() => say('The target circle is back in place. Drag it onto the donor circle.')}
+        onDrop={({via}) => {
+          if (via === 'key') {
+            park();
+            say('The target touches the donor. Use the arrow keys to choose the spot on the target ring, then press Enter to join Tn3 there.');
+            requestFocus('.t3-target-track');
+            return;
+          }
+          const a = lastAngle.current;
+          if (a != null) act({kind: 'drop', target: 'target-circle', angle: a});
+        }}>{target(ghost)}</Draggable>
+    </g>}
+    {/* Keyboard dock: the target waits against the donor; its ring chooses the joining spot */}
+    {parked && <>
+      <g transform={`translate(${dock.x} ${dock.y})`}>{target(null)}</g>
+      <Track className="t3-target-track" cx={dock.x} cy={dock.y} r={tr} value={join} ghostSpan={JOIN_HALF} expected={guided} hitWidth={ringTrackHit(k, tr)}
+        label="Target ring: arrow keys choose where Tn3 joins it, Enter joins it here"
+        onPreview={deg => say(`Spot ${deg}° on the target ring (site ${boundaryFromAngle(deg)}). Press Enter to join Tn3 here.`)}
+        onConfirm={deg => act({kind: 'drop', target: 'target-circle', angle: deg})} />
     </>}
-    {co && <g className="sl-pop">
-      <text className="sl-caption" x={CO[0] - 70} y="44">COINTEGRATE · ONE CIRCLE</text>
-      <path className="sl-backbone sl-donor" d={arc(...CO, 200, 340)} fill="none" />
-      <path className="sl-backbone sl-target" d={arc(...CO, 20, 160)} fill="none" />
-      {copyArc(...CO, 0, 'copy-1')}{copyArc(...CO, 180, 'copy-2')}
-      {res(...CO, 0, 'r1')}{res(...CO, 180, 'r2')}
-      {[20, 160].map(a => <path key={a} className="sl-tsd" d={arc(...CO, a === 20 ? 17 : 160, a === 20 ? 22 : 165)} />)}
-      <text className="sl-note" x={CO[0]} y={CO[1] - 6} textAnchor="middle">donor backbone (left) + target backbone (right)</text>
-      <text className="sl-note" x={CO[0]} y={CO[1] + 14} textAnchor="middle">two Tn3 copies, same direction</text>
+
+    {/* Joined: strand transfer links Tn3's ends to the target; the fork waits at Tn3 */}
+    {(stage === 1 || stage === 2) && <g className="ts-pop">
+      <g transform={`translate(${dock.x} ${dock.y})`}>{target(null)}</g>
+      {elementArc(dock.x, dock.y, tr, join - JOIN_HALF, join + JOIN_HALF)}
+      {[-1, 1].map(side => {
+        const [x0, y0] = polar(dx, dy, dr, face + side * EL3_HALF), [x1, y1] = polar(dock.x, dock.y, tr, join - side * JOIN_HALF);
+        return <line key={side} className="t3-transfer" x1={x0} y1={y0} x2={x1} y2={y1} />;
+      })}
+      <text className="ts-note" x={dock.x} y={dock.y + 5} textAnchor="middle">site {s.boundary ?? 0}</text>
+      <HoldTarget className="t3-fork" cx={fork.x} cy={fork.y} hitR={Math.min(26 * k, 40)} ringR={26}
+        label="Hold the replication fork to copy Tn3 and fuse the circles" expected={guided && stage === 2}
+        onHold={() => act({kind: 'hold', target: 'fork'})}>
+        <g transform={`translate(${fork.x} ${fork.y}) rotate(${face - 90})`} filter={url(ids.contact)}>
+          <path className="t3-fork-arms" d="M -16 0 L 0 0 L 15 -11 M 0 0 L 15 11" />
+          <circle className="t3-fork-hub" r="5" />
+        </g>
+      </HoldTarget>
+      <text className="ts-note" x={L.forkNote[0]} y={L.forkNote[1]} textAnchor={L.forkNote[2]}>replication fork</text>
     </g>}
-    {resolved && <g className="sl-pop">
-      <text className="sl-caption" x="200" y="62">DONOR REPLICON</text><text className="sl-caption" x="460" y="62">TARGET REPLICON</text>
-      <circle className="sl-backbone sl-donor" cx="290" cy="185" r="88" fill="none" /><path className="sl-element-arc" d={arc(290, 185, 88, 330, 10)} />
-      <circle className="sl-backbone sl-target" cx="470" cy="185" r="88" fill="none" /><path className="sl-element-arc" d={arc(470, 185, 88, 350, 30)} />
-      <path className="sl-tsd" d={arc(470, 185, 88, 344, 349)} /><path className="sl-tsd" d={arc(470, 185, 88, 31, 36)} />
-      <text className="sl-note" x="380" y="318" textAnchor="middle">Circles may remain linked; unlinking is not modelled.</text>
+
+    {/* Cointegrate: one circle, two copies to tap, res sites for TnpR */}
+    {(stage === 3 || stage === 4) && <g className="ts-pop">
+      <text className="ts-caption" x={L.coCap[0]} y={L.coCap[1]} textAnchor="middle">COINTEGRATE · ONE CIRCLE</text>
+      <circle className="ts-ring-shadow" cx={cx} cy={cy + 6} r={cr} />
+      <path className="ts-arc t3-arc-donor" d={arc(cx, cy, cr, ...L.donorArc)} filter={url(ids.shade)} />
+      <path className="ts-arc t3-arc-target" d={arc(cx, cy, cr, ...L.targetArc)} filter={url(ids.shade)} />
+      {L.tsds.map(([a0, a1]) => <path key={a0} className="ts-arc ts-arc-tsd" d={arc(cx, cy, cr, a0, a1)} filter={url(ids.shade)} />)}
+      {COPY_IDS.map((id, i) => {
+        const a = L.copies[i], seen = s.inspected.includes(id), [lx, ly] = polar(cx, cy, cr - 32, a);
+        return <TapTarget key={id} className={`t3-${id}`} expected={guided && stage === 3 && !seen}
+          label={seen ? `Tn3 copy ${i + 1}: inspected` : `Inspect Tn3 copy ${i + 1}`}
+          hit={{d: sector(cx, cy, cr - copyHit, cr + copyHit, a - copySpan, a + copySpan)}} onTap={() => act({kind: 'tap', target: id})}>
+          {elementArc(cx, cy, cr, a - COPY_HALF, a + COPY_HALF)}
+          <text className={seen ? 'ts-check t3-copy-label' : 'ts-note t3-copy-label'} x={lx} y={ly + 5} textAnchor="middle">{seen ? '✓ ' : ''}copy {i + 1}</text>
+        </TapTarget>;
+      })}
+      {[0, 1].map(i => res(resDot(i).x, resDot(i).y, `res-${i}`))}
+      <text className="ts-note" x={cx} y={cy - 6} textAnchor="middle">donor + target backbones</text>
+      <text className="ts-note" x={cx} y={cy + 14} textAnchor="middle">two Tn3 copies, same direction</text>
+      {!s.tnpR && <text className="ts-note" x={L.tray[0]} y={L.tray[1] + 34} textAnchor="middle">TnpR</text>}
+      <Draggable key={s.tnpR ? `tnpr-res-${resAt}` : 'tnpr-tray'} className="t3-tnpr" x={seat.x} y={seat.y}
+        zones={s.tnpR ? [...resZones, offZone] : resZones} expected={guided && stage === 4 && answeredRes && !s.tnpR}
+        hit={{x: -22 * k, y: -22 * k, width: 44 * k, height: 44 * k}}
+        label={s.tnpR ? `TnpR docked on the res site in copy ${resAt + 1}. Drag it off the DNA to remove it, or press Enter to pick it up` : 'Drag TnpR onto a res site to dock it, or press Enter to pick it up'}
+        carriedLabel={s.tnpR ? 'Carrying TnpR. Arrow keys choose a res site or off the DNA, Enter drops it, Escape puts it back' : 'Carrying TnpR. Arrow keys choose a res site, Enter docks it, Escape puts it back'}
+        onCarry={active => { sendDemo({type: 'drag', active}); if (active) say(s.tnpR ? 'Carrying TnpR. Drop it on a res site, or anywhere off the DNA to remove it.' : 'Carrying TnpR. Drop it on a red res site.'); }}
+        onAnnounce={text => text && say(text)}
+        onCancel={() => say(s.tnpR ? 'TnpR is back on its res site.' : 'TnpR is back off the DNA. Drag it onto a red res site.')}
+        onDrop={({zone}) => {
+          if (zone === 'off') { act({kind: 'drag-off', target: 'tnpR'}); return; }
+          setResAt(zone === 'res-1' ? 1 : 0);
+          act({kind: 'drop', target: 'tnpR'});
+        }}>{tnprBody}</Draggable>
     </g>}
-  </svg>;
+
+    {/* Resolved: two circles, one Tn3 each */}
+    {stage === 5 && <g className="ts-pop">
+      {L.RES.map(([x, y, r], i) => <g key={i}>
+        <text className="ts-caption" x={x} y={y + L.resCap} textAnchor="middle">{i ? 'TARGET REPLICON' : 'DONOR REPLICON'}</text>
+        {ring(i ? 'target' : 'donor', x, y, r)}
+        {elementArc(x, y, r, i ? -10 : -30, i ? 30 : 10)}
+        {i === 1 && <><path className="ts-arc ts-arc-tsd" d={arc(x, y, r, -16, -11)} filter={url(ids.shade)} /><path className="ts-arc ts-arc-tsd" d={arc(x, y, r, 31, 36)} filter={url(ids.shade)} /></>}
+      </g>)}
+      <text className="ts-note" x={L.note[0]} y={L.note[1]} textAnchor="middle">Circles may remain linked; unlinking is not modelled.</text>
+    </g>}
+
+    {handAt && <DemoHand show={demo.show} still={demo.still} from={handAt.from} to={handAt.to} text={handAt.text} labelAt={handAt.labelAt} />}
+  </>;
 }

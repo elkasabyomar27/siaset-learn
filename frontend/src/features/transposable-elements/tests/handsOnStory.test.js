@@ -79,7 +79,8 @@ test('story-lab CSS: no global focus override; new scene CSS uses tokens and gat
   const story = readFileSync(new URL('../components/storyLab.css', import.meta.url), 'utf8');
   // A bare [role=button]:focus-visible rule gave kit targets a second focus indicator.
   assert.doesNotMatch(story, /(^|[},])\s*\[role=["']?button["']?\]:focus-visible/m);
-  assert.match(story, /\.sl-scene \[role=button\]:focus-visible/, 'old-markup scenes keep a focus indicator');
+  // Every story scene is on the kit now, so the old-markup focus rule is gone too.
+  assert.doesNotMatch(story, /\[role=["']?button["']?\]:focus-visible/);
   const scenes = readFileSync(new URL('../components/storyScenes.css', import.meta.url), 'utf8');
   assert.doesNotMatch(scenes, /#[0-9a-f]{3,8}\b|rgba?\(/i, 'tokens only');
   const outside = scenes.replace(/@media \(prefers-reduced-motion: no-preference\)\s*\{[\s\S]*$/, '');
@@ -143,13 +144,90 @@ describe('Tn5 scene in free mode (SSR)', () => {
   });
 });
 
-test('Laboratory: Tn5 has one live region for scene feedback', async () => {
+test('Laboratory: Tn5 and Tn3 each have one live region for scene feedback', async () => {
   const ssr = await startSsr();
   try {
     const Laboratory = (await ssr.load('/src/features/transposable-elements/Laboratory.jsx')).default;
     const tn5 = ssr.html(Laboratory, {}, {url: '/lab/transposable-elements?experiment=tn5'});
     assert.doesNotMatch(tn5, /<section class="sl-task" aria-live/);
     const tn3 = ssr.html(Laboratory, {}, {url: '/lab/transposable-elements?experiment=tn3'});
-    assert.match(tn3, /<section class="sl-task" aria-live="polite"/);
+    assert.doesNotMatch(tn3, /<section class="sl-task" aria-live/);
   } finally { await ssr.close(); }
+});
+
+describe('Tn3 lab on the kit (SSR)', () => {
+  let ssr, html, mod;
+  before(async () => {
+    ssr = await startSsr();
+    const Laboratory = (await ssr.load('/src/features/transposable-elements/Laboratory.jsx')).default;
+    html = ssr.html(Laboratory, {}, {url: '/lab/transposable-elements?experiment=tn3'});
+    mod = await ssr.load('/src/features/transposable-elements/components/StoryScenes.jsx');
+  });
+  after(() => ssr.close());
+  const buttonTexts = page => [...page.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/g)].map(m => m[1].replace(/<[^>]+>/g, ''));
+
+  test('Tn3 lab has no action buttons under the scene', () => {
+    for (const text of buttonTexts(html)) assert.doesNotMatch(text, /Join target here|Start replication|Tn3 copy (1|2)|Dock TnpR on res/);
+    assert.doesNotMatch(html, /<input[^>]*type="range"/);
+    assert.match(html, /Restart lab/);
+    // Resolve is a commitment action and stays a real button at its step.
+    const s = run(newStory('tn3'), [{type: 'dock-target', boundary: 200}, {type: 'answer', checkpoint: 'tn3', value: 1}, {type: 'replicate'},
+      {type: 'inspect', feature: 'copy-1'}, {type: 'inspect', feature: 'copy-2'}]);
+    assert.equal(s.stage, 4);
+    const scene = ssr.html(mod.Tn3Scene, {s, dispatch() {}});
+    for (const text of buttonTexts(scene)) assert.doesNotMatch(text, /Dock TnpR|Resolve/, 'no HTML buttons inside the scene');
+  });
+
+  test('Tn3 Resolve stays a button in the lab', async () => {
+    const src = (await import('node:fs')).readFileSync(new URL('../Laboratory.jsx', import.meta.url), 'utf8');
+    assert.match(src, /<button[^>]*onClick=\{\(\) => dispatch\(\{type: 'resolve'\}\)\}>Resolve/);
+  });
+
+  test('Tn3 scene targets are labelled', () => {
+    assert.match(html, /role="button"[^>]*aria-label="Drag the target circle[^"]*"/);
+    assert.match(html, /<svg[^>]*class="ho-svg"[^>]*role="group"[^>]*aria-label="[^"]*Tn3[^"]*"/);
+    assert.match(html, /<div class="ho-next[^"]*" role="status" aria-live="polite"><\/div>/);
+    const joined = run(newStory('tn3'), [{type: 'dock-target', boundary: 200}, {type: 'answer', checkpoint: 'tn3', value: 1}]);
+    assert.equal(joined.stage, 2);
+    const fork = ssr.html(mod.Tn3Scene, {s: joined, dispatch() {}});
+    assert.match(fork, /role="button"[^>]*aria-label="Hold the replication fork[^"]*"/);
+    assert.match(fork, /<svg[^>]*role="group"[^>]*aria-label="[^"]*site 200[^"]*"/, 'label follows the state');
+    const co = run(joined, [{type: 'replicate'}]);
+    const coHtml = ssr.html(mod.Tn3Scene, {s: co, dispatch() {}});
+    assert.match(coHtml, /role="button"[^>]*aria-label="Inspect Tn3 copy 1[^"]*"/);
+    assert.match(coHtml, /role="button"[^>]*aria-label="Inspect Tn3 copy 2[^"]*"/);
+    assert.match(coHtml, /role="button"[^>]*aria-label="Drag TnpR onto a res site[^"]*"/);
+  });
+
+  test('Tn3 resolved scene keeps the linked-circles note', () => {
+    const s = run(newStory('tn3'), [{type: 'dock-target', boundary: 200}, {type: 'answer', checkpoint: 'tn3', value: 1}, {type: 'replicate'},
+      {type: 'inspect', feature: 'copy-1'}, {type: 'inspect', feature: 'copy-2'}, {type: 'answer', checkpoint: 'resolution', value: 2},
+      {type: 'enzyme', available: true}, {type: 'resolve'}]);
+    assert.equal(s.stage, 5);
+    assert.match(ssr.html(mod.Tn3Scene, {s, dispatch() {}}), /Circles may remain linked; unlinking is not modelled\./);
+  });
+
+  test('Tn3 scene still renders the sandbox stage mapping', async () => {
+    const {newBench} = await import('../freeBench.js');
+    const bench = newBench('tn3');
+    for (const stage of [0, 2, 4, 5]) assert.match(ssr.html(mod.Tn3Scene, {s: {...bench, inspected: [], answers: {}, stage}, dispatch() {}}), /class="ho-svg"/);
+  });
+
+  test('Tn3 task strings name the gestures', async () => {
+    const {STORY} = await import('../storyLab.js');
+    assert.match(STORY.tn3[0].task, /drag/i);
+    assert.match(STORY.tn3[2].task, /hold/i);
+    assert.match(STORY.tn3[3].task, /tap/i);
+    assert.match(STORY.tn3[4].task, /drag/i);
+    assert.doesNotMatch(STORY.tn3[0].task, /Tap a spot/);
+  });
+});
+
+test('story-lab CSS keeps only rules something still uses', async () => {
+  const {readFileSync} = await import('node:fs');
+  const story = readFileSync(new URL('../components/storyLab.css', import.meta.url), 'utf8');
+  for (const gone of ['.sl-scene', '.sl-ring-track', '.sl-res', '.sl-tnp', '.sl-or', '.is-target', '.sl-element-arc']) {
+    assert.ok(!story.includes(gone + ' ') && !story.includes(gone + '{') && !story.includes(gone + ','), `${gone} removed`);
+  }
+  assert.match(story, /\.sl-site/, 'the sandbox still uses .sl-site');
 });

@@ -1,4 +1,4 @@
-/* Story-lab scenes on the hands-on kit (Tn5). Tokens only; motion only in the
+/* Story-lab scenes on the hands-on kit (Tn5, Tn3). Tokens only; motion only in the
    no-preference block at the end of this file. */
 
 /* The story lab frames the stage itself (vitals above, note below). */
@@ -45,6 +45,17 @@
 .ts-ghost { fill: none; stroke: var(--scientific-element); stroke-opacity: 0.6; stroke-width: 18; stroke-dasharray: 4 3; pointer-events: none; }
 .ts-swipe-reach { fill: transparent; stroke: none; }
 .ts-ground-shadow { fill: var(--color-molecular-background); opacity: 0.6; pointer-events: none; }
+
+/* Tn3 */
+.t3-ring-donor, .t3-arc-donor { stroke: var(--scientific-donor); }
+.t3-ring-target, .t3-arc-target { stroke: var(--scientific-target); }
+.t3-res { fill: var(--scientific-res); stroke: var(--color-molecular-background); stroke-width: 2; pointer-events: none; }
+.t3-transfer { stroke: var(--scientific-element); stroke-width: 2; stroke-dasharray: 4 4; opacity: 0.8; pointer-events: none; }
+.t3-fork-arms { fill: none; stroke: var(--scientific-element); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.t3-fork-hub { fill: var(--color-molecular-text); }
+.t3-tnpr-body { fill: var(--scientific-res); stroke: var(--color-molecular-text); stroke-width: 1.5; }
+.t3-gloss { fill: var(--color-molecular-text); opacity: 0.4; pointer-events: none; }
+.t3-copy-label { font-weight: 700; }
 
 @media (max-width: 640px) {
   .ts-caption, .ts-note { font-size: 14px; }

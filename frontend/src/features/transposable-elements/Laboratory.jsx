@@ -28,7 +28,6 @@ export default function Laboratory() {
 
 function StoryLab({ scenario, changeScenario }) {
   const [s, setS] = useState(() => newStory(scenario));
-  const [site, setSite] = useState(80);
   const [saved, setSaved] = useState(null);
   const steps = STORY[scenario], step = steps[s.stage], guided = guidedStages[scenario][s.stage];
   const activeProfile = profiles.find(p => p.id === scenario);
@@ -56,23 +55,18 @@ function StoryLab({ scenario, changeScenario }) {
       <p className="sl-scene-note">Schematic scene: not to scale, no sequence. Molecular results are calculated by the lab engine.</p>
     </section>
 
-    {/* Tn5: the scene's NextStep is the one live region for scene feedback. */}
-    <section className="sl-task" aria-live={scenario === 'tn5' ? undefined : 'polite'}>
+    {/* The scene's NextStep is the one live region for scene feedback. */}
+    <section className="sl-task">
       <p className="eyebrow">STEP {s.stage + 1} OF {steps.length}{guided.explanatory ? ' · EXPLANATORY' : ''}</p>
       <h2>{step.title}</h2><p>{step.task}</p>
       {guided.checkpoint && !(guided.checkpoint === 'tn3' && s.stage > 1) && <Checkpoint id={guided.checkpoint} answer={s.answers[guided.checkpoint]} onAnswer={value => dispatch({type: 'answer', checkpoint: guided.checkpoint, value})} />}
       <div className="sl-actions">
-        {/* Tn5 is done entirely in the scene. Tn3's controls stay until its scene moves onto the kit. */}
-        {scenario === 'tn3' && s.stage === 0 && <><label className="sl-site">Ring position <input type="range" min="0" max="359" value={site} onChange={e => setSite(Number(e.target.value))} /><b>{boundaryFromAngle(site)}</b></label>
-          <button type="button" className="primary-button" onClick={() => dispatch({type: 'dock-target', angle: site})}>Join target here →</button><small className="sl-or">or tap the ring in the scene</small></>}
-        {scenario === 'tn3' && s.stage === 2 && <button type="button" className="primary-button" onClick={() => dispatch({type: 'replicate'})}>Start replication →</button>}
-        {scenario === 'tn3' && s.stage === 3 && ['copy-1', 'copy-2'].map(id => <button key={id} type="button" className="outline-button" disabled={s.inspected.includes(id)} onClick={() => dispatch({type: 'inspect', feature: id})}>{s.inspected.includes(id) ? '✓ ' : ''}Tn3 {id === 'copy-1' ? 'copy 1' : 'copy 2'}</button>)}
-        {scenario === 'tn3' && s.stage === 4 && <><button type="button" className="outline-button" aria-pressed={s.tnpR} onClick={() => dispatch({type: 'enzyme', available: !s.tnpR})}>{s.tnpR ? '✓ TnpR docked on res' : 'Dock TnpR on res'}</button><button type="button" className="primary-button" onClick={() => dispatch({type: 'resolve'})}>Resolve →</button></>}
+        {/* Every lab action happens in the scene; Resolve is Tn3's commitment action. */}
+        {scenario === 'tn3' && s.stage === 4 && <button type="button" className="primary-button" onClick={() => dispatch({type: 'resolve'})}>Resolve →</button>}
         {isComplete(s) && <button type="button" className="primary-button" onClick={save}>Save completed lab</button>}
         <button type="button" className="account-text-button sl-restart" onClick={() => { setS(newStory(scenario)); setSaved(null); }}>Restart lab</button>
       </div>
-      {/* Tn5 shows the model's message in the scene's next-step line instead. */}
-      {s.message && scenario !== 'tn5' && <div className={`sl-message${s.message.ok ? ' is-good' : ''}`} role="status">{s.message.text}</div>}
+      {/* The model's message shows in the scene's next-step line. */}
       {saved && <div className={`sl-message${saved.ok ? ' is-good' : ''}`} role="status">{saved.text}</div>}
       <WhatChanged change={s.change} onDismiss={() => setS(prev => ({...prev, change: null}))} />
     </section>

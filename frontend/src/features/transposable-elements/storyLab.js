@@ -18,11 +18,11 @@ export const STORY = {
     {stage: 4, title: 'Review and save', task: 'One element moved; the target site was duplicated. Save your completed lab.'},
   ],
   tn3: [
-    {stage: 0, title: 'Bring the circles together', task: 'Tap a spot on the target ring to choose where Tn3 will join it.'},
+    {stage: 0, title: 'Bring the circles together', task: 'Drag the target circle onto the donor circle. The spot on the target ring that touches the donor is where Tn3 will join it.'},
     {stage: 1, title: 'Predict the joined product', task: 'Strand transfer joins Tn3’s ends to the target. Predict the structure that replication will complete.'},
-    {stage: 2, title: 'Replicate through Tn3', task: 'Start replication. DNA synthesis copies Tn3 and fuses both circles into one cointegrate.'},
-    {stage: 3, title: 'Inspect the cointegrate', task: 'Tap both Tn3 copies in the cointegrate.'},
-    {stage: 4, title: 'Resolve with TnpR', task: 'Predict what resolution does, dock TnpR on a res site, then resolve.'},
+    {stage: 2, title: 'Replicate through Tn3', task: 'Press and hold the replication fork until the ring fills. DNA synthesis copies Tn3 and fuses both circles into one cointegrate.'},
+    {stage: 3, title: 'Inspect the cointegrate', task: 'Tap each Tn3 copy in the cointegrate.'},
+    {stage: 4, title: 'Resolve with TnpR', task: 'Predict what resolution does. Then drag TnpR onto a res site and press Resolve. Dragging TnpR off the DNA removes it.'},
     {stage: 5, title: 'Review and save', task: 'Two circles, one Tn3 each: resolution separated them without removing a copy. Save your completed lab.'},
   ],
 };

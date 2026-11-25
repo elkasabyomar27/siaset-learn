@@ -10,32 +10,7 @@
 .sl-stage-wrap { border-radius:14px; overflow:hidden; border:1px solid #22313b; background:radial-gradient(ellipse at 50% 40%, #13222b, #0b1217 70%); }
 .sl-vitals { display:flex; flex-wrap:wrap; gap:6px 22px; padding:12px 16px; border-bottom:1px solid #22313b; font-size:10px; letter-spacing:.08em; color:#8399a5; }
 .sl-vitals b { margin-left:6px; font-size:14px; letter-spacing:0; color:#eef5f8; }
-.sl-scene { display:block; width:100%; height:auto; }
 .sl-scene-note { margin:0; padding:9px 16px 12px; font-size:11px; color:#7f95a1; border-top:1px solid #22313b; }
-
-.sl-caption { fill:#7f95a1; font-size:11px; letter-spacing:.08em; }
-.sl-note { fill:#9fb3bf; font-size:11px; }
-.sl-hint { fill:#8edfc9; font-size:13px; font-weight:600; letter-spacing:.06em; animation:sl-breathe 1.8s ease-in-out infinite; }
-.sl-backbone { stroke-width:9; stroke-linecap:round; fill:none; }
-.sl-donor { stroke:var(--scientific-donor); }
-.sl-target { stroke:var(--scientific-target); }
-.sl-element-arc { fill:none; stroke:var(--scientific-element); stroke-width:15; stroke-linecap:butt; }
-.sl-tsd { fill:none; stroke:var(--scientific-tsd); stroke-width:15; }
-.sl-res { fill:var(--scientific-res); stroke:#0b1217; stroke-width:2; }
-.sl-slide, .sl-tnp { transition:transform .8s cubic-bezier(.4,0,.2,1); }
-.sl-tnp circle { fill:#b78ad0; stroke:#f1e0fa; stroke-width:2; }
-.sl-tnp text { fill:#22102c; font-size:13px; font-weight:800; }
-.sl-tnpr circle { fill:#ff9f7a; stroke:#ffe1d4; }
-.sl-transfer { fill:none; stroke:#ffd27a; stroke-width:1.6; stroke-dasharray:4 4; opacity:.8; }
-.sl-ring-glow { fill:none; stroke:#8edfc9; stroke-width:22; opacity:.12; animation:sl-ring 1.8s ease-in-out infinite; pointer-events:none; }
-.sl-ring-track { fill:none; stroke:transparent; stroke-width:34; cursor:crosshair; }
-.is-target { cursor:pointer; }
-.sl-res.is-target { stroke:#fff; stroke-width:2.5; animation:sl-pulse 1.4s ease-in-out infinite; }
-.sl-element-arc.is-target, .sl-tsd.is-target { animation:sl-glow 1.4s ease-in-out infinite; }
-.sl-element-arc.is-done, .sl-tsd.is-done { filter:drop-shadow(0 0 6px #fff6c8); }
-/* Old-markup scenes (Tn3) only: kit targets draw their own single focus ring (handsOn.css). */
-.sl-scene [role=button]:focus-visible { outline:none; filter:drop-shadow(0 0 4px var(--color-molecular-text)) drop-shadow(0 0 2px var(--color-focus-on-dark)); }
-.sl-pop { animation:sl-pop .6s ease both; transform-box:fill-box; transform-origin:center; }
 
 .sl-task { margin-top:14px; padding:18px 20px; border-radius:14px; border:1px solid #22313b; background:#0f171d; color:#dfe8ec; }
 .sl-task h2 { margin:4px 0 6px; font-size:22px; }
@@ -46,27 +21,15 @@
 .sl-site { display:flex; align-items:center; gap:8px; font-size:12px; color:#a8bac3; }
 .sl-site input { width:150px; accent-color:#8edfc9; }
 .sl-site b { min-width:3ch; color:#eef5f8; font-variant-numeric:tabular-nums; }
-.sl-or { font-size:11px; color:#7f95a1; }
 .sl-restart { margin-left:auto; }
 .sl-message { margin-top:12px; padding:11px 14px; border-radius:8px; border-left:3px solid #e9a97a; background:#2b1d19; color:#ffdcc4; font-size:13px; }
 .sl-message.is-good { border-color:#82d9b0; background:#163c31; color:#c8f5de; }
 .sl-engine { margin-top:14px; border:1px solid #22313b; border-radius:12px; background:#0f171d; }
 .sl-engine summary { cursor:pointer; padding:12px 16px; font-size:13px; color:#a8bac3; }
 
-@keyframes sl-pulse { 0%,100% { opacity:1; } 50% { opacity:.55; } }
-@keyframes sl-glow { 0%,100% { filter:none; } 50% { filter:drop-shadow(0 0 7px #fff6c8); } }
-@keyframes sl-ring { 0%,100% { opacity:.08; } 50% { opacity:.22; } }
-@keyframes sl-breathe { 0%,100% { opacity:1; } 50% { opacity:.6; } }
-@keyframes sl-pop { from { transform:scale(.94); } to { transform:none; } }
-
 @media (max-width:640px) {
   .sl-restart { margin-left:0; }
   .sl-site input { width:120px; }
-  .sl-caption, .sl-note { font-size:14px; }
-}
-@media (prefers-reduced-motion:reduce) {
-  .sl-slide, .sl-tnp { transition:none; }
-  .sl-hint, .sl-ring-glow, .sl-res.is-target, .sl-element-arc.is-target, .sl-tsd.is-target, .sl-pop { animation:none; }
 }
 
 /* Free sandbox layout */
