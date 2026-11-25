@@ -21,7 +21,8 @@ export function stepDrag(s, e) {
         : { ...at(s, -1), phase: 'cancelled', x: e.x, y: e.y };
     }
     case 'cancel':
-      return s.phase === 'dragging' ? { ...at(s, -1), phase: 'cancelled' } : s;
+      // Also ends a keyboard carry (e.g. focus left the item), so it never stays lifted.
+      return s.phase === 'dragging' || s.phase === 'carrying' ? { ...at(s, -1), phase: 'cancelled' } : s;
     case 'key-down': {
       if (s.phase === 'idle' || s.phase === 'cancelled') {
         return isKeyDown(e, 'Enter') ? { ...at(s, n ? 0 : -1), phase: 'carrying' } : s;

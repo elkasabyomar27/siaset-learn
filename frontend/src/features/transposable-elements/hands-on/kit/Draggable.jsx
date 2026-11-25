@@ -39,6 +39,7 @@ export function Draggable({
     className={cls('ho-drag', expected && 'ho-expected', className)} data-dragging={dragging ? 'true' : 'false'}
     style={{transform: `translate(${px}px, ${py}px)`}} {...handlers}>
     <g className={cls('ho-lift', active && 'ho-carried')}>{children}</g>
+    {expected && <rect className="ho-halo" x={hit.x} y={hit.y} width={Math.max(MIN_HIT, hit.width)} height={Math.max(MIN_HIT, hit.height)} rx="8" />}
     <rect className="ho-hit" x={hit.x} y={hit.y} width={Math.max(MIN_HIT, hit.width)} height={Math.max(MIN_HIT, hit.height)} />
   </g>;
 }

@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createElement, Fragment} from 'react';
 import {demoHand, initialDemo} from '../hands-on/demoHand.js';
 import {DEMO_IDLE_MS, startTrack, stepTrack} from '../hands-on/gestures/index.js';
-import {keyName} from '../hands-on/useGesture.js';
+import {keyName, routeKey, pointerGate} from '../hands-on/useGesture.js';
 import {startSsr} from './helpers/ssr.js';
 
 test('demo hand shows once per kind, again after 8 s idle, never while dragging, still under reduced motion', () => {
@@ -112,6 +112,47 @@ test('useGesture keyName folds Shift into the key the recognizers expect', () =>
   assert.equal(keyName({key: 'Shift', shiftKey: true}), 'Shift');
 });
 
+test('useGesture routeKey: owned keys always preventDefault; auto-repeat reaches only hold', () => {
+  const idle = {phase: 'idle'}, carrying = {phase: 'carrying'};
+  for (const key of ['Enter', ' ', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Escape']) {
+    assert.equal(routeKey({key, shiftKey: false, repeat: false}, 'key-down', idle, false).prevent, true, key);
+  }
+  assert.equal(routeKey({key: 'ArrowLeft', shiftKey: true, repeat: false}, 'key-down', idle, false).prevent, true, 'Shift+arrow');
+  assert.equal(routeKey({key: 'Tab', shiftKey: false, repeat: false}, 'key-down', idle, false).prevent, false, 'Tab moves focus when not carrying');
+  assert.equal(routeKey({key: 'Tab', shiftKey: true, repeat: false}, 'key-down', carrying, false).prevent, true, 'Tab is owned while carrying');
+  assert.equal(routeKey({key: 'a', shiftKey: false, repeat: false}, 'key-down', idle, false).prevent, false);
+  const rep = {key: 'Enter', shiftKey: false, repeat: true};
+  assert.deepEqual(routeKey(rep, 'key-down', idle, false), {send: false, prevent: true}, 'repeat dropped but still no page action');
+  assert.deepEqual(routeKey({key: ' ', shiftKey: false, repeat: true}, 'key-down', {phase: 'done', locked: true}, true), {send: true, prevent: true}, 'hold gets repeats (its lock handles them); Space never scrolls');
+  assert.deepEqual(routeKey({key: ' ', shiftKey: false, repeat: false}, 'key-up', idle, false), {send: true, prevent: false});
+});
+
+test('useGesture pointerGate: only the pointer that started the gesture is followed', () => {
+  let g = pointerGate(null, 'down', 1);
+  assert.deepEqual(g, {accept: true, active: 1});
+  assert.equal(pointerGate(1, 'down', 2).accept, false, 'second finger does not restart');
+  assert.equal(pointerGate(1, 'move', 2).accept, false);
+  assert.equal(pointerGate(1, 'up', 2).accept, false);
+  assert.equal(pointerGate(1, 'up', 2).active, 1, 'foreign up keeps the gesture');
+  assert.equal(pointerGate(1, 'move', 1).accept, true);
+  g = pointerGate(1, 'up', 1);
+  assert.deepEqual(g, {accept: true, active: null});
+  assert.deepEqual(pointerGate(1, 'cancel', 1), {accept: true, active: null});
+  assert.equal(pointerGate(null, 'move', 3).accept, false, 'hover moves are ignored');
+});
+
+test('handsOn.css: one focus indicator on kit targets, SVG-effective pulse, no dead HTML-only rules on SVG', () => {
+  const css = readFileSync(new URL('../hands-on/kit/handsOn.css', import.meta.url), 'utf8');
+  const stageFocus = css.match(/\.ho-stage :focus-visible[^{]*\{/)[0];
+  for (const t of ['.ho-hold', '.ho-swipe', '.ho-drag', '.ho-track']) assert.ok(stageFocus.includes(t), `stage outline excludes ${t}`);
+  assert.match(css, /\.ho-track:focus-visible \.ho-focus-ring\s*\{[^}]*stroke: var\(--color-focus-on-dark\)/);
+  assert.doesNotMatch(css, /(^|[\s,}])\.ho-expected\s*\{/, '.ho-expected alone (applies to <g>) is not styled with HTML-only properties');
+  assert.match(css, /\.ho-target\.ho-expected/);
+  assert.doesNotMatch(css, /\.ho-hand\s*\{[^}]*position/);
+  const motion = css.match(/@media \(prefers-reduced-motion: no-preference\)\s*\{[\s\S]*?\n\}/)[0];
+  assert.match(motion, /\.ho-halo[^{]*\{[^}]*animation/);
+});
+
 describe('kit components (SSR)', () => {
   let ssr;
   before(async () => { ssr = await startSsr(); });
@@ -170,6 +211,19 @@ describe('kit components (SSR)', () => {
     }
     for (const id of ['sc1-enzyme', 'sc1-tube-shade', 'sc1-contact', 'sc1-lift']) assert.ok(html.includes(`id="${id}"`), id);
     assert.doesNotMatch(html, /#[0-9a-f]{3,8}\b|rgba?\(/i, 'tokens only');
+    const sized = ssr.html(HandsOnDefs, {idPrefix: 'sc2', width: 760, height: 340});
+    for (const tag of sized.match(/<filter\b[^>]*>/g)) {
+      assert.equal(attr(tag, 'x'), -760); assert.equal(attr(tag, 'y'), -340);
+      assert.equal(attr(tag, 'width'), 3 * 760); assert.equal(attr(tag, 'height'), 3 * 340);
+    }
+  });
+
+  test('Draggable and Track draw an SVG halo when expected; Track has its own focus ring', async () => {
+    const Draggable = await load('Draggable'), Track = await load('Track');
+    assert.match(ssr.html(Draggable, {label: 'd', zones: [], expected: true}), /class="ho-halo"/);
+    assert.doesNotMatch(ssr.html(Draggable, {label: 'd', zones: []}), /ho-halo/);
+    const track = ssr.html(Track, {label: 't', cx: 0, cy: 0, r: 90, value: 0});
+    assert.match(track, /class="ho-focus-ring"/);
   });
 
   test('BenchStage: both variants, labelled, scalable, and two stages never share ids', async () => {

@@ -11,7 +11,7 @@ import {
 // refused attempt (the model says no) can be retried. `sync`: config the recognizer
 // copied into its state at start, refreshed from the latest props before each event.
 const RECOGNIZERS = new Map([
-  [startHold, {start: startHold, step: stepHold, rearm: false}],
+  [startHold, {start: startHold, step: stepHold, rearm: false, repeat: true}],
   [startSwipe, {start: startSwipe, step: stepSwipe, rearm: true, sync: (s, c) => ({...s, line: c.line, band: c.band ?? s.band})}],
   [startDrag, {start: startDrag, step: stepDrag, rearm: true, sync: (s, c) => ({...s, zones: c.zones ?? []})}],
   [startPour, {start: startPour, step: stepPour, rearm: true}],
@@ -26,6 +26,27 @@ const TICKING = new Set(['holding', 'pouring']);
 export function keyName(e) {
   const k = e.key;
   return e.shiftKey && typeof k === 'string' && k.length > 1 && k !== 'Shift' ? `Shift+${k}` : k;
+}
+
+// Keys every kit target owns: they never also scroll the page or activate anything else,
+// whether or not the recognizer changed state. Tab is owned only while carrying.
+const OWNED_KEYS = new Set(['Enter', ' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Escape']);
+
+// What to do with a keyboard event: send it to the recognizer, and/or preventDefault.
+// Auto-repeated key-downs reach only recognizers that handle repeat (hold, via its lock).
+export function routeKey(e, type, state, allowRepeat) {
+  const name = keyName(e), base = typeof name === 'string' ? name.replace(/^Shift\+/, '') : name;
+  const owned = OWNED_KEYS.has(base) || (base === 'Tab' && state.phase === 'carrying');
+  if (type !== 'key-down') return {send: true, prevent: false};
+  return {send: !(e.repeat && !allowRepeat), prevent: owned};
+}
+
+// Follow only the pointer that started the gesture (a second finger is ignored).
+// Returns {accept, active}: whether to dispatch, and the new active pointer id.
+export function pointerGate(active, type, pointerId) {
+  if (type === 'down') return active == null || active === pointerId ? {accept: true, active: pointerId} : {accept: false, active};
+  if (active == null || active !== pointerId) return {accept: false, active};
+  return {accept: true, active: type === 'up' || type === 'cancel' ? null : active};
 }
 
 // Pointer position in the coordinate space the target's own attributes live in
@@ -47,7 +68,8 @@ const now = () => performance.now();
 /**
  * useGesture(start, config, onDone, onChange) → {handlers, state, reset}
  *  - start: a Task 1 start function (startHold, startSwipe, startDrag, startPour,
- *    startDial, startTrack) or a custom {start, step, rearm?, sync?} recognizer.
+ *    startDial, startTrack) or a custom {start, step, rearm?, sync?, repeat?} recognizer
+ *    (repeat: true lets auto-repeated key-downs through; only hold needs it).
  *  - onDone(done) is called once per completion.
  *  - onChange(next, prev) is called after every event that changed the state.
  */
@@ -86,17 +108,22 @@ export function useGesture(start, config = {}, onDone, onChange) {
     return () => cancelAnimationFrame(id);
   }, [ticking, dispatch]);
 
+  const activePointer = useRef(null);
   const pointer = type => e => {
+    if (type === 'down' && e.button > 0) return;
+    const gate = pointerGate(activePointer.current, type, e.pointerId);
+    if (!gate.accept) return;
+    activePointer.current = gate.active;
     if (type === 'down') {
-      if (e.button > 0) return;
       try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* not capturable (synthetic event) */ }
     }
     const p = type === 'cancel' ? {} : toLocal(e);
     dispatch({type, ...p, t: now()});
   };
   const key = type => e => {
-    // Consumed keys (state changed) do not also scroll the page or move focus.
-    if (dispatch({type, key: keyName(e), t: now()}) && type === 'key-down') e.preventDefault();
+    const route = routeKey(e, type, current.current, !!rec.repeat);
+    if (route.prevent) e.preventDefault();
+    if (route.send) dispatch({type, key: keyName(e), t: now()});
   };
 
   const handlers = {
@@ -104,6 +131,8 @@ export function useGesture(start, config = {}, onDone, onChange) {
     onPointerMove: pointer('move'),
     onPointerUp: pointer('up'),
     onPointerCancel: pointer('cancel'),
+    // Capture lost without an up (element removed, OS gesture): end the gesture.
+    onLostPointerCapture: pointer('cancel'),
     onKeyDown: key('key-down'),
     onKeyUp: key('key-up'),
     onBlur: () => dispatch({type: 'cancel', t: now()}),

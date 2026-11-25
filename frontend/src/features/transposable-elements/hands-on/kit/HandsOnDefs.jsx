@@ -41,8 +41,10 @@ function Sphere({id, kind}) {
  */
 export function HandsOnDefs({idPrefix, width = 1000, height = 1000, tube = 14}) {
   const auto = safeId(useId());
-  const ids = defIds(idPrefix ?? auto), pad = 120;
-  const region = {filterUnits: 'userSpaceOnUse', x: -pad, y: -pad, width: width + 2 * pad, height: height + 2 * pad};
+  const ids = defIds(idPrefix ?? auto);
+  // Generous symmetric region (one stage size on every side) so big rings, long tubes
+  // and lifted shadows near the edges are never clipped.
+  const region = {filterUnits: 'userSpaceOnUse', x: -width, y: -height, width: 3 * width, height: 3 * height};
   const shadow = 'color-mix(in srgb, var(--color-molecular-background) 85%, var(--color-brand-primary))';
   return <defs>
     {DNA_KINDS.map(kind => <linearGradient key={kind} id={ids.tube[kind]} gradientUnits="userSpaceOnUse" x1="0" y1={-tube / 2} x2="0" y2={tube / 2}>

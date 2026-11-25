@@ -218,3 +218,18 @@ test('dial detents: ArrowRight then Enter', () => {
   assert.equal(s.done.value, 55);
   assert.equal(s.detent, 1);
 });
+
+test('drag: cancel (e.g. blur) ends a keyboard carry, with or without zones', () => {
+  const zone = { id: 'a', label: 'A', contains: () => false };
+  for (const zones of [[], [zone]]) {
+    let s = run(stepDrag, startDrag({ zones }), [{ type: 'key-down', key: 'Enter', t: 0 }]);
+    assert.equal(s.phase, 'carrying');
+    s = stepDrag(s, { type: 'cancel', t: 1 });
+    assert.equal(s.phase, 'cancelled');
+    assert.equal(s.over, null);
+    assert.equal(s.done, null);
+    s = stepDrag(s, { type: 'key-down', key: 'Enter', t: 2 });
+    assert.equal(s.phase, 'carrying', 'a later Enter picks it up again rather than dropping');
+    assert.equal(s.done, null);
+  }
+});

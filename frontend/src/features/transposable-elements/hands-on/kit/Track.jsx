@@ -23,6 +23,7 @@ export function Track({label, cx, cy, r, value = 0, step, bigStep, ghostSpan = 8
       <path className="ho-ghost" d={ringArc(cx, cy, r, p - ghostSpan, p + ghostSpan)} />
       <circle className="ho-ghost-dot" cx={dot[0]} cy={dot[1]} r="6" />
     </>}
+    <circle className="ho-focus-ring" cx={cx} cy={cy} r={r} />
     <circle className="ho-hit ho-track-hit" cx={cx} cy={cy} r={Math.max(r, MIN_HIT / 2)} strokeWidth={MIN_HIT} pointerEvents="stroke" />
   </g>;
 }

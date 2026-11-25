@@ -10,6 +10,8 @@ export async function startSsr() {
   const server = await createServer({
     root: fileURLToPath(new URL('../../../../../', import.meta.url)),
     server: {middlewareMode: true, hmr: false}, appType: 'custom', logLevel: 'error',
+    // No dependency scan: it races server.close() and prints a spurious error.
+    optimizeDeps: {noDiscovery: true, include: []},
   });
   return {
     load: path => server.ssrLoadModule(path),
