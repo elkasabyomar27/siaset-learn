@@ -11,6 +11,8 @@ import {copyLedgerIntent} from '../hands-on/intents/copyLedger.js';
 import {LANES, COPY_CHOICES, copyFeedback} from '../copyLedger.js';
 import {elementBuilderIntent, applyBuilderAction} from '../hands-on/intents/elementBuilder.js';
 import {IS_PARTS, canAdd} from '../mobileElementBuilder.js';
+import {compositeIntent} from '../hands-on/intents/composite.js';
+import {MODULES, CARGO, END_CHOICES, REFERENCE, arrangement, matchElement} from '../compositeBuilder.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -237,6 +239,47 @@ describe('MobileElementBuilder', () => {
     assert.match(html, /Test: can it move\?/);
     assert.match(html, /Clear track/);
     assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="DNA track with 0 of 5 parts/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('CompositeBuilder', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('CompositeBuilder'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('CompositeBuilder: gestures reach every option', () => {
+    const design = {module: 'IS50', left: 1, right: -1, cargo: 'tet'};
+    for (const m of MODULES) for (const side of ['left', 'right']) assert.deepEqual(compositeIntent({kind: 'drop', part: 'module', module: m, target: side}, design), {module: m});
+    for (const id of Object.keys(CARGO)) assert.deepEqual(compositeIntent({kind: 'drop', part: 'cargo', cargo: id, target: 'cargo'}, design), {cargo: id});
+    for (const id of Object.keys(END_CHOICES)) assert.deepEqual(compositeIntent({kind: 'drop', part: 'transposase', target: `ends-${id}`}, design), {ends: id});
+    // Flip: both signs reach both sides, as the old Flip buttons.
+    for (const side of ['left', 'right']) for (const sign of [1, -1]) assert.deepEqual(compositeIntent({kind: 'swipe', target: side}, {...design, [side]: sign}), {[side]: -sign});
+    // Rebuilding every classical element by gestures alone reaches its match.
+    for (const [name, r] of Object.entries(REFERENCE)) {
+      let d = {module: 'IS1', left: 1, right: 1, cargo: 'kan'};
+      const apply = p => { d = {...d, ...p}; };
+      apply(compositeIntent({kind: 'drop', part: 'module', module: r.module, target: 'left'}, d));
+      apply(compositeIntent({kind: 'drop', part: 'cargo', cargo: r.cargo, target: 'cargo'}, d));
+      if (arrangement(d) !== r.arrangement) apply(compositeIntent({kind: 'swipe', target: 'right'}, d));
+      assert.equal(matchElement(d), name);
+    }
+    assert.equal(compositeIntent({kind: 'drop', part: 'module', module: 'IS99', target: 'left'}, design), null);
+    assert.equal(compositeIntent({kind: 'drop', part: 'transposase', target: 'ends-inner'}, design), null);
+    assert.equal(compositeIntent({kind: 'swipe', target: 'cargo'}, design), null);
+  });
+
+  test('CompositeBuilder: the module, cargo, ends and flip buttons are gone; Run stays a button', () => {
+    assert.doesNotMatch(html, /aria-label="(IS module type|Module directions|Cargo|Ends used by transposase)"/);
+    assert.doesNotMatch(html, /Flip left|Flip right/);
+    const labels = buttons(html);
+    assert.equal(labels.filter(l => /^IS module IS/.test(l)).length, MODULES.length);
+    assert.equal(labels.filter(l => /^Cargo gene/.test(l)).length, Object.keys(CARGO).length);
+    assert.ok(labels.some(l => /^Left IS module/.test(l)) && labels.some(l => /^Right IS module/.test(l)));
+    assert.ok(labels.some(l => /^Transposase: acting on/.test(l)));
+    assert.match(html, /Run transposase/);
+    assert.match(html, /aria-label="Choose an element to rebuild"/, 'the target choice stays tabs');
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="IS50 module/);
     assert.match(html, /Practice only/);
   });
 });
