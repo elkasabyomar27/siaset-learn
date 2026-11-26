@@ -7,9 +7,6 @@
 .tsd-presets button { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 44px; padding: 8px 14px; }
 .tsd-presets button small { font-size: 11px; opacity: .75; }
 .tsd-presets button[aria-pressed=true] { border-color: #6f9a55; background: #eaf3df; color: #3f6a2e; box-shadow: inset 3px 0 #6f9a55; }
-.tsd-slider { display: grid; gap: 6px; font-size: 13px; min-width: 200px; flex: 1 1 200px; max-width: 320px; }
-.tsd-slider b { font-size: 15px; margin-left: 6px; }
-.tsd-slider input { width: 100%; min-height: 32px; accent-color: #6f9a55; }
 .tsd-mystery { margin: 0; padding: 10px 14px; border: 1px dashed #b49ac6; border-radius: 8px; background: #f8f2fb; color: #5d3f72; font-size: 13px; }
 .tsd-mystery b { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; background: #c79cda; color: #2a1836; }
 
@@ -40,7 +37,6 @@
 .tsd-element text { fill: #2c220d; font-size: 13px; font-weight: 700; letter-spacing: .04em; }
 
 .tsd-nick line { stroke: #ff9f7a; stroke-width: 2.5; stroke-linecap: round; }
-.tsd-nick text { fill: #ffb597; font-size: 14px; }
 .tsd-stagger-bracket line { stroke: #e4c8f0; stroke-width: 1.5; stroke-dasharray: 4 3; }
 .tsd-stagger-bracket text, .tsd-repeat text { fill: #e4c8f0; font-size: 12px; font-weight: 600; }
 .tsd-repeat path { fill: none; stroke: #e4c8f0; stroke-width: 1.6; }
@@ -81,8 +77,7 @@
   .tsd-pos--interval { font-size: 11px; }
   .tsd-stagger-bracket text, .tsd-repeat text { font-size: 13px; }
   .tsd-strand-labels { display: none; }
-  .tsd-slider { max-width: none; }
-  .tsd-actions-spacer { display: none; }
+    .tsd-actions-spacer { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tsd-world, .tsd-cell, .tsd-element { transition: none; }

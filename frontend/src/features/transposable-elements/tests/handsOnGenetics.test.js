@@ -21,6 +21,8 @@ import {phenotypeIntent} from '../hands-on/intents/phenotype.js';
 import {SITES, PROMOTER_INFO, BACKUP, MEDIUM, DEFAULT_PHENO, phenotypeChain} from '../phenotypeChain.js';
 import {operonIntent} from '../hands-on/intents/operon.js';
 import {SLOTS, TE_PROMOTER, DEFAULT_OPERON, simulateOperon} from '../operonModel.js';
+import {tsdIntent, fillGap} from '../hands-on/intents/tsd.js';
+import {STAGGER_RANGE, HOST_LENGTH, clampCut, validSetup, tsdLayout, PRESETS} from '../tsdJourney.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -441,6 +443,61 @@ describe('OperonExplorer', () => {
     assert.match(html, /<legend>Assumptions<\/legend>/);
     assert.match(html, /Assume no other promoters exist/);
     assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Operon bench/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('TsdBuilder', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('TsdBuilder'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('TsdBuilder: gestures reach every option', () => {
+    // Every (stagger, cut) the two sliders could make: top mark to the cut, then bottom mark to cut + stagger.
+    for (let stagger = STAGGER_RANGE[0]; stagger <= STAGGER_RANGE[1]; stagger++) for (let cut = 2; cut <= HOST_LENGTH - stagger - 2; cut++) {
+      let cur = {cut: 2, stagger: 2, stage: 0};
+      cur = {...cur, ...tsdIntent({kind: 'drop', part: 'cut', mark: 'top', pos: cut}, cur)};
+      cur = {...cur, ...tsdIntent({kind: 'drop', part: 'cut', mark: 'bottom', pos: cut + stagger}, cur)};
+      assert.deepEqual([cur.cut, cur.stagger], [cut, stagger], `${stagger}/${cut}`);
+      assert.ok(validSetup(cur));
+      assert.doesNotThrow(() => tsdLayout({cut: cur.cut, stagger: cur.stagger, stage: 3}));
+    }
+    // Wild drops are clamped exactly like the sliders were (stagger 2..10, clampCut).
+    for (const pos of [-5, 0, 1, 19, 20, 99]) for (const mark of ['top', 'bottom']) {
+      const p = tsdIntent({kind: 'drop', part: 'cut', mark, pos}, {cut: 4, stagger: 9});
+      assert.ok(validSetup(p), `${mark} ${pos}`);
+      assert.equal(p.cut, clampCut(p.cut, p.stagger));
+    }
+    // A mystery element keeps its hidden stagger: only the cut position can move.
+    assert.deepEqual(tsdIntent({kind: 'drop', part: 'cut', mark: 'top', pos: 7}, {cut: 4, stagger: 6, locked: true}), {cut: 7, stagger: 6, stage: 1});
+    assert.equal(tsdIntent({kind: 'drop', part: 'cut', mark: 'bottom', pos: 7}, {cut: 4, stagger: 6, locked: true}), null);
+    // Presets stay chips and set the same stagger.
+    assert.deepEqual(PRESETS.map(p => p.stagger), [9, 5]);
+    // The old Next button, by gesture: still gated behind the prediction.
+    assert.equal(tsdIntent({kind: 'drop', part: 'element', target: 'gap'}, {stage: 1, predicted: false}), null);
+    assert.deepEqual(tsdIntent({kind: 'drop', part: 'element', target: 'gap'}, {stage: 1, predicted: true}), {stage: 2});
+    assert.equal(tsdIntent({kind: 'drop', part: 'element', target: 'gap'}, {stage: 0, predicted: true}), null);
+    assert.deepEqual(tsdIntent({kind: 'drop', part: 'polymerase', target: 'left'}, {stage: 2}), {fill: 'left'});
+    assert.equal(tsdIntent({kind: 'drop', part: 'polymerase', target: 'left'}, {stage: 1}), null);
+    let r = fillGap([], 'left'); assert.deepEqual([r.filled, r.done], [['left'], false]);
+    r = fillGap(r.filled, 'left'); assert.equal(r.done, false, 'the same gap twice does not finish');
+    r = fillGap(r.filled, 'right'); assert.equal(r.done, true);
+    assert.equal(tsdIntent(null), null);
+    assert.equal(tsdIntent({kind: 'tap'}), null);
+  });
+
+  test('TsdBuilder: sliders and the next-step button are gone; cut marks are labelled; Back and presets stay', () => {
+    assert.doesNotMatch(html, /type="range"/);
+    assert.doesNotMatch(html, /Next step →|Predict first/);
+    assert.doesNotMatch(html, /<button[^>]*primary-button/, 'no primary button before the last stage');
+    const labels = buttons(html);
+    assert.ok(labels.some(l => /^Top cut mark: before position 5/.test(l)));
+    assert.ok(labels.some(l => /^Bottom cut mark: after position 13/.test(l)));
+    assert.match(html, /← Back/);
+    assert.match(html, /Forward →/);
+    assert.match(html, /aria-label="Load a real element"/);
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="The target is an unbroken double strand/);
+    assert.match(html, /role="status"/);
     assert.match(html, /Practice only/);
   });
 });

@@ -35,3 +35,5 @@
 .ho-assume-choice legend { padding: 0; font-size: 0.9rem; color: var(--color-text-secondary); }
 .ho-assume-choice > div { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
 .ho-assume-choice button { min-height: 44px; }
+.tsd-distance { margin: 0; align-self: center; font-size: 0.95rem; }
+.tsd-distance b { margin: 0 var(--space-1) 0 var(--space-1); font-size: 1.05rem; }
