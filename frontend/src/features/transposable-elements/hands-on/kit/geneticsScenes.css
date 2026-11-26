@@ -1,0 +1,31 @@
+/* Scenes for the Genetics experiments on the hands-on kit. Tokens only. */
+.gx-scroll { overflow-x: auto; }
+.gx-stage { min-width: var(--gx-min, 560px); }
+.gx-note { margin: var(--space-3) 0 0; }
+.gx-text { fill: var(--color-molecular-text); font-size: 13px; pointer-events: none; }
+.gx-small { fill: var(--color-molecular-muted); font-size: 11px; pointer-events: none; }
+.gx-zone { fill: color-mix(in srgb, var(--color-molecular-text) 6%, transparent); stroke: color-mix(in srgb, var(--color-molecular-text) 35%, transparent); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.gx-zone[data-over="true"] { stroke: var(--color-brand-highlight); fill: color-mix(in srgb, var(--color-brand-highlight) 14%, transparent); }
+.gx-solid { fill: color-mix(in srgb, var(--color-molecular-text) 10%, transparent); stroke: color-mix(in srgb, var(--color-molecular-text) 45%, transparent); stroke-width: 1.5; }
+.gx-piece { fill: var(--color-brand-primary); stroke: var(--color-brand-accent); stroke-width: 1.5; }
+.gx-piece-element { fill: color-mix(in srgb, var(--scientific-element) 55%, var(--color-molecular-background)); stroke: var(--scientific-element); }
+.gx-piece-gene { fill: color-mix(in srgb, var(--scientific-gene) 55%, var(--color-molecular-background)); stroke: var(--scientific-gene); }
+.gx-piece-tir { fill: color-mix(in srgb, var(--scientific-tir) 55%, var(--color-molecular-background)); stroke: var(--scientific-tir); }
+.gx-piece-tsd { fill: color-mix(in srgb, var(--scientific-tsd) 55%, var(--color-molecular-background)); stroke: var(--scientific-tsd); }
+.gx-piece-target { fill: color-mix(in srgb, var(--scientific-target) 55%, var(--color-molecular-background)); stroke: var(--scientific-target); }
+.gx-dna { stroke: var(--scientific-target); stroke-width: 8; stroke-linecap: round; fill: none; }
+.gx-mark-good { fill: var(--color-success); }
+.gx-mark-bad { fill: var(--color-error); }
+.gx-switch-track { fill: color-mix(in srgb, var(--color-molecular-text) 20%, transparent); stroke: var(--color-molecular-muted); stroke-width: 1.5; }
+.gx-switch[data-on="true"] .gx-switch-track { fill: var(--color-success); stroke: var(--color-success); }
+.gx-switch-knob { fill: var(--color-molecular-text); }
+.gx-crank { fill: var(--color-brand-primary); stroke: var(--color-brand-accent); stroke-width: 2; }
+.gx-crank-handle { stroke: var(--color-brand-highlight); stroke-width: 6; stroke-linecap: round; }
+.ho-assumptions { margin: var(--space-3) 0; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+.ho-assumptions legend { padding: 0 var(--space-2); font-weight: 700; }
+.ho-assume-row { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; }
+.ho-assume-row input { width: 28px; height: 28px; flex: none; }
+.gx-grow-hint { color: var(--color-molecular-muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .gx-switch-knob { transition: transform 160ms ease; }
+}
