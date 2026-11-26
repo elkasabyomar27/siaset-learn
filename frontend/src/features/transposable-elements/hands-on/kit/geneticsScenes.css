@@ -37,3 +37,9 @@
 .ho-assume-choice button { min-height: 44px; }
 .tsd-distance { margin: 0; align-self: center; font-size: 0.95rem; }
 .tsd-distance b { margin: 0 var(--space-1) 0 var(--space-1); font-size: 1.05rem; }
+/* Bacterial cells */
+.hg-bridge-line { stroke: var(--color-molecular-muted); stroke-width: 4; stroke-linecap: round; }
+.hg-bridge-line.is-used { stroke: var(--color-brand-highlight); }
+[data-growth="grows"] .hg-wall { stroke: var(--color-success); }
+[data-growth="inhibited"] .hg-wall { stroke: var(--color-error); stroke-dasharray: 4 4; }
+[data-growth="undetermined"] .hg-wall { stroke: var(--color-brand-highlight); stroke-dasharray: 8 4; }

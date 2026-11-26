@@ -215,15 +215,6 @@
 @keyframes pb-lift-in { from { transform:translateY(8px); } to { transform:none; } }
 
 /* HGT lab */
-.hg-cells { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; padding:16px; }
-.hg-cell { margin:0; padding:10px; border-radius:12px; border:1px solid #22313b; background:#121c23; transition:background .4s,border-color .4s; }
-.hg-cell figcaption { display:flex; justify-content:space-between; gap:8px; font-size:12px; color:#dfe8ec; margin-bottom:6px; }
-.hg-cell.is-grows { border-color:#3f9a76; background:#152c25; }
-.hg-cell.is-inhibited { border-color:#b8664e; background:#2b1d19; opacity:.75; }
-.hg-cell.is-undetermined { border-color:#8a7a45; border-style:dashed; }
-.hg-growth { font-weight:700; }
-.is-grows .hg-growth { color:#9fe2c0; } .is-inhibited .hg-growth { color:#ffb597; } .is-undetermined .hg-growth { color:#ffd27a; }
-.hg-cell svg { width:100%; height:auto; display:block; }
 .hg-wall { fill:#1a2a33; stroke:#5d7c8c; stroke-width:2; }
 .hg-chromosome { fill:none; stroke:var(--scientific-target); stroke-width:5; }
 .hg-plasmid circle { fill:none; stroke:#9fd3a8; stroke-width:4; }
@@ -231,8 +222,6 @@
 .hg-tn { fill:none; stroke:var(--scientific-element); stroke-width:7; stroke-linecap:round; }
 .hg-fragment line:first-child { stroke:#5d7c8c; stroke-width:4; stroke-linecap:round; }
 .hg-tag { fill:#8fa4b0; font-size:10px; }
-.hg-bridge { font-size:22px; color:#3b4d58; transition:color .4s; }
-.hg-bridge.is-used { color:#ffd27a; }
 .hg-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
 .hg-actions button { min-height:48px; display:inline-flex; flex-direction:column; align-items:flex-start; justify-content:center; line-height:1.2; }
 .hg-actions button small { font-size:10px; font-weight:400; opacity:.85; }
@@ -241,9 +230,7 @@
 .hg-scope { margin-left:8px; font-size:11px; padding:1px 8px; border-radius:10px; background:#eef2e8; color:#5f7457; }
 .hg-scope.is-failed { background:#fdf0ec; color:#8a3f2b; }
 @media (max-width:640px) {
-  .hg-cells { grid-template-columns:1fr; }
-  .hg-bridge { transform:rotate(90deg); justify-self:center; }
-}
+    }
 @media (prefers-reduced-motion:reduce) { .rl-molecule, .rl-products .rl-molecule, .hg-plasmid.is-new { animation:none; } }
 
 /* Anatomy dissection lab (topic 3) */

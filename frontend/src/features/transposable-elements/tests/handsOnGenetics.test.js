@@ -23,6 +23,8 @@ import {operonIntent} from '../hands-on/intents/operon.js';
 import {SLOTS, TE_PROMOTER, DEFAULT_OPERON, simulateOperon} from '../operonModel.js';
 import {tsdIntent, fillGap} from '../hands-on/intents/tsd.js';
 import {STAGGER_RANGE, HOST_LENGTH, clampCut, validSetup, tsdLayout, PRESETS} from '../tsdJourney.js';
+import {hgtIntent} from '../hands-on/intents/hgt.js';
+import {PREREQS, newHgt, setPrereq, act} from '../hgtLab.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -498,6 +500,68 @@ describe('TsdBuilder', () => {
     assert.match(html, /aria-label="Load a real element"/);
     assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="The target is an unbroken double strand/);
     assert.match(html, /role="status"/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('HgtLab', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('HgtLab'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  // What the old checkboxes and buttons did, applied to a lab.
+  const apply = (lab, p) => 'prereq' in p ? setPrereq(lab, p.prereq, p.value) : 'act' in p ? act(lab, p.act).lab : lab;
+
+  test('HgtLab: gestures reach every option', () => {
+    assert.deepEqual(hgtIntent({kind: 'drop', part: 'donor', target: 'recipient'}), {prereq: 'contact', value: true});
+    assert.deepEqual(hgtIntent({kind: 'drop', part: 'donor', target: 'apart'}), {prereq: 'contact', value: false});
+    for (const part of ['conjugative', 'oriT']) {
+      assert.deepEqual(hgtIntent({kind: 'drop', part, target: 'plasmid'}), {prereq: part, value: true});
+      assert.deepEqual(hgtIntent({kind: 'drop', part, target: 'tray'}), {prereq: part, value: false});
+    }
+    for (const v of [true, false]) {
+      assert.deepEqual(hgtIntent({kind: 'assume', control: 'compatibleRecipient', value: v}), {prereq: 'compatibleRecipient', value: v});
+      assert.deepEqual(hgtIntent({kind: 'assume', control: 'selection', value: v}), {assume: v});
+    }
+    assert.deepEqual(hgtIntent({kind: 'hold', target: 'tn5'}), {act: 'transpose'});
+    assert.deepEqual(hgtIntent({kind: 'hold', target: 'bridge'}), {act: 'conjugate'});
+    // Every old prerequisite is reachable, and the lab ends in the same state as the old checkboxes gave.
+    for (const key of Object.keys(PREREQS)) for (const value of [true, false]) {
+      const g = key === 'contact' ? {kind: 'drop', part: 'donor', target: value ? 'recipient' : 'apart'}
+        : key === 'compatibleRecipient' ? {kind: 'assume', control: key, value} : {kind: 'drop', part: key, target: value ? 'plasmid' : 'tray'};
+      assert.deepEqual(apply(newHgt(), hgtIntent(g)), setPrereq(newHgt(), key, value), `${key}=${value}`);
+    }
+    // Refused moves still reach the model: conjugating with a requirement missing logs the failure.
+    let lab = apply(newHgt(), hgtIntent({kind: 'hold', target: 'bridge'}));
+    assert.equal(lab.log.at(-1).ok, false);
+    lab = apply(lab, hgtIntent({kind: 'hold', target: 'tn5'}));
+    assert.equal(lab.log.at(-1).ok, true);
+    for (const [k, p] of [['conjugative', 'plasmid'], ['oriT', 'plasmid']]) lab = apply(lab, hgtIntent({kind: 'drop', part: k, target: p}));
+    lab = apply(lab, hgtIntent({kind: 'drop', part: 'donor', target: 'recipient'}));
+    lab = apply(lab, hgtIntent({kind: 'assume', control: 'compatibleRecipient', value: true}).prereq ? {prereq: 'compatibleRecipient', value: true} : {});
+    lab = apply(lab, hgtIntent({kind: 'hold', target: 'bridge'}));
+    assert.equal(lab.bact.phase, 'transferred');
+    assert.equal(hgtIntent({kind: 'drop', part: 'donor', target: 'moon'}), null);
+    assert.equal(hgtIntent({kind: 'hold', target: 'bench'}), null);
+    assert.equal(hgtIntent({kind: 'assume', control: 'conjugative', value: true}), null);
+    assert.equal(hgtIntent(null), null);
+  });
+
+  test('HgtLab: prerequisite checkboxes and operation buttons are gone; selection and reset stay', () => {
+    assert.doesNotMatch(html, /type="checkbox"[^>]*>\s*(<!-- -->)? ?Plasmid encodes transfer machinery/);
+    assert.doesNotMatch(html, /Plasmid encodes transfer machinery|origin of transfer \(oriT\)<\/label>|Cells are in contact/);
+    assert.doesNotMatch(html, /Transpose <small>|Conjugate <small>/);
+    const labels = buttons(html);
+    assert.ok(labels.some(l => /^Donor cell: touching the recipient/.test(l)));
+    assert.ok(labels.some(l => /^Transfer machinery: on the plasmid/.test(l)));
+    assert.ok(labels.some(l => /^Origin of transfer \(oriT\): on the plasmid/.test(l)));
+    assert.ok(labels.some(l => /^Tn5 on the donor DNA fragment\. Hold to transpose/.test(l)));
+    assert.ok(labels.some(l => /^Bridge between the cells \(touching\)\. Hold to conjugate/.test(l)));
+    assert.match(html, /Add antibiotic/);
+    assert.match(html, /Reset cells/);
+    assert.match(html, /Recipient is compatible/);
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Two bacterial cells, touching/);
+    assert.match(html, /role="img" aria-label="Donor cell: chromosome/);
     assert.match(html, /Practice only/);
   });
 });
