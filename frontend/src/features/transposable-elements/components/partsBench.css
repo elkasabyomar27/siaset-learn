@@ -54,11 +54,9 @@
 }
 
 /* Operon explorer */
-.op-toggles { display:grid; gap:8px; font-size:13px; color:#4b5d43; }
-.op-toggles label { display:flex; gap:8px; align-items:center; min-height:32px; }
 .op-dna { stroke:#2a3944; stroke-width:6; stroke-linecap:round; }
 .op-promoter rect { fill:#e9c46a; }
-.op-promoter text, .op-gene text, .op-te text { fill:#1c1608; font-size:15px; font-weight:700; }
+.op-promoter text, .op-gene text { fill:#1c1608; font-size:15px; font-weight:700; }
 .op-promoter.is-broken rect { fill:#5b4a2a; }
 .op-promoter.is-broken text { fill:#a99566; text-decoration:line-through; }
 .op-gene path { fill:var(--scientific-target); stroke:#0e1419; stroke-width:1; transition:fill .4s, opacity .4s; }
@@ -67,10 +65,6 @@
 .op-gene--reduced text { fill:#9fb0ba; }
 .op-gene--undetermined path { fill:#c9a85a; opacity:.75; stroke-dasharray:4 3; stroke:#f2da99; }
 .op-gene--interrupted path { fill:#d98b74; }
-.op-bflag { fill:none; stroke:#7fd6a9; stroke-width:2.5; }
-.op-te rect { fill:var(--scientific-element); stroke:#fff6c8; stroke-width:1.5; }
-.op-te { animation:pb-pop .35s ease both; }
-.op-te-mark { font-size:13px !important; }
 .op-rna line { stroke-width:3; stroke-dasharray:7 5; animation:op-flow 1s linear infinite; }
 .op-rna--p line, .op-rna--p .op-tip { stroke:#9fd8ff; }
 .op-rna--te line, .op-rna--te .op-tip { stroke:#ffd27a; }
@@ -105,7 +99,7 @@
 .cs-empty { color:#8a9a82; font-size:12px; text-align:center; }
 @media (prefers-reduced-motion:reduce) {
   .op-rna line { animation:none; }
-  .op-te, .cs-card, .cs-placed { animation:none; }
+  .cs-card, .cs-placed { animation:none; }
 }
 
 /* Mobility gates */
@@ -242,7 +236,6 @@
 .hg-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
 .hg-actions button { min-height:48px; display:inline-flex; flex-direction:column; align-items:flex-start; justify-content:center; line-height:1.2; }
 .hg-actions button small { font-size:10px; font-weight:400; opacity:.85; }
-.hg-prereqs { margin-top:14px; }
 .hg-log { margin:12px 0 0; padding-left:22px; display:grid; gap:4px; font-size:13px; color:#4b5d43; }
 .hg-log li.is-failed { color:#8a3f2b; }
 .hg-scope { margin-left:8px; font-size:11px; padding:1px 8px; border-radius:10px; background:#eef2e8; color:#5f7457; }

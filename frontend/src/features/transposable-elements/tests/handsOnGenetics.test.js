@@ -19,6 +19,8 @@ import {recombinationIntent} from '../hands-on/intents/recombination.js';
 import {ORIENTATIONS, SUBSTRATES, recombine} from '../recombinationLab.js';
 import {phenotypeIntent} from '../hands-on/intents/phenotype.js';
 import {SITES, PROMOTER_INFO, BACKUP, MEDIUM, DEFAULT_PHENO, phenotypeChain} from '../phenotypeChain.js';
+import {operonIntent} from '../hands-on/intents/operon.js';
+import {SLOTS, TE_PROMOTER, DEFAULT_OPERON, simulateOperon} from '../operonModel.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -380,6 +382,65 @@ describe('PhenotypeExplorer', () => {
     assert.match(html, /<legend>Backup enzyme<\/legend>/);
     assert.match(html, /<legend>Growth test<\/legend>/);
     assert.match(html, /role="img" aria-label="Illustrative growth plate/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('OperonExplorer', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('OperonExplorer'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('OperonExplorer: gestures reach every option', () => {
+    // Slot: each real slot by dropping into it, "No insertion" by dropping the element back in the tray.
+    for (const slot of Object.keys(SLOTS)) {
+      const g = {kind: 'drop', part: 'element', target: slot === 'none' ? 'tray' : slot};
+      assert.deepEqual(operonIntent(g, DEFAULT_OPERON), {slot});
+    }
+    // Outward promoter: a swipe cycles, so every value is reachable from every value (when an element is placed).
+    const values = Object.keys(TE_PROMOTER);
+    for (const from of values) for (const to of values) {
+      let cur = {slot: 'geneA', tePromoter: from}, n = 0;
+      while (cur.tePromoter !== to && n++ < 5) cur = {...cur, ...operonIntent({kind: 'swipe', target: 'promoter'}, cur)};
+      assert.equal(cur.tePromoter, to, `${from} -> ${to}`);
+    }
+    assert.equal(operonIntent({kind: 'swipe', target: 'promoter'}, {slot: 'none', tePromoter: 'none'}), null, 'the old buttons were disabled without an element');
+    // Pieces: terminator, B promoter, assumption, each both ways.
+    const placed = {slot: 'between'};
+    assert.deepEqual(operonIntent({kind: 'drop', part: 'terminator', target: 'te'}, placed), {terminator: true});
+    assert.deepEqual(operonIntent({kind: 'drop', part: 'terminator', target: 'tray'}, placed), {terminator: false});
+    assert.equal(operonIntent({kind: 'drop', part: 'terminator', target: 'te'}, {slot: 'none'}), null, 'the old checkbox was disabled without an element');
+    assert.deepEqual(operonIntent({kind: 'drop', part: 'bPromoter', target: 'geneB'}, {slot: 'none'}), {bPromoter: true});
+    assert.deepEqual(operonIntent({kind: 'drop', part: 'bPromoter', target: 'tray'}, {slot: 'none'}), {bPromoter: false});
+    for (const v of [true, false]) assert.deepEqual(operonIntent({kind: 'assume', control: 'assumeNoHidden', value: v}), {assumeNoHidden: v});
+    // Every old configuration is reachable and the model accepts it.
+    for (const slot of Object.keys(SLOTS)) for (const tePromoter of values) for (const terminator of [true, false]) for (const bPromoter of [true, false]) {
+      let cur = {...DEFAULT_OPERON};
+      const go = g => { cur = {...cur, ...operonIntent(g, cur)}; };
+      go({kind: 'drop', part: 'element', target: slot === 'none' ? 'tray' : slot});
+      while (cur.tePromoter !== tePromoter && slot !== 'none') go({kind: 'swipe', target: 'promoter'});
+      if (slot !== 'none') go({kind: 'drop', part: 'terminator', target: terminator ? 'te' : 'tray'});
+      go({kind: 'drop', part: 'bPromoter', target: bPromoter ? 'geneB' : 'tray'});
+      assert.equal(cur.slot, slot);
+      assert.equal(cur.bPromoter, bPromoter);
+      if (slot !== 'none') assert.deepEqual([cur.tePromoter, cur.terminator], [tePromoter, terminator]);
+      assert.ok(simulateOperon(cur).genes.A);
+    }
+    assert.equal(operonIntent({kind: 'drop', part: 'element', target: 'none'}, {}), null);
+    assert.equal(operonIntent(null), null);
+  });
+
+  test('OperonExplorer: slot, promoter and part controls are gone; the DNA has labelled targets', () => {
+    assert.doesNotMatch(html, /aria-label="(Insertion site|Element outward promoter)"/);
+    assert.doesNotMatch(html, /type="checkbox"[^>]*>\s*<span>Element has a terminator|Gene B has its own promoter<\/label>|Element has a terminator/);
+    assert.doesNotMatch(html, /Outward promoter →<\/button>/);
+    const labels = buttons(html);
+    assert.ok(labels.some(l => /^Element: in the tray/.test(l)));
+    assert.ok(labels.some(l => /^Terminator piece/.test(l)));
+    assert.ok(labels.some(l => /^B promoter piece/.test(l)));
+    assert.match(html, /<legend>Assumptions<\/legend>/);
+    assert.match(html, /Assume no other promoters exist/);
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Operon bench/);
     assert.match(html, /Practice only/);
   });
 });
