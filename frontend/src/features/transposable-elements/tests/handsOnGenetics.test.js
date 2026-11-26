@@ -17,6 +17,8 @@ import {trackStep} from '../hands-on/gestures/track.js';
 import {timingFromDegrees} from '../hands-on/intents/kernel.js';
 import {recombinationIntent} from '../hands-on/intents/recombination.js';
 import {ORIENTATIONS, SUBSTRATES, recombine} from '../recombinationLab.js';
+import {phenotypeIntent} from '../hands-on/intents/phenotype.js';
+import {SITES, PROMOTER_INFO, BACKUP, MEDIUM, DEFAULT_PHENO, phenotypeChain} from '../phenotypeChain.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -343,6 +345,41 @@ describe('RecombinationLab', () => {
     assert.match(html, /similar enough to pair/);
     assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Recombination bench/);
     assert.match(html, /role="status"/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('PhenotypeExplorer', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('PhenotypeExplorer'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('PhenotypeExplorer: gestures reach every option', () => {
+    for (const site of Object.keys(SITES)) assert.deepEqual(phenotypeIntent({kind: 'drop', part: 'element', target: site}), {site});
+    for (const [control, options] of Object.entries({promoterInfo: PROMOTER_INFO, backup: BACKUP, medium: MEDIUM}))
+      for (const value of Object.keys(options)) assert.deepEqual(phenotypeIntent({kind: 'assume', control, value}), {[control]: value});
+    // Every old button combination is reachable, and the model gets exactly that input.
+    for (const site of Object.keys(SITES)) for (const promoterInfo of Object.keys(PROMOTER_INFO)) for (const backup of Object.keys(BACKUP)) for (const medium of Object.keys(MEDIUM)) {
+      let cur = {...DEFAULT_PHENO};
+      for (const g of [{kind: 'drop', part: 'element', target: site}, {kind: 'assume', control: 'promoterInfo', value: promoterInfo}, {kind: 'assume', control: 'backup', value: backup}, {kind: 'assume', control: 'medium', value: medium}]) cur = {...cur, ...phenotypeIntent(g)};
+      assert.deepEqual(cur, {site, promoterInfo, backup, medium});
+      assert.equal(typeof phenotypeChain(cur).phenotype.outcome, 'string');
+    }
+    assert.equal(phenotypeIntent({kind: 'drop', part: 'element', target: 'moon'}), null);
+    assert.equal(phenotypeIntent({kind: 'assume', control: 'backup', value: 'maybe'}), null);
+    assert.equal(phenotypeIntent({kind: 'assume', control: 'site', value: 'coding'}), null);
+    assert.equal(phenotypeIntent(null), null);
+  });
+
+  test('PhenotypeExplorer: the site buttons are gone; the element is a labelled target and assumptions are chips', () => {
+    assert.doesNotMatch(html, /aria-label="Insertion site"/);
+    assert.doesNotMatch(html, /Inside the enzyme’s coding region<\/button>/);
+    assert.ok(buttons(html).some(l => /^Element: inserted in the enzyme’s coding region/.test(l)));
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Gene bench/);
+    assert.match(html, /aria-label="Assumptions"/);
+    assert.match(html, /<legend>Backup enzyme<\/legend>/);
+    assert.match(html, /<legend>Growth test<\/legend>/);
+    assert.match(html, /role="img" aria-label="Illustrative growth plate/);
     assert.match(html, /Practice only/);
   });
 });
