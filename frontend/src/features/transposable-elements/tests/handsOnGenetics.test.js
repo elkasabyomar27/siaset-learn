@@ -5,6 +5,8 @@ import {mobilityIntent, controlKind} from '../hands-on/intents/mobility.js';
 import {kernelIntent} from '../hands-on/intents/kernel.js';
 import {anatomyIntent} from '../hands-on/intents/anatomy.js';
 import {ANATOMY_CASES, LABELS, correctBoundaries, transposaseDirection, checkDissection} from '../anatomyLab.js';
+import {classificationIntent, cellId} from '../hands-on/intents/classification.js';
+import {CLASS_CARDS, checkPlacement} from '../classificationSort.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -127,6 +129,36 @@ describe('AnatomyLab', () => {
     assert.ok(labels.some(l => /^Left bracket/.test(l)) && labels.some(l => /^Right bracket/.test(l)));
     assert.ok(labels.some(l => /^Transposase reading direction/.test(l)));
     assert.match(html, /Check my dissection/, 'Check stays a button');
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('ClassificationSort', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('ClassificationSort'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('ClassificationSort: gestures reach every option', () => {
+    for (const card of CLASS_CARDS) for (const cls of ['I', 'II']) for (const copies of ['increase', 'same']) {
+      const place = classificationIntent({kind: 'drop', card: card.id, target: cellId(cls, copies)});
+      assert.deepEqual(place, {card: card.id, cls, copies});
+      // Right or wrong, the drop reaches the model, which answers a wrong one with its hint.
+      const r = checkPlacement(place.card, place.cls, place.copies);
+      assert.equal(r.correct, card.cls === cls && card.copies === copies);
+      assert.ok(r.text.length > 10);
+    }
+    assert.equal(classificationIntent({kind: 'drop', card: 'ty', target: 'tray'}), null);
+    assert.equal(classificationIntent({kind: 'tap', card: 'ty', target: 'I-same'}), null);
+  });
+
+  test('ClassificationSort: select-then-click cells are gone; every card is a labelled target', () => {
+    assert.doesNotMatch(html, /class="cs-cell/);
+    assert.doesNotMatch(html, /cs-tray/);
+    assert.doesNotMatch(html, /<button[^>]*aria-pressed/);
+    const labels = buttons(html);
+    assert.equal(labels.filter(l => /Drag it into a grid cell/.test(l)).length, CLASS_CARDS.length);
+    assert.ok(labels.some(l => /^Ty \(yeast\)/.test(l)));
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Classification grid/);
     assert.match(html, /Practice only/);
   });
 });
