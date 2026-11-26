@@ -53,7 +53,7 @@ function KernelScene({ ac, timing, prediction, growing, seed, apply, setNote }) 
     <text className="gx-small" x={RING.cx} y={RING.cy - RING.r - 12} textAnchor="middle">start of development</text>
     <circle className="gx-piece gx-piece-target" cx={mx} cy={my} r="10" />
     <Track className="kg-timing" label={ac ? `Excision timing: ${when(timing)}. Slide the marker round the development clock, or use the arrow keys and Enter` : 'Excision timing: needs Ac in the genome first'}
-      cx={RING.cx} cy={RING.cy} r={RING.r} value={degreesFromTiming(timing)} step={18} bigStep={54} hitWidth={44 * k}
+      cx={RING.cx} cy={RING.cy} r={RING.r} value={degreesFromTiming(timing)} step={18} bigStep={54} wrap={false} hitWidth={44 * k}
       onPreview={deg => ac && setNote(`Excisions tend to happen: ${when(deg / 360)}.`)}
       onConfirm={deg => { if (act({kind: 'track', value: deg})) setNote('Timing set. Grow a kernel to see the pattern.'); else setNote('Put Ac in the genome first: without it Ds cannot excise.'); }} />
     <HoldTarget className="kg-kernel" label={seed ? 'Hold to grow another kernel' : 'Hold to grow the kernel'} cx={KERNEL_AT.x} cy={KERNEL_AT.y} hitR={Math.max(40, 22 * k)} ringR={46} expected={!!prediction && !growing && ac}

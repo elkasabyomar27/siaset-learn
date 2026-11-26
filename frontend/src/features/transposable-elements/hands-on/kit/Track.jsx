@@ -12,10 +12,11 @@ export const ringArc = (cx, cy, r, from, to) => {
 // Position on a ring track (inside an SVG). Pointer: press on the ring and slide,
 // release confirms. Keyboard: arrows preview (Shift for big steps) with a ghost arc,
 // Enter confirms, Escape clears. onPreview(deg) lets the parent speak the value.
+// wrap=false stops the arrow keys at both ends (a timeline, not a clock).
 // hitWidth: the touch band across the ring, in viewBox units (>= 44). Scenes drawn small pass
 // 44 / scale so the band stays 44 css px.
-export function Track({label, cx, cy, r, value = 0, step, bigStep, ghostSpan = 8, hitWidth = MIN_HIT, onPreview, onConfirm, expected = false, className}) {
-  const {handlers, state} = useGesture(startTrack, {cx, cy, value, step, bigStep}, done => onConfirm?.(done.value, done), (next, prev) => {
+export function Track({label, cx, cy, r, value = 0, step, bigStep, wrap = true, ghostSpan = 8, hitWidth = MIN_HIT, onPreview, onConfirm, expected = false, className}) {
+  const {handlers, state} = useGesture(startTrack, {cx, cy, value, step, bigStep, wrap}, done => onConfirm?.(done.value, done), (next, prev) => {
     if (next.preview != null && next.preview !== prev.preview) onPreview?.(next.preview);
   });
   const p = state.preview, dot = p != null ? polar(cx, cy, r, p) : null, band = Math.max(MIN_HIT, hitWidth);

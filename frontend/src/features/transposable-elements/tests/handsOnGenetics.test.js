@@ -13,6 +13,8 @@ import {elementBuilderIntent, applyBuilderAction} from '../hands-on/intents/elem
 import {IS_PARTS, canAdd} from '../mobileElementBuilder.js';
 import {compositeIntent} from '../hands-on/intents/composite.js';
 import {MODULES, CARGO, END_CHOICES, REFERENCE, arrangement, matchElement} from '../compositeBuilder.js';
+import {trackStep} from '../hands-on/gestures/track.js';
+import {timingFromDegrees} from '../hands-on/intents/kernel.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -281,6 +283,23 @@ describe('CompositeBuilder', () => {
     assert.match(html, /aria-label="Choose an element to rebuild"/, 'the target choice stays tabs');
     assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="IS50 module/);
     assert.match(html, /Practice only/);
+  });
+});
+
+describe('KernelGrower timing track', () => {
+  test('KernelGrower: the timing track stops at both ends instead of wrapping', () => {
+    const opts = {step: 18, bigStep: 54, wrap: false};
+    assert.equal(timingFromDegrees(trackStep(342, 'ArrowRight', opts)), 1, '0.95 plus a step is 1, not 0');
+    assert.equal(timingFromDegrees(trackStep(359, 'ArrowRight', opts)), 1);
+    assert.equal(timingFromDegrees(trackStep(0, 'ArrowLeft', opts)), 0);
+    assert.equal(timingFromDegrees(trackStep(342, 'Shift+ArrowRight', opts)), 1);
+    // The same step wraps on a clock, which is why the kernel timeline opts out.
+    assert.equal(timingFromDegrees(trackStep(342, 'ArrowRight', {step: 18, bigStep: 54})), 0);
+  });
+  test('KernelGrower: the scene turns wrapping off and the Track passes it on', async () => {
+    const fs = await import('node:fs');
+    assert.match(fs.readFileSync(new URL('../components/KernelGrower.jsx', import.meta.url), 'utf8'), /wrap=\{false\}/);
+    assert.match(fs.readFileSync(new URL('../hands-on/kit/Track.jsx', import.meta.url), 'utf8'), /startTrack, \{cx, cy, value, step, bigStep, wrap\}/);
   });
 });
 
