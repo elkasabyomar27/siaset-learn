@@ -375,8 +375,6 @@ body { font-family: var(--font-body); background: var(--color-page-background); 
 .lab-shell .sl-task .sl-actions .outline-button:hover:not(:disabled) { border-color: var(--lab-teal); background: var(--color-surface-selected); }
 .lab-shell .sl-task .sl-actions .primary-button { min-height: 52px; border-radius: 12px; background: var(--lab-teal); border-color: var(--lab-teal); color: var(--color-surface); font-weight: 700; font-size: 15px; }
 .lab-shell .sl-task .sl-actions .primary-button:hover:not(:disabled) { background: var(--color-action-hover); }
-.lab-shell .sl-task .sl-site { color: var(--color-text); font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.lab-shell .sl-task .sl-site input[type=range] { flex: 1; min-height: 44px; accent-color: var(--lab-teal); }
 .lab-shell .sl-task .sl-restart { align-self: flex-start; color: var(--color-link); }
 .lab-shell .sl-task .checkpoint { background: var(--color-warning-bg); border: 1.5px solid var(--lab-amber); border-radius: 16px; margin: 12px 0; padding: 14px; }
 .lab-shell .sl-task .checkpoint .eyebrow { color: var(--color-warning); }
@@ -453,5 +451,4 @@ body { font-family: var(--font-body); background: var(--color-page-background); 
 }
 
 /* Contrast fixes for controls inherited from the dark lab theme. */
-.lab-shell .sl-task .sl-site b { color: var(--color-text); }
 .lab-shell .kg-scale, .lab-shell .tsd-slider small { color: var(--color-text-secondary); }

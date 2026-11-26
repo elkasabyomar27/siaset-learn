@@ -229,5 +229,96 @@ test('story-lab CSS keeps only rules something still uses', async () => {
   for (const gone of ['.sl-scene', '.sl-ring-track', '.sl-res', '.sl-tnp', '.sl-or', '.is-target', '.sl-element-arc']) {
     assert.ok(!story.includes(gone + ' ') && !story.includes(gone + '{') && !story.includes(gone + ','), `${gone} removed`);
   }
-  assert.match(story, /\.sl-site/, 'the sandbox still uses .sl-site');
+  // Task 7: the sandbox's site slider is gone too, so nothing uses .sl-site any more.
+  assert.doesNotMatch(story, /\.sl-site/, 'the sandbox has no site slider');
+});
+
+describe('Sandbox on the kit', () => {
+  let ssr, Sandbox, sandboxAction, scenes, freeBench;
+  before(async () => {
+    ssr = await startSsr();
+    ({default: Sandbox, sandboxAction} = await ssr.load('/src/features/transposable-elements/Sandbox.jsx'));
+    scenes = await ssr.load('/src/features/transposable-elements/components/StoryScenes.jsx');
+    freeBench = await import('../freeBench.js');
+  });
+  after(() => ssr.close());
+  const buttonTexts = page => [...page.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/g)].map(m => m[1].replace(/<[^>]+>/g, ''));
+
+  test('sandbox reaches every BENCH_GOAL by gestures', () => {
+    const {newBench, BENCH_GOALS} = freeBench;
+    const notebook = [];
+    // A gesture goes through storyIntent (as the scene does); `resolve` is the page's Resolve button.
+    const play = (scenario, steps, b = newBench(scenario)) => steps.reduce((bench, g) => {
+      const action = g.type ? g : storyIntent(scenario, g);
+      assert.ok(action, `gesture maps to an action: ${JSON.stringify(g)}`);
+      const r = sandboxAction(bench, action);
+      notebook.push(r.entry);
+      return r.bench;
+    }, b);
+    const last = () => notebook.at(-1);
+
+    let b = play('tn5', [swipe('end-left')]);
+    assert.equal(last().ok, false);
+    assert.match(last().text, /none is bound/);
+    b = play('tn5', [hold('end-left'), hold('end-right'), swipe('end-left'), swipe('end-right'), {kind: 'drop', target: 'ring', angle: 120}], b);
+    assert.equal(last().action, 'insert');
+    assert.equal(last().ok, true);
+    assert.equal(b.history.state.phase, 'inserted');
+    assert.equal(b.boundary, boundaryFromAngle(120), 'the drop angle becomes the target site');
+    play('tn5', [{kind: 'drop', target: 'ring', angle: 200}], b);
+    assert.equal(last().ok, false);
+    assert.match(last().text, /initial donor/);
+
+    // Refused before the circles touch: the fork is there to hold anyway.
+    play('tn3', [hold('fork')]);
+    assert.equal(last().ok, false);
+    assert.match(last().text, /not in contact/);
+    let t = play('tn3', [{kind: 'drop', target: 'target-circle', angle: 270}, hold('fork'), {type: 'resolve'}]);
+    assert.equal(last().ok, false);
+    assert.match(last().text, /TnpR/);
+    t = play('tn3', [{kind: 'drop', target: 'tnpR'}, {type: 'resolve'}], t);
+    assert.equal(t.history.state.phase, 'resolved');
+
+    for (const goal of BENCH_GOALS) assert.ok(goal.done(notebook), goal.id);
+  });
+
+  test('the tools row is gone; Fresh molecules and Clear notebook stay', async () => {
+    const html = ssr.html(Sandbox, {}, {url: '/lab/transposable-elements/sandbox'});
+    for (const text of buttonTexts(html)) assert.doesNotMatch(text, /Bind transposase ·|✂ Cut ·|Insert Tn5 →|Bring circles together|Replicate →|Dock TnpR/);
+    assert.doesNotMatch(html, /<input[^>]*type="range"/);
+    assert.doesNotMatch(html, /use the tools below/);
+    assert.match(html, /Fresh molecules/);
+    assert.match(html, /role="button"[^>]*aria-label="Left end of Tn5: press and hold to bind transposase/);
+    const src = (await import('node:fs')).readFileSync(new URL('../Sandbox.jsx', import.meta.url), 'utf8');
+    assert.match(src, /Clear notebook/);
+    assert.match(src, /<Tn3Scene[^>]*\bfree\b/, 'Tn3 runs in free mode');
+    assert.doesNotMatch(src, /sl-message/, 'the scene line is the one live region for scene feedback');
+    assert.match(src, /useMemo/, 'the scene object is stable between unrelated renders');
+    assert.match(src, /onClick=\{\(\) => dispatch\(\{type: 'resolve'\}\)\}>Resolve/, 'Resolve stays a real button');
+  });
+
+  test('free scenes carry the model message in their one live region', () => {
+    const {newBench} = freeBench;
+    const r = sandboxAction(newBench('tn5'), {type: 'cut', end: 'left'});
+    const html = ssr.html(scenes.Tn5Scene, {s: {...r.bench, inspected: [], answers: {}, stage: 0}, dispatch() {}, free: true});
+    assert.match(html, /role="status" aria-live="polite"><span>[^<]*<span class="ts-msg is-refused">✗ Nothing cuts the left end/);
+    assert.equal(html.match(/aria-live/g).length, 1);
+  });
+
+  test('free Tn5: the inserted element stays draggable onto the ring', () => {
+    const {newBench} = freeBench;
+    let b = newBench('tn5');
+    for (const a of [{type: 'bind', end: 'left'}, {type: 'bind', end: 'right'}, {type: 'cut', end: 'left'}, {type: 'cut', end: 'right'}, {type: 'insert', angle: 90}]) b = sandboxAction(b, a).bench;
+    const html = ssr.html(scenes.Tn5Scene, {s: {...b, inspected: [], answers: {}, stage: 3}, dispatch() {}, free: true});
+    assert.match(html, /role="button"[^>]*aria-label="Tn5, inserted in the ring[^"]*"/);
+    assert.match(html, /class="[^"]*ts-ring-track/);
+    assert.match(html, /aria-label="Inspect the left purple repeat"/);
+  });
+
+  test('free Tn3: the fork is present before the circles touch', () => {
+    const html = ssr.html(scenes.Tn3Scene, {s: {...freeBench.newBench('tn3'), inspected: [], answers: {}, stage: 0}, dispatch() {}, free: true});
+    assert.match(html, /role="button"[^>]*aria-label="Hold the replication fork[^"]*"/);
+    assert.match(html, /role="button"[^>]*aria-label="Drag the target circle[^"]*"/);
+    assert.doesNotMatch(html, /ho-expected/, 'nothing is highlighted in free mode');
+  });
 });

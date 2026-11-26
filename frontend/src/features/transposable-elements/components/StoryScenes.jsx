@@ -96,8 +96,8 @@ function useStoryShell(scenario, dispatch, {flowKey, nextFocus, needKind, needKe
 
   // The next-step line: the step hint as plain text until the first action, then one live region
   // carrying the model's message (✓/✗) and the hint, or a local note.
-  const nextRow = (s, {freeMode, hint, extra}) => {
-    const message = !freeMode && s.message
+  const nextRow = (s, {hint, extra}) => {
+    const message = s.message
       ? <span className={`ts-msg ${s.message.ok ? 'is-good' : 'is-refused'}`}>{s.message.ok ? '✓ ' : '✗ '}{s.message.text} </span> : null;
     const localNote = note && note.s === s ? note.text : null;
     const live = acted || localNote != null || message != null;
@@ -142,7 +142,7 @@ function sceneLabel(s, free, inserted) {
 }
 
 function stepHint(s, {freeMode, free, inserted, answered}) {
-  if (freeMode) return inserted ? 'Tap a purple repeat to inspect it.' : free ? 'Drag Tn5 onto the target ring. Keyboard: Enter picks it up and drops it on the ring; then the arrow keys choose the spot.' : 'Hold an end to bind transposase. Swipe down across a held end to cut it.';
+  if (freeMode) return inserted ? 'Tap a purple repeat to inspect it, or drag Tn5 onto the ring again.' : free ? 'Drag Tn5 onto the target ring. Keyboard: Enter picks it up and drops it on the ring; then the arrow keys choose the spot.' : 'Hold an end to bind transposase. Swipe down across a held end to cut it.';
   switch (s.stage) {
     case 0: return s.bound.length ? 'One end held. Now press and hold the other gold end.' : 'Press and hold a gold end of Tn5 until the ring fills.';
     case 1:
@@ -155,7 +155,8 @@ function stepHint(s, {freeMode, free, inserted, answered}) {
   }
 }
 
-// free: sandbox mode. Ends stay holdable until bound and swipeable once bound; nothing is highlighted.
+// free: sandbox mode. Ends stay holdable until bound and swipeable once bound, the inserted Tn5 stays
+// draggable (a second insert is the engine's to refuse), and nothing is highlighted.
 export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
   const [ghost, setGhost] = useState(null);
   const {stage, bound, cut} = s, free = cut.length === 2, inserted = stage >= 2;
@@ -179,7 +180,7 @@ export function Tn5Scene({ s, dispatch, free: freeMode = false }) {
   const {act} = shell, say = shell.say(s);
   const L = shell.narrow ? NARROW : WIDE;
 
-  const after = shell.nextRow(s, {freeMode, hint: stepHint(s, {freeMode, free, inserted, answered}),
+  const after = shell.nextRow(s, {hint: stepHint(s, {freeMode, free, inserted, answered}),
     extra: stage === 2 && !freeMode && <button type="button" className="ts-continue" onClick={() => act({kind: 'tap', target: 'inserted'})}>Continue</button>});
 
   return <div ref={shell.box} className="ts-scene" onPointerDownCapture={shell.activity} onKeyDownCapture={shell.onKeyDownCapture}>
@@ -272,6 +273,29 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
     return null;
   })();
 
+  // Carrying Tn5 to the ring: the freed element, or (sandbox) the inserted one for a second try.
+  const carry = (home, label, homeText) => ({
+    zones, label, x: home.x, y: home.y,
+    carriedLabel: 'Carrying Tn5. Press Enter to drop it on the target ring, Escape to put it back',
+    onCarry: active => { carrying.current = active; sendDemo({type: 'drag', active}); if (active) say('Carrying Tn5. Drop it on the blue target ring.'); else setGhost(null); },
+    onAnnounce: text => text && say(text),
+    onCancel: () => say(homeText),
+    onDrop: ({via}) => {
+      if (via === 'key') {
+        say('Tn5 is over the ring. Use the arrow keys to choose the spot, then press Enter to insert it.');
+        requestFocus('.ts-ring-track');
+        return;
+      }
+      const a = lastAngle.current;
+      if (a != null) act({kind: 'drop', target: 'ring', angle: a});
+    },
+  });
+  const ringTrack = <Track className="ts-ring-track" cx={cx} cy={cy} r={r} value={80} ghostSpan={ARC_HALF} expected={!freeMode} hitWidth={ringTrackHit(k, r)}
+    label="Target ring: arrow keys choose where Tn5 inserts, Enter inserts it here"
+    onPreview={deg => say(`Spot ${deg}° on the ring. Press Enter to insert Tn5 here.`)}
+    onConfirm={deg => act({kind: 'drop', target: 'ring', angle: deg})} />;
+  const ghostArc = ghost != null && <path className="ts-ghost" d={arc(cx, cy, r, ghost - ARC_HALF, ghost + ARC_HALF)} />;
+
   const leftShift = free || inserted ? -gap : cut.includes('left') ? -8 : 0, rightShift = free || inserted ? gap : cut.includes('right') ? 8 : 0;
   const hitHalf = clamp(ARC_HALF * k, ARC_HALF, 25), tsdSpan = clamp(32 * k, 32, 50), ringHit = clamp(26 * k, 26, 40);
 
@@ -311,40 +335,34 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
     {/* Freed Tn5: carry it to the ring (pointer), or Enter, then the ring's arrow keys (keyboard) */}
     {free && !inserted && <>
       <ellipse className="ts-ground-shadow" cx={elCx} cy={DY + 2} rx={half * 0.8} ry={7} />
-      <Track className="ts-ring-track" cx={cx} cy={cy} r={r} value={80} ghostSpan={ARC_HALF} expected={!freeMode} hitWidth={ringTrackHit(k, r)}
-        label="Target ring: arrow keys choose where Tn5 inserts, Enter inserts it here"
-        onPreview={deg => say(`Spot ${deg}° on the ring. Press Enter to insert Tn5 here.`)}
-        onConfirm={deg => act({kind: 'drop', target: 'ring', angle: deg})} />
+      {ringTrack}
       <text className="ts-hint" x={cx} y={cy + 5} textAnchor="middle">drop Tn5 here</text>
-      {ghost != null && <path className="ts-ghost" d={arc(cx, cy, r, ghost - ARC_HALF, ghost + ARC_HALF)} />}
+      {ghostArc}
       <g onPointerMoveCapture={trackPointer} onPointerUpCapture={trackPointer}>
-        <Draggable className="ts-tn5" x={elCx} y={DY - lift} zones={zones} expected={!freeMode}
-          hit={{x: -half, y: -22 * k, width: 2 * half, height: 44 * k}}
-          label="Tn5, cut free. Drag it onto the target ring, or press Enter to pick it up"
-          carriedLabel="Carrying Tn5. Press Enter to drop it on the target ring, Escape to put it back"
-          onCarry={active => { carrying.current = active; sendDemo({type: 'drag', active}); if (active) say('Carrying Tn5. Drop it on the blue target ring.'); else setGhost(null); }}
-          onAnnounce={text => text && say(text)}
-          onCancel={() => say('Tn5 is back in place. Drag it onto the blue target ring.')}
-          onDrop={({via}) => {
-            if (via === 'key') {
-              say('Tn5 is over the ring. Use the arrow keys to choose the spot, then press Enter to insert it.');
-              requestFocus('.ts-ring-track');
-              return;
-            }
-            const a = lastAngle.current;
-            if (a != null) act({kind: 'drop', target: 'ring', angle: a});
-          }}>{freedTn5}</Draggable>
+        <Draggable className="ts-tn5" expected={!freeMode} hit={{x: -half, y: -22 * k, width: 2 * half, height: 44 * k}}
+          {...carry({x: elCx, y: DY - lift}, 'Tn5, cut free. Drag it onto the target ring, or press Enter to pick it up', 'Tn5 is back in place. Drag it onto the blue target ring.')}>{freedTn5}</Draggable>
       </g>
     </>}
 
     {/* Inserted: the element and the two host repeats are tap targets */}
+    {/* Sandbox: the ring stays a drop target under the inserted element (keyboard: its arrow keys) */}
+    {inserted && freeMode && ringTrack}
     {inserted && <g className="ts-pop">
       {!freeMode
         ? <TapTarget className="ts-inserted" label="Tn5 inserted in the target ring. Tap to inspect the insertion" expected={stage === 2}
           hit={{d: sector(cx, cy, r - ringHit, r + ringHit, tsdAngle - hitHalf, tsdAngle + hitHalf)}} onTap={() => act({kind: 'tap', target: 'inserted'})}>
           <path className="ts-arc ts-arc-element" d={arc(cx, cy, r, tsdAngle - ARC_HALF, tsdAngle + ARC_HALF)} filter={url(ids.shade)} />
         </TapTarget>
-        : <path className="ts-arc ts-arc-element" d={arc(cx, cy, r, tsdAngle - ARC_HALF, tsdAngle + ARC_HALF)} filter={url(ids.shade)} />}
+        : (() => {
+          // Sandbox: Tn5 stays a Draggable, so dropping it on the ring again is the "insert twice" attempt.
+          const [ix, iy] = polar(cx, cy, r, tsdAngle);
+          return <g onPointerMoveCapture={trackPointer} onPointerUpCapture={trackPointer}>
+            <Draggable className="ts-tn5-inserted" hit={{x: -22 * k, y: -22 * k, width: 44 * k, height: 44 * k}}
+              {...carry({x: ix, y: iy}, 'Tn5, inserted in the ring. Drag it onto the ring again, or press Enter to pick it up', 'Tn5 is back where it inserted.')}>
+              <path className="ts-arc ts-arc-element" d={arc(cx, cy, r, tsdAngle - ARC_HALF, tsdAngle + ARC_HALF)} transform={`translate(${-ix} ${-iy})`} filter={url(ids.shade)} />
+            </Draggable>
+          </g>;
+        })()}
       {[['target-tsd-left', -1], ['target-tsd-right', 1]].map(([id, dir]) => {
         const seen = s.inspected.includes(id), word = dir < 0 ? 'left' : 'right';
         const a0 = tsdAngle + dir * ARC_HALF, a1 = a0 + dir * TSD_W, h0 = tsdAngle + dir * hitHalf, h1 = h0 + dir * tsdSpan;
@@ -358,6 +376,7 @@ function Tn5Body({ s, L, freeMode, free, inserted, answered, act, say, ghost, se
       })}
       <text className="ts-note" x={cx} y={cy + 4} textAnchor="middle">{tsdBlock ? `${tsdBlock.bp} bp repeats` : ''}</text>
     </g>}
+    {inserted && freeMode && ghostArc}
 
     {handAt && <DemoHand show={demo.show} still={demo.still} from={handAt.from} to={handAt.to} text={handAt.text} labelAt={handAt.labelAt} />}
   </>;
@@ -393,9 +412,9 @@ function tn3Label(s, parked) {
 function tn3Hint(s, {freeMode, answeredRes, parked}) {
   const {stage} = s;
   if (freeMode) return stage === 5 ? 'Resolved. Use Fresh molecules to start again.'
-    : stage >= 3 ? 'Tap a Tn3 copy to inspect it. Drag TnpR onto a res site, or off the DNA to remove it.'
+    : stage >= 3 ? 'Tap a Tn3 copy to inspect it. Drag TnpR onto a res site, or off the DNA to remove it; then press Resolve.'
       : stage >= 1 ? 'Hold the replication fork to replicate through Tn3.'
-        : 'Drag the target circle onto the donor circle. The side that touches the donor is where Tn3 joins.';
+        : 'Drag the target circle onto the donor circle; the side that touches the donor is where Tn3 joins. Or try holding the fork first.';
   switch (stage) {
     case 0: return parked ? 'Use the arrow keys to choose the spot on the target ring, then press Enter to join Tn3 there.'
       : 'Drag the target circle onto the donor circle; the side that touches the donor is where Tn3 joins. Keyboard: Enter picks it up, Enter docks it, then the arrow keys choose the spot.';
@@ -409,7 +428,8 @@ function tn3Hint(s, {freeMode, answeredRes, parked}) {
   }
 }
 
-// free: sandbox mode (optional; nothing is highlighted and the model message is left to the page).
+// free: sandbox mode. Nothing is highlighted, and every target stays reachable when it is not the
+// expected move (the fork before the circles touch), so refused attempts reach the model.
 export function Tn3Scene({ s, dispatch, free: freeMode = false }) {
   const [ghost, setGhost] = useState(null);
   const [parkedFor, setParkedFor] = useState(null); // the history a keyboard dock was made in: Restart un-parks
@@ -428,7 +448,7 @@ export function Tn3Scene({ s, dispatch, free: freeMode = false }) {
             : [null, `none-${stage}`];
   const shell = useStoryShell('tn3', dispatch, {flowKey: `${stage}|${s.inspected.length}|${s.tnpR}|${resAt}`, nextFocus, needKind, needKey});
   const L = shell.narrow ? NARROW3 : WIDE3;
-  const after = shell.nextRow(s, {freeMode, hint: tn3Hint(s, {freeMode, answeredRes, parked})});
+  const after = shell.nextRow(s, {hint: tn3Hint(s, {freeMode, answeredRes, parked})});
 
   return <div ref={shell.box} className="ts-scene t3-scene" onPointerDownCapture={shell.activity} onKeyDownCapture={shell.onKeyDownCapture}>
     <BenchStage variant="molecular" width={L.W} height={L.H} label={tn3Label(s, parked)} after={after}>
@@ -509,11 +529,24 @@ function Tn3Body({ s, L, freeMode, answeredRes, parked, park, resAt, setResAt, a
     if (demo.kind === 'tap') return {from: xy(polar(cx, cy, cr, L.copies[s.inspected.includes('copy-1') ? 1 : 0]))};
     return null;
   })();
+  const forkTarget = <>
+    <HoldTarget className="t3-fork" cx={fork.x} cy={fork.y} hitR={Math.min(26 * k, 40)} ringR={26}
+      label="Hold the replication fork to copy Tn3 and fuse the circles" expected={guided && stage === 2}
+      onHold={() => act({kind: 'hold', target: 'fork'})}>
+      <g transform={`translate(${fork.x} ${fork.y}) rotate(${face - 90})`} filter={url(ids.contact)}>
+        <path className="t3-fork-arms" d="M -16 0 L 0 0 L 15 -11 M 0 0 L 15 11" />
+        <circle className="t3-fork-hub" r="5" />
+      </g>
+    </HoldTarget>
+    <text className="ts-note" x={L.forkNote[0]} y={L.forkNote[1]} textAnchor={L.forkNote[2]}>replication fork</text>
+  </>;
   const copyHit = clamp(26 * k, 26, 40), copySpan = clamp(COPY_HALF * k, COPY_HALF + 4, 32);
 
   return <>
     {/* Before replication: the donor, and the target circle the learner brings to it */}
     {stage <= 2 && donor}
+    {/* Sandbox: the fork is there before the circles touch, so replicating too early reaches the engine */}
+    {freeMode && stage === 0 && !parked && forkTarget}
     {stage === 0 && !parked && <g onPointerDownCapture={onGrab} onPointerMoveCapture={trackPointer} onPointerUpCapture={trackPointer}>
       <Draggable className="t3-target" x={home.x} y={home.y} zones={donorZone} expected={guided}
         hit={{x: -tr - 12, y: -tr - 12, width: 2 * tr + 24, height: 2 * tr + 24}}
@@ -551,15 +584,7 @@ function Tn3Body({ s, L, freeMode, answeredRes, parked, park, resAt, setResAt, a
         return <line key={side} className="t3-transfer" x1={x0} y1={y0} x2={x1} y2={y1} />;
       })}
       <text className="ts-note" x={dock.x} y={dock.y + 5} textAnchor="middle">site {s.boundary ?? 0}</text>
-      <HoldTarget className="t3-fork" cx={fork.x} cy={fork.y} hitR={Math.min(26 * k, 40)} ringR={26}
-        label="Hold the replication fork to copy Tn3 and fuse the circles" expected={guided && stage === 2}
-        onHold={() => act({kind: 'hold', target: 'fork'})}>
-        <g transform={`translate(${fork.x} ${fork.y}) rotate(${face - 90})`} filter={url(ids.contact)}>
-          <path className="t3-fork-arms" d="M -16 0 L 0 0 L 15 -11 M 0 0 L 15 11" />
-          <circle className="t3-fork-hub" r="5" />
-        </g>
-      </HoldTarget>
-      <text className="ts-note" x={L.forkNote[0]} y={L.forkNote[1]} textAnchor={L.forkNote[2]}>replication fork</text>
+      {forkTarget}
     </g>}
 
     {/* Cointegrate: one circle, two copies to tap, res sites for TnpR */}

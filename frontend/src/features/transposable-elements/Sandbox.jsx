@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import MoleculeView from './components/MoleculeView.jsx';
 import { WhatChanged } from '../../ui/ExperimentBench.jsx';
@@ -8,7 +8,12 @@ import { newBench, benchAction, BENCH_GOALS } from './freeBench.js';
 import { boundaryFromAngle } from './storyLab.js';
 import './components/storyLab.css';
 
-// Free hands-on sandbox: the story-lab scenes without a script. Any action, any order; the engine
+/** One sandbox attempt: a scene gesture's action (angle -> target site), judged by the free bench. */
+export function sandboxAction(bench, action) {
+  return benchAction(bench, action.angle === undefined ? action : {...action, boundary: boundaryFromAngle(action.angle)});
+}
+
+// Free hands-on sandbox: the story-lab scenes without a script. Any gesture, any order; the engine
 // decides what happens. Session-only: nothing here records lesson or lab completion.
 export default function Sandbox() {
   const [bench, setBenchState] = useState(() => newBench('tn5'));
@@ -17,23 +22,26 @@ export default function Sandbox() {
   const setBench = next => { latest.current = typeof next === 'function' ? next(latest.current) : next; setBenchState(latest.current); };
   const [notebook, setNotebook] = useState([]);
   const [inspected, setInspected] = useState([]);
-  const [site, setSite] = useState(80);
   const {scenario} = bench, state = bench.history.state, phase = state.phase;
   const done = new Set(BENCH_GOALS.filter(g => g.done(notebook)).map(g => g.id));
 
   function dispatch(action) {
-    const a = action.angle === undefined ? action : {...action, boundary: boundaryFromAngle(action.angle)};
-    if (a.type === 'inspect') setInspected(list => list.includes(a.feature) ? list : [...list, a.feature]);
-    const r = benchAction(latest.current, a);
+    if (action.type === 'inspect') setInspected(list => list.includes(action.feature) ? list : [...list, action.feature]);
+    const r = sandboxAction(latest.current, action);
     setBench(r.bench);
     setNotebook(n => [...n, r.entry]);
   }
   function restart(next = scenario) { setBench(newBench(next)); setInspected([]); }
 
   // The scenes are shared with the story labs; map bench state onto the scene's stage vocabulary.
-  const scene = scenario === 'tn5'
-    ? {...bench, inspected, answers: {}, stage: phase === 'inserted' ? 3 : bench.bound.length === 2 ? 1 : 0}
-    : {...bench, inspected, answers: {}, stage: phase === 'resolved' ? 5 : phase === 'cointegrate' ? 4 : bench.joined ? 2 : 0};
+  // Memoized: the scene keys its live line and local notes on this object, so it must change only
+  // when the bench (or what was inspected) does.
+  const scene = useMemo(() => {
+    const p = bench.history.state.phase;
+    return bench.scenario === 'tn5'
+      ? {...bench, inspected, answers: {}, stage: p === 'inserted' ? 3 : bench.bound.length === 2 ? 1 : 0}
+      : {...bench, inspected, answers: {}, stage: p === 'resolved' ? 5 : p === 'cointegrate' ? 4 : bench.joined ? 2 : 0};
+  }, [bench, inspected]);
 
   return <main className="laboratory hands-on-lab story-lab sandbox-bench">
     <header className="bench-header"><div><p className="eyebrow">SIASET / FREE EXPLORATION</p><h1>Your DNA playground.</h1><p>No script. Try any step in any order, even the wrong ones, and see what the engine allows.</p></div><div className="bench-mode"><span>MOLECULAR SANDBOX</span><small>Session only · never records progress</small></div></header>
@@ -41,28 +49,23 @@ export default function Sandbox() {
 
     <section className="sl-stage-wrap" aria-label="Free bench scene">
       <div className="sl-vitals"><span>ELEMENT COPIES <b>{copies(state).length}</b></span><span>DNA MOLECULES <b>{state.molecules.length}</b></span><span>STATE <b>{phase === 'initial' ? 'Separate DNA' : phase === 'inserted' ? 'Inserted' : phase === 'cointegrate' ? 'Cointegrate' : 'Resolved'}</b></span>{scenario === 'tn3' && <span>TnpR <b>{bench.tnpR ? 'docked' : 'absent'}</b></span>}</div>
-      {scenario === 'tn5' ? <Tn5Scene s={scene} dispatch={dispatch} free /> : <Tn3Scene s={scene} dispatch={dispatch} />}
-      <p className="sl-scene-note">Tap parts of the scene, or use the tools below. Schematic: not to scale, no sequence.</p>
+      {scenario === 'tn5' ? <Tn5Scene s={scene} dispatch={dispatch} free /> : <Tn3Scene s={scene} dispatch={dispatch} free />}
+      <p className="sl-scene-note">{scenario === 'tn5'
+        ? 'Hold an end to bind transposase. Swipe down across an end to cut it. Drag Tn5 onto the ring, even twice. Schematic: not to scale, no sequence.'
+        : 'Drag the target onto the donor. Hold the fork to replicate. Drag TnpR onto a res site, then press Resolve. Schematic: not to scale, no sequence.'}</p>
     </section>
 
-    <section className="sl-task" aria-label="Tools">
-      <p className="eyebrow">TOOLS · USE THEM IN ANY ORDER</p>
-      <div className="sl-actions sb-tools">
-        {scenario === 'tn5' ? <>
-          {['left', 'right'].map(end => <button key={`b${end}`} type="button" className="outline-button" onClick={() => dispatch({type: 'bind', end})}>Bind transposase · {end}</button>)}
-          {['left', 'right'].map(end => <button key={`c${end}`} type="button" className="outline-button" onClick={() => dispatch({type: 'cut', end})}>✂ Cut · {end}</button>)}
-          <label className="sl-site">Target site <input type="range" min="0" max="359" value={site} onChange={e => setSite(Number(e.target.value))} /><b>{boundaryFromAngle(site)}</b></label>
-          <button type="button" className="primary-button" onClick={() => dispatch({type: 'insert', angle: site})}>Insert Tn5 →</button>
-        </> : <>
-          <label className="sl-site">Target site <input type="range" min="0" max="359" value={site} onChange={e => setSite(Number(e.target.value))} /><b>{boundaryFromAngle(site)}</b></label>
-          <button type="button" className="outline-button" onClick={() => dispatch({type: 'dock-target', angle: site})}>Bring circles together</button>
-          <button type="button" className="primary-button" onClick={() => dispatch({type: 'replicate'})}>Replicate →</button>
-          <button type="button" className="outline-button" aria-pressed={bench.tnpR} onClick={() => dispatch({type: 'enzyme', available: !bench.tnpR})}>{bench.tnpR ? '✓ TnpR docked' : 'Dock TnpR'}</button>
-          <button type="button" className="primary-button" onClick={() => dispatch({type: 'resolve'})}>Resolve →</button>
-        </>}
+    {/* The scene's next-step line is the one live region for scene feedback, Resolve's included. */}
+    <section className="sl-task" aria-label="Bench">
+      <p className="eyebrow">AT THE BENCH · ANY ORDER</p>
+      <p>{scenario === 'tn5'
+        ? 'Everything happens in the scene. Keyboard: Tab to a part; hold Enter to bind an end, press Enter to cut it; Enter picks Tn5 up and drops it on the ring, then the arrow keys choose the spot.'
+        : 'Everything except Resolve happens in the scene. Keyboard: Tab to a part; Enter picks up and drops, arrow keys choose, hold Enter on the fork to replicate.'}</p>
+      <div className="sl-actions">
+        {/* Resolve is a commitment action: a real button, available at any time so the engine can refuse it. */}
+        {scenario === 'tn3' && <button type="button" className="primary-button" onClick={() => dispatch({type: 'resolve'})}>Resolve →</button>}
         <button type="button" className="account-text-button sl-restart" onClick={() => restart()}>Fresh molecules</button>
       </div>
-      {bench.message && <div className={`sl-message${bench.message.ok ? ' is-good' : ''}`} role="status" aria-live="polite">{bench.message.ok ? '✓ ' : '✗ '}{bench.message.text}</div>}
       <WhatChanged change={bench.change} onDismiss={() => setBench(b => ({...b, change: null}))} />
     </section>
 
