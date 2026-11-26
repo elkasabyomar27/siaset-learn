@@ -43,3 +43,7 @@
 [data-growth="grows"] .hg-wall { stroke: var(--color-success); }
 [data-growth="inhibited"] .hg-wall { stroke: var(--color-error); stroke-dasharray: 4 4; }
 [data-growth="undetermined"] .hg-wall { stroke: var(--color-brand-highlight); stroke-dasharray: 8 4; }
+/* Lesson explorers: the scene frame around the diagram */
+.gx-explorer-scene { margin: var(--space-3) 0; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto; }
+.gx-explorer .tsd-predict { margin: var(--space-3) 0; }
+.gx-explorer .primary-button { min-height: 44px; }

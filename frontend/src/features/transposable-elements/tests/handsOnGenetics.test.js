@@ -25,6 +25,11 @@ import {tsdIntent, fillGap} from '../hands-on/intents/tsd.js';
 import {STAGGER_RANGE, HOST_LENGTH, clampCut, validSetup, tsdLayout, PRESETS} from '../tsdJourney.js';
 import {hgtIntent} from '../hands-on/intents/hgt.js';
 import {PREREQS, newHgt, setPrereq, act} from '../hgtLab.js';
+import {lessonById} from '../curriculum/lessons.js';
+import {investigate, runInvestigation, predictionOptions as bacterialOptions} from '../bacterialExplorerLogic.js';
+import {reveal, runReveal, predictionOptions as consequenceOptions} from '../consequenceExplorerLogic.js';
+import {resistanceExample, bacterialTransition, targetingCompatible, predictionFeedback as bacterialFeedback} from '../engine/bacterial.js';
+import {rearrange, insertionExample, tsdEvidence} from '../engine/consequences.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -563,6 +568,122 @@ describe('HgtLab', () => {
     assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Two bacterial cells, touching/);
     assert.match(html, /role="img" aria-label="Donor cell: chromosome/);
     assert.match(html, /Practice only/);
+  });
+});
+
+// The evidence rule. These are the bodies of the ORIGINAL BacterialExplorer.investigate and
+// ConsequenceExplorer.reveal, copied verbatim (state setters replaced by return values), kept here
+// as the reference the extracted logic must match.
+const oldInvestigate = (lesson, index, prediction, onInspect) => {
+  const variant = lesson.variants[index];
+  let model = null, note = 'Explanatory classification only; no molecular transition calculated.';
+  if (Number.isInteger(variant.stage)) { model = resistanceExample(variant.stage); note = variant.stage === 0 ? 'Calculated initial symbolic state.' : 'Calculated bounded states: Tn5 insertion and conjugation remain separate operations.'; }
+  if (variant.activity === 'blocked') {
+    const s = resistanceExample(1).state; s.transfer.conjugative = false;
+    try { bacterialTransition(s, 'conjugate'); } catch (e) { note = `Calculated gate rejection: ${e.message}. State unchanged.`; model = {state: s, events: []}; }
+  }
+  if (['tnsd', 'tnse', 'mismatch'].includes(variant.activity)) {
+    const compatible = targetingCompatible(variant.activity === 'tnsd' ? 'tnsd' : 'tnse', variant.activity === 'tnse' ? 'replication-transfer' : 'attTn7-glmS');
+    note = `Context compatibility: ${compatible ? 'supported' : 'unsupported'}. No insertion state, coordinate or probability calculated.`;
+  }
+  const feedback = bacterialFeedback(variant.outcome, prediction, variant.explanation);
+  if (feedback.correct) onInspect(index);
+  return {model, note, ...feedback};
+};
+const oldReveal = (lesson, index, prediction, onInspect) => {
+  const variant = lesson.variants[index];
+  if (!prediction) return null;
+  let calculated = null;
+  if (lesson.id === 'genomic-consequences') calculated = index === 0 ? insertionExample('tn5') : rearrange(variant.outcome, {homology: true, orientation: index === 2 ? 'inverted' : 'direct', substrate: index === 3 ? 'misaligned-sisters' : 'intramolecular'});
+  if (lesson.id === 'tsd' && index < 2) calculated = tsdEvidence(index === 0 ? 'tn5' : 'tn3');
+  if (prediction === variant.outcome) onInspect(index);
+  return {calculated, correct: prediction === variant.outcome};
+};
+const spy = () => { const calls = []; const f = i => calls.push(i); f.calls = calls; return f; };
+const wrongFor = (options, outcome) => options.find(o => o !== outcome) ?? 'not an outcome';
+
+describe('Explorers: lesson evidence', () => {
+  const consequenceLessons = ['tsd', 'genomic-consequences'];
+
+  test('BacterialExplorer: onInspect calls are identical', () => {
+    const lesson = lessonById('bacterial-hgt');
+    assert.ok(lesson.variants.length >= 12);
+    const options = bacterialOptions(lesson);
+    lesson.variants.forEach((variant, index) => {
+      for (const [name, prediction] of [['correct', variant.outcome], ['wrong', wrongFor(options, variant.outcome)], ['empty', '']]) {
+        const was = spy(), now = spy(), shown = [];
+        const old = oldInvestigate(lesson, index, prediction, was);
+        runInvestigation(lesson, index, prediction, {onInspect: now, setResult: r => shown.push(r)});
+        assert.deepEqual(now.calls, was.calls, `${variant.label} ${name}`);
+        assert.deepEqual(shown[0], old, `${variant.label} ${name}: same result`);
+        assert.deepEqual(now.calls, name === 'correct' ? [index] : [], `${variant.label} ${name}: only on a correct prediction, with its own index`);
+        assert.deepEqual(investigate(lesson, index, prediction).inspect, name === 'correct' ? index : null);
+      }
+    });
+  });
+
+  test('ConsequenceExplorer: onInspect calls are identical', () => {
+    for (const id of consequenceLessons) {
+      const lesson = lessonById(id), options = consequenceOptions(lesson);
+      assert.ok(lesson.variants.length >= 3, id);
+      lesson.variants.forEach((variant, index) => {
+        for (const [name, prediction] of [['correct', variant.outcome], ['wrong', wrongFor(options, variant.outcome)], ['empty', '']]) {
+          const was = spy(), now = spy(), shown = [];
+          const old = oldReveal(lesson, index, prediction, was);
+          runReveal(lesson, index, prediction, {onInspect: now, setResult: r => shown.push(r)});
+          assert.deepEqual(now.calls, was.calls, `${id} ${variant.label} ${name}`);
+          assert.deepEqual(shown[0] ?? null, old, `${id} ${variant.label} ${name}: same result`);
+          assert.deepEqual(now.calls, name === 'correct' ? [index] : [], `${id} ${variant.label} ${name}`);
+          assert.deepEqual(reveal(lesson, index, prediction).inspect, name === 'correct' ? index : null);
+        }
+      });
+    }
+  });
+
+  test('ConsequenceExplorer: every other lesson that shares it records evidence the same way', () => {
+    for (const lesson of ['phenotypes', 'expression', 'regulation', 'extraction-principles', 'dna-quantification'].map(lessonById).filter(l => l?.check2)) {
+      lesson.variants.forEach((variant, index) => {
+        const was = spy(), now = spy();
+        oldReveal(lesson, index, variant.outcome, was);
+        runReveal(lesson, index, variant.outcome, {onInspect: now, setResult: () => {}});
+        assert.deepEqual(now.calls, was.calls);
+      });
+    }
+  });
+});
+
+describe('BacterialExplorer and ConsequenceExplorer markup', () => {
+  let ssr, Bacterial, Consequence;
+  before(async () => {
+    ssr = await startSsr();
+    Bacterial = (await ssr.load('/src/features/transposable-elements/BacterialExplorer.jsx')).default;
+    Consequence = (await ssr.load('/src/features/transposable-elements/ConsequenceExplorer.jsx')).default;
+  });
+  after(() => ssr.close());
+  const chips = html => [...html.matchAll(/<fieldset class="tsd-predict"><legend>[^<]*<\/legend><div>([\s\S]*?)<\/div>/g)].flatMap(m => [...m[1].matchAll(/<button[^>]*aria-pressed="(true|false)"[^>]*>([^<]*)<\/button>/g)].map(b => b[2]));
+
+  test('BacterialExplorer: the prediction is choice chips, one per outcome; Test reasoning stays a button', () => {
+    for (const id of ['bacterial-hgt']) {
+      const lesson = lessonById(id), html = ssr.html(Bacterial, {lesson, inspected: [1], onInspect: () => {}});
+      assert.doesNotMatch(html, /<select|<option/);
+      assert.deepEqual(chips(html), bacterialOptions(lesson));
+      assert.match(html, /<legend>Predict or classify this scenario<\/legend>/);
+      assert.match(html, /<button[^>]*class="primary-button"[^>]*disabled[^>]*>Test reasoning<\/button>/, 'disabled until a prediction is chosen');
+      assert.equal((html.match(/class="outline-button" aria-pressed/g) || []).length, lesson.variants.length + bacterialOptions(lesson).length);
+      assert.match(html, /aria-label="Bacterial scientific scenarios"/);
+      assert.match(html, /✓/, 'inspected tabs keep their tick');
+    }
+  });
+
+  test('ConsequenceExplorer: the prediction is choice chips; the reveal button keeps its text per lesson', () => {
+    for (const [id, button] of [['tsd', 'Investigate prediction'], ['genomic-consequences', 'Calculate selected event']]) {
+      const lesson = lessonById(id), html = ssr.html(Consequence, {lesson, inspected: [], onInspect: () => {}});
+      assert.doesNotMatch(html, /<select|<option/);
+      assert.deepEqual(chips(html), consequenceOptions(lesson));
+      assert.match(html, /<legend>Predict the qualitative outcome<\/legend>/);
+      assert.match(html, new RegExp(`class="primary-button"[^>]*disabled[^>]*>${button}</button>`));
+      assert.match(html, /aria-label="Scientific contexts"/);
+    }
   });
 });
 
