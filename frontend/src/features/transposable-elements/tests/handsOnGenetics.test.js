@@ -7,6 +7,8 @@ import {anatomyIntent} from '../hands-on/intents/anatomy.js';
 import {ANATOMY_CASES, LABELS, correctBoundaries, transposaseDirection, checkDissection} from '../anatomyLab.js';
 import {classificationIntent, cellId} from '../hands-on/intents/classification.js';
 import {CLASS_CARDS, checkPlacement} from '../classificationSort.js';
+import {copyLedgerIntent} from '../hands-on/intents/copyLedger.js';
+import {LANES, COPY_CHOICES, copyFeedback} from '../copyLedger.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -159,6 +161,34 @@ describe('ClassificationSort', () => {
     assert.equal(labels.filter(l => /Drag it into a grid cell/.test(l)).length, CLASS_CARDS.length);
     assert.ok(labels.some(l => /^Ty \(yeast\)/.test(l)));
     assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Classification grid/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('CopyLedger', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('CopyLedger'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('CopyLedger: gestures reach every option', () => {
+    // Holding the crank advances once a guess exists, for every guess; without one it is refused.
+    for (const lane of Object.keys(LANES)) for (const guess of COPY_CHOICES) {
+      assert.deepEqual(copyLedgerIntent({kind: 'hold', target: 'crank'}, {guess}), {type: 'advance'});
+      // The feedback the advance produces is the engine's, for that guess.
+      assert.equal(typeof copyFeedback(lane, 1, guess).correct, 'boolean');
+    }
+    assert.equal(copyLedgerIntent({kind: 'hold', target: 'crank'}, {guess: null}), null);
+    assert.equal(copyLedgerIntent({kind: 'tap', target: 'crank'}, {guess: 1}), null);
+    assert.equal(copyLedgerIntent({kind: 'hold', target: 'gear'}, {guess: 1}), null);
+  });
+
+  test('CopyLedger: the advance button is gone; each lane has a labelled crank and keeps its question', () => {
+    assert.doesNotMatch(html, /<button[^>]*primary-button/);
+    assert.doesNotMatch(html, /Transpose →|Replicate →/);
+    const labels = buttons(html);
+    assert.equal(labels.filter(l => /^Hold the crank/.test(l)).length, 2);
+    assert.equal((html.match(/<fieldset class="tsd-predict">/g) || []).length, 2, 'the guess stays a question');
+    assert.match(html, /Predict copies after/);
     assert.match(html, /Practice only/);
   });
 });
