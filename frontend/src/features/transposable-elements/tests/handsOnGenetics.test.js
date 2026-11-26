@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {SYSTEMS} from '../mobilityGates.js';
 import {mobilityIntent, controlKind} from '../hands-on/intents/mobility.js';
 import {kernelIntent} from '../hands-on/intents/kernel.js';
+import {anatomyIntent} from '../hands-on/intents/anatomy.js';
+import {ANATOMY_CASES, LABELS, correctBoundaries, transposaseDirection, checkDissection} from '../anatomyLab.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -81,6 +83,50 @@ describe('KernelGrower', () => {
     assert.ok(labels.some(l => /^Hold to grow the kernel/.test(l)));
     assert.match(html, /<fieldset class="tsd-predict">/, 'the prediction stays a question');
     assert.match(html, /role="img" aria-label="A colourless kernel, not grown yet\."/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('AnatomyLab', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('AnatomyLab'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('AnatomyLab: gestures reach every option', () => {
+    for (const c of ANATOMY_CASES) {
+      let w = {left: null, right: null, labels: {}, direction: null};
+      const apply = g => { const p = anatomyIntent(g, w); assert.ok(p, JSON.stringify(g)); w = {...w, ...p}; return p; };
+      // Every gap takes either bracket, as {left: g} / {right: g}.
+      for (let g = 0; g <= c.segments.length; g++) for (const b of ['left', 'right']) assert.deepEqual(anatomyIntent({kind: 'drop', target: 'gap', index: g, bracket: b}, w), {[b]: g});
+      // Every label on every segment, as the old per-label button wrote it.
+      c.segments.forEach((_, i) => Object.keys(LABELS).forEach(tag => assert.deepEqual(anatomyIntent({kind: 'drop', target: 'segment', index: i, tag}, {labels: {}}), {labels: {[i]: tag}})));
+      // A full correct dissection by gestures alone is graded as solved.
+      const [L, R] = correctBoundaries(c);
+      apply({kind: 'drop', target: 'gap', index: L, bracket: 'left'}); apply({kind: 'drop', target: 'gap', index: R, bracket: 'right'});
+      c.segments.forEach((s, i) => apply({kind: 'drop', target: 'segment', index: i, tag: s.kind}));
+      const want = transposaseDirection(c);
+      for (let n = 0; n < 2 && w.direction !== want; n++) apply({kind: 'swipe', target: 'arrow'}); // a swipe flips the reading
+      assert.equal(w.direction, want);
+      assert.equal(checkDissection(c, w).allOk, true, c.id);
+      // A wrong tag still reaches the model, which then marks it wrong.
+      const wrong = anatomyIntent({kind: 'drop', target: 'segment', index: 0, tag: 'cargo'}, w).labels;
+      assert.equal(checkDissection(c, {...w, labels: wrong}).labelResults[0], false);
+    }
+    assert.equal(anatomyIntent({kind: 'tap', target: 'segment', index: 3}).selected, 3);
+    assert.equal(anatomyIntent({kind: 'drop', target: 'gap', index: 1, bracket: 'middle'}), null);
+  });
+
+  test('AnatomyLab: the label, gap and direction buttons are gone; targets are labelled', () => {
+    assert.doesNotMatch(html, /class="al-gap/);
+    assert.doesNotMatch(html, /class="al-labels"/);
+    assert.doesNotMatch(html, /al-direction/);
+    assert.doesNotMatch(html, /Rightward|Leftward/);
+    const labels = buttons(html);
+    assert.equal(labels.filter(l => /^Name tag:/.test(l)).length, Object.keys(LABELS).length);
+    assert.equal(labels.filter(l => /^Segment \d/.test(l)).length, ANATOMY_CASES[0].segments.length);
+    assert.ok(labels.some(l => /^Left bracket/.test(l)) && labels.some(l => /^Right bracket/.test(l)));
+    assert.ok(labels.some(l => /^Transposase reading direction/.test(l)));
+    assert.match(html, /Check my dissection/, 'Check stays a button');
     assert.match(html, /Practice only/);
   });
 });
