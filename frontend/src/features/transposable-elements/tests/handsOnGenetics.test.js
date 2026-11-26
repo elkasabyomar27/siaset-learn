@@ -9,6 +9,8 @@ import {classificationIntent, cellId} from '../hands-on/intents/classification.j
 import {CLASS_CARDS, checkPlacement} from '../classificationSort.js';
 import {copyLedgerIntent} from '../hands-on/intents/copyLedger.js';
 import {LANES, COPY_CHOICES, copyFeedback} from '../copyLedger.js';
+import {elementBuilderIntent, applyBuilderAction} from '../hands-on/intents/elementBuilder.js';
+import {IS_PARTS, canAdd} from '../mobileElementBuilder.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -189,6 +191,52 @@ describe('CopyLedger', () => {
     assert.equal(labels.filter(l => /^Hold the crank/.test(l)).length, 2);
     assert.equal((html.match(/<fieldset class="tsd-predict">/g) || []).length, 2, 'the guess stays a question');
     assert.match(html, /Predict copies after/);
+    assert.match(html, /Practice only/);
+  });
+});
+
+describe('MobileElementBuilder', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('MobileElementBuilder'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  // What the old buttons did, kept here as the reference.
+  const oldAdd = (t, kind) => canAdd(t, kind) ? [...t, kind] : t;
+  const oldMove = (t, i, d) => { const j = i + d; if (j < 0 || j >= t.length) return t; const n = [...t]; [n[i], n[j]] = [n[j], n[i]]; return n; };
+
+  test('MobileElementBuilder: gestures reach every option', () => {
+    // Add: every part, gated by canAdd (track limit and two ends).
+    let t = [];
+    for (const kind of ['end', 'transposase', 'cargo', 'host', 'end', 'end']) {
+      const a = elementBuilderIntent({kind: 'drop', source: 'bin', part: kind, target: 'rail'}, t);
+      assert.equal(!!a, canAdd(t, kind), `add ${kind} to ${t.length}`);
+      t = applyBuilderAction(t, a);
+    }
+    assert.deepEqual(t, ['end', 'transposase', 'cargo', 'host', 'end'].slice(0, 5));
+    assert.equal(elementBuilderIntent({kind: 'drop', source: 'bin', part: 'host', target: 'rail'}, t), null, 'full track refuses');
+    assert.equal(elementBuilderIntent({kind: 'drop', source: 'bin', part: 'end', target: 'off'}, []), null);
+    // Reorder from any index to any slot equals the repeated adjacent moves.
+    const base = ['end', 'transposase', 'cargo', 'host', 'end'];
+    for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) {
+      const a = elementBuilderIntent({kind: 'drop', source: 'tile', index: i, target: 'slot', slot: j}, base);
+      if (i === j) { assert.equal(a, null); continue; }
+      let want = base; for (let k = i; k !== j; k += j > i ? 1 : -1) want = oldMove(want, k, j > i ? 1 : -1);
+      assert.deepEqual(applyBuilderAction(base, a), want, `${i}->${j}`);
+    }
+    // Remove: dragging any tile off the track equals the old × button.
+    for (let i = 0; i < 5; i++) assert.deepEqual(applyBuilderAction(base, elementBuilderIntent({kind: 'drop', source: 'tile', index: i, target: 'off'}, base)), base.filter((_, n) => n !== i));
+    assert.deepEqual(oldAdd([], 'end'), applyBuilderAction([], {type: 'add', kind: 'end'}));
+    assert.equal(elementBuilderIntent({kind: 'drop', source: 'tile', index: 9, target: 'off'}, base), null);
+  });
+
+  test('MobileElementBuilder: the part and arrow buttons are gone; Test stays a button', () => {
+    assert.doesNotMatch(html, /pb-part-button|pb-palette|pb-tile-tools/);
+    assert.doesNotMatch(html, /Move .* (left|right)|aria-label="Remove /);
+    const labels = buttons(html);
+    for (const part of Object.values(IS_PARTS)) assert.ok(labels.some(l => l.startsWith(part.label)), part.label);
+    assert.match(html, /Test: can it move\?/);
+    assert.match(html, /Clear track/);
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="DNA track with 0 of 5 parts/);
     assert.match(html, /Practice only/);
   });
 });
