@@ -29,3 +29,9 @@
 @media (prefers-reduced-motion: no-preference) {
   .gx-switch-knob { transition: transform 160ms ease; }
 }
+/* Choice chips and assumption choices */
+.ho-assume-title { margin: 0 0 var(--space-2); font-weight: 700; }
+.ho-assume-choice { margin: 0 0 var(--space-3); padding: 0; border: 0; min-width: 0; }
+.ho-assume-choice legend { padding: 0; font-size: 0.9rem; color: var(--color-text-secondary); }
+.ho-assume-choice > div { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.ho-assume-choice button { min-height: 44px; }

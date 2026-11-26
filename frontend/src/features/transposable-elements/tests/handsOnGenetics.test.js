@@ -15,6 +15,8 @@ import {compositeIntent} from '../hands-on/intents/composite.js';
 import {MODULES, CARGO, END_CHOICES, REFERENCE, arrangement, matchElement} from '../compositeBuilder.js';
 import {trackStep} from '../hands-on/gestures/track.js';
 import {timingFromDegrees} from '../hands-on/intents/kernel.js';
+import {recombinationIntent} from '../hands-on/intents/recombination.js';
+import {ORIENTATIONS, SUBSTRATES, recombine} from '../recombinationLab.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -300,6 +302,48 @@ describe('KernelGrower timing track', () => {
     const fs = await import('node:fs');
     assert.match(fs.readFileSync(new URL('../components/KernelGrower.jsx', import.meta.url), 'utf8'), /wrap=\{false\}/);
     assert.match(fs.readFileSync(new URL('../hands-on/kit/Track.jsx', import.meta.url), 'utf8'), /startTrack, \{cx, cy, value, step, bigStep, wrap\}/);
+  });
+});
+
+describe('RecombinationLab', () => {
+  let ssr, html;
+  before(async () => { ssr = await startSsr(); const C = (await ssr.load(COMP('RecombinationLab'))).default; html = ssr.html(C); });
+  after(() => ssr.close());
+
+  test('RecombinationLab: gestures reach every option', () => {
+    // Orientation: a swipe flips from either side, so both values are reachable.
+    for (const o of Object.keys(ORIENTATIONS)) assert.deepEqual(recombinationIntent({kind: 'swipe', target: 'copy2'}, {orientation: o}), {orientation: o === 'direct' ? 'inverted' : 'direct'});
+    for (const s of Object.keys(SUBSTRATES)) assert.deepEqual(recombinationIntent({kind: 'drop', part: 'substrate', substrate: s, target: 'stage'}), {substrate: s});
+    for (const h of [true, false]) assert.deepEqual(recombinationIntent({kind: 'assume', control: 'homology', value: h}), {homology: h});
+    // Every old (orientation, substrate, homology) combination is reachable and runs the model with those inputs.
+    for (const o of Object.keys(ORIENTATIONS)) for (const s of Object.keys(SUBSTRATES)) for (const h of [true, false]) {
+      let cur = {orientation: 'direct', substrate: 'intramolecular', homology: true};
+      if (cur.orientation !== o) cur = {...cur, ...recombinationIntent({kind: 'swipe', target: 'copy2'}, cur)};
+      cur = {...cur, ...recombinationIntent({kind: 'drop', part: 'substrate', substrate: s, target: 'stage'}, cur), ...recombinationIntent({kind: 'assume', control: 'homology', value: h}, cur)};
+      assert.deepEqual(cur, {orientation: o, substrate: s, homology: h});
+      assert.deepEqual(recombinationIntent({kind: 'drop', part: 'copy', target: 'copy2'}, cur), {run: true});
+      assert.equal(typeof recombine(cur).ok, 'boolean');
+    }
+    assert.equal(recombinationIntent({kind: 'drop', part: 'substrate', substrate: 'nonsense', target: 'stage'}), null);
+    assert.equal(recombinationIntent({kind: 'drop', part: 'copy', target: 'stage'}), null);
+    assert.equal(recombinationIntent({kind: 'swipe', target: 'copy1'}, {}), null);
+    assert.equal(recombinationIntent(null), null);
+  });
+
+  test('RecombinationLab: the old buttons are gone; targets are labelled', () => {
+    assert.doesNotMatch(html, /Recombine →/);
+    assert.doesNotMatch(html, /aria-label="(Second copy direction|Where the copies pair)"/);
+    assert.doesNotMatch(html, /<button[^>]*class="[^"]*(outline-button|primary-button)/);
+    assert.doesNotMatch(html, /type="range"/);
+    const labels = buttons(html);
+    assert.ok(labels.some(l => /^Second copy points/.test(l)));
+    assert.equal(labels.filter(l => /^Substrate card:/.test(l)).length, 2);
+    assert.ok(labels.some(l => /^First TE copy\. Drag it onto the second copy/.test(l)));
+    assert.match(html, /<legend>Assumptions<\/legend>/);
+    assert.match(html, /similar enough to pair/);
+    assert.match(html, /<svg[^>]*role="group"[^>]*aria-label="Recombination bench/);
+    assert.match(html, /role="status"/);
+    assert.match(html, /Practice only/);
   });
 });
 

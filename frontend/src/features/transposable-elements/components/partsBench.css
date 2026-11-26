@@ -214,7 +214,6 @@
 .rl-host { background:var(--scientific-target); }
 .rl-te { background:var(--scientific-element); }
 .rl-x { background:#9fd3a8; }
-.rl-stage.is-paired .rl-te { box-shadow:0 0 0 2px #e4c8f0; }
 .rl-molecule.is-circle .rl-track { padding:10px 12px; border:2px dashed #8a93a0; border-radius:40px; width:max-content; }
 .rl-molecule.is-circle .rl-block:last-child::after { content:'↺'; position:absolute; right:-1.4em; top:50%; transform:translateY(-50%); width:auto; height:auto; background:none; color:#a8bac3; font-size:14px; }
 .rl-after-head { border-top:1px solid #22313b; }
