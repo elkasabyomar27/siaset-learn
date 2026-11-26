@@ -25,7 +25,7 @@ function SortScene({ placed, onDrop, setNote }) {
   const first = CLASS_CARDS.findIndex(c => !placed[c.id]);
   return <>
     <text className="gx-small" x="8" y="16">ELEMENTS TO SORT: drag a card into the grid</text>
-    {CLASS_CARDS.map((card, i) => placed[card.id] ? null : <Draggable key={card.id} className="cs-card" x={cardAt(i).x} y={cardAt(i).y} zones={zones} expected={i === first && !Object.keys(placed).length}
+    {CLASS_CARDS.map((card, i) => placed[card.id] ? null : <Draggable key={card.id} className="gx-card" x={cardAt(i).x} y={cardAt(i).y} zones={zones} expected={i === first && !Object.keys(placed).length}
       hit={hitBox(CARD_W, CARD_H, scale)}
       label={`${card.name}${card.hypothetical ? ', hypothetical' : ''}: ${card.steps.join(', then ')}. Drag it into a grid cell`}
       carriedLabel={`Carrying ${card.name}. Press Enter to place it, arrow keys to choose the cell`}
