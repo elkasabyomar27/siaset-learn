@@ -56,7 +56,7 @@
 /* Operon explorer */
 .op-dna { stroke:#2a3944; stroke-width:6; stroke-linecap:round; }
 .op-promoter rect { fill:#e9c46a; }
-.op-promoter text, .op-gene text { fill:#1c1608; font-size:15px; font-weight:700; }
+.op-promoter text, .op-gene text { fill:var(--color-molecular-background); font-size:15px; font-weight:700; }
 .op-promoter.is-broken rect { fill:#5b4a2a; }
 .op-promoter.is-broken text { fill:#a99566; text-decoration:line-through; }
 .op-gene path { fill:var(--scientific-target); stroke:#0e1419; stroke-width:1; transition:fill .4s, opacity .4s; }

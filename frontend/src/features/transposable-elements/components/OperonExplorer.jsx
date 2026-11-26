@@ -82,7 +82,7 @@ function OperonScene({ config, result, onGesture, setNote }) {
       <text className="gx-text" y={placed ? 5 : 5} textAnchor="middle">TE</text>
     </Draggable>
     {placed && <SwipeTarget className="op-swipe" label={`Element carries ${PROMOTER_TEXT[config.tePromoter]}. Swipe across the promoter arrow, or press Enter, to change it`}
-      line={{x1: teX[0], y1: DNA_Y - 34, x2: teX[1], y2: DNA_Y - 34}} band={Math.max(22, 14 * k)}
+      line={{x1: teX[0], y1: DNA_Y - 34, x2: teX[1], y2: DNA_Y - 34}} band={Math.max(22, 22 * k)}
       onSwipe={() => { const p = send({kind: 'swipe', target: 'promoter'}, config); if (p) setNote(`Element now carries ${PROMOTER_TEXT[p.tePromoter]}.`); }}>
       <path className="gx-dna" strokeWidth="3" d={`M${teMid} ${DNA_Y - 6} V${DNA_Y - 34} ${config.tePromoter === 'left' ? `h-26 m10 -8 l-10 8 l10 8` : config.tePromoter === 'right' ? `h26 m-10 -8 l10 8 l-10 8` : 'h0'}`} style={{opacity: config.tePromoter === 'none' ? 0.35 : 1}} />
       <text className="gx-small" x={teMid} y={DNA_Y - 42} textAnchor="middle">{config.tePromoter === 'none' ? 'swipe: promoter?' : 'promoter'}</text>

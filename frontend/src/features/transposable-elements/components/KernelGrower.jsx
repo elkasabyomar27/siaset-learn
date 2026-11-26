@@ -93,6 +93,7 @@ export default function KernelGrower() {
 
   const [note, setNote] = useState('');
   function apply(p) {
+    if (('ac' in p && p.ac === ac) || ('timing' in p && p.timing === timing)) return; // a no-op keeps the prediction and kernel
     if (p.grow) grow();
     else if ('ac' in p) reset(() => setAc(p.ac));
     else if ('timing' in p) reset(() => setTiming(p.timing));

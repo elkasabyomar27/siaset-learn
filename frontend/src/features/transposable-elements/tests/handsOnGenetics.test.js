@@ -30,6 +30,7 @@ import {investigate, runInvestigation, predictionOptions as bacterialOptions} fr
 import {reveal, runReveal, predictionOptions as consequenceOptions} from '../consequenceExplorerLogic.js';
 import {resistanceExample, bacterialTransition, targetingCompatible, predictionFeedback as bacterialFeedback} from '../engine/bacterial.js';
 import {rearrange, insertionExample, tsdEvidence} from '../engine/consequences.js';
+import {hitBox} from '../hands-on/kit/useDemoHand.js';
 import {startSsr} from './helpers/ssr.js';
 
 const COMP = n => `/src/features/transposable-elements/components/${n}.jsx`;
@@ -404,7 +405,7 @@ describe('OperonExplorer', () => {
     // Slot: each real slot by dropping into it, "No insertion" by dropping the element back in the tray.
     for (const slot of Object.keys(SLOTS)) {
       const g = {kind: 'drop', part: 'element', target: slot === 'none' ? 'tray' : slot};
-      assert.deepEqual(operonIntent(g, DEFAULT_OPERON), {slot});
+      assert.deepEqual(operonIntent(g, DEFAULT_OPERON), slot === 'none' ? {slot, terminator: false, bPromoter: false} : {slot});
     }
     // Outward promoter: a swipe cycles, so every value is reachable from every value (when an element is placed).
     const values = Object.keys(TE_PROMOTER);
@@ -684,6 +685,34 @@ describe('BacterialExplorer and ConsequenceExplorer markup', () => {
       assert.match(html, new RegExp(`class="primary-button"[^>]*disabled[^>]*>${button}</button>`));
       assert.match(html, /aria-label="Scientific contexts"/);
     }
+  });
+});
+
+describe('Review fixes', () => {
+  const read = async f => (await import('node:fs')).readFileSync(new URL(f, import.meta.url), 'utf8');
+  test('hit boxes stay at least 44 css px at any scale', () => {
+    for (const scale of [0.6, 0.66, 1, 2]) for (const [w, h] of [[10, 10], [96, 40]]) {
+      const b = hitBox(w, h, scale);
+      assert.ok(b.width * scale >= 44 - 1e-9 && b.height * scale >= 44 - 1e-9, `${w}x${h} at ${scale}`);
+    }
+  });
+  test('the stage keeps its drawing width and measures before the first paint', async () => {
+    assert.match(await read('../hands-on/kit/geneticsScenes.css'), /\.gx-stage \{ min-width: calc\(var\(--gx-min, 560px\) \+ 2 \* \(var\(--space-4\) \+ 1px\)\); \}/);
+    assert.match(await read('../hands-on/kit/BenchStage.jsx'), /useLayoutEffect\(\(\) => \{[\s\S]*getBoundingClientRect/);
+    assert.match(await read('../components/OperonExplorer.jsx'), /Math\.max\(22, 22 \* k\)/);
+  });
+  test('no-op gestures are recognisable and do not wipe state', async () => {
+    const same = tsdIntent({kind: 'drop', part: 'cut', mark: 'top', pos: 4}, {cut: 4, stagger: 9});
+    assert.deepEqual([same.cut, same.stagger], [4, 9]);
+    assert.match(await read('../components/TsdBuilder.jsx'), /p\.cut === cut && p\.stagger === stagger\) return p/);
+    assert.match(await read('../components/KernelGrower.jsx'), /p\.ac === ac\) \|\| \('timing' in p && p\.timing === timing\)\) return/);
+    // Re-dropping the same tag keeps the current selection.
+    assert.match(await read('../components/AnatomyLab.jsx'), /i === undefined \? w\.selected : Number\(i\)/);
+  });
+  test('a swipe flip is a functional update; the tray takes the terminator back', async () => {
+    assert.match(await read('../components/CompositeBuilder.jsx'), /onChange\(d => \(\{\[g\.target\]: -d\[g\.target\]\}\)\)/);
+    assert.deepEqual(operonIntent({kind: 'drop', part: 'element', target: 'tray'}, {slot: 'geneA', terminator: true}), {slot: 'none', terminator: false, bPromoter: false});
+    assert.doesNotMatch(await read('../components/partsBench.css'), /#1c1608[^;]*;\s*font-size:15px/);
   });
 });
 

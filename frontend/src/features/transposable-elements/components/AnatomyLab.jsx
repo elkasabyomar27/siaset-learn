@@ -88,7 +88,7 @@ export default function AnatomyLab() {
   const update = patch => setWork(all => all.map((x, i) => i === caseIndex ? {...x, ...patch, result: null} : x));
   // Dropping a tag also opens that segment's clue; tapping a segment only selects it (the old behaviour).
   const apply = patch => 'selected' in patch ? setWork(all => all.map((x, k) => k === caseIndex ? {...x, selected: patch.selected} : x))
-    : update('labels' in patch ? {...patch, selected: Number(Object.keys(patch.labels).find(i => patch.labels[i] !== w.labels[i]) ?? w.selected)} : patch);
+    : update('labels' in patch ? {...patch, selected: (i => i === undefined ? w.selected : Number(i))(Object.keys(patch.labels).find(i => patch.labels[i] !== w.labels[i]))} : patch);
 
   function check() {
     const result = checkDissection(c, w);

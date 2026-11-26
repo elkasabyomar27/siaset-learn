@@ -30,7 +30,7 @@ function CompositeScene({ design, ends, moving, used, onChange, onEnds, setNote 
   const sideZones = ['left', 'right'].map(s => ({id: s, label: `the ${s} IS slot`, contains: inBox(X[s], Y - 10, MOD, H + 20)}));
   const cargoZone = [{id: 'cargo', label: 'the cargo slot', contains: inBox(X.cargo, Y - 10, CARGO_W, H + 20)}];
   const endsZones = Object.keys(END_CHOICES).map(id => ({id: `ends-${id}`, label: END_CHOICES[id], contains: inBox(ENDS_AT[id] - 80, ENDS_Y - 30, 160, 60)}));
-  const send = g => { activity(); const p = compositeIntent(g, design); if (p) ('ends' in p ? onEnds(p.ends) : onChange(p)); return p; };
+  const send = g => { activity(); const p = compositeIntent(g, design); if (p) ('ends' in p ? onEnds(p.ends) : g.kind === 'swipe' ? onChange(d => ({[g.target]: -d[g.target]})) : onChange(p)); return p; };
   const module = (side, x) => {
     const dir = design[side], name = `${design.module}-${side === 'left' ? 'L' : 'R'}`, y = Y + lift(side), dirText = dir === 1 ? 'pointing right' : 'pointing left';
     const tip = dir === 1 ? `M${MOD - 34} ${H / 2 - 9} l12 9 l-12 9` : `M34 ${H / 2 - 9} l-12 9 l12 9`;

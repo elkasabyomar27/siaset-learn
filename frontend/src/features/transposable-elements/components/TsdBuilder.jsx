@@ -158,6 +158,7 @@ export default function TsdBuilder() {
   function onGesture(g) {
     const p = tsdIntent(g, {cut, stagger, stage, predicted: prediction !== null, locked: challenge});
     if (!p) return null;
+    if ('cut' in p && p.cut === cut && p.stagger === stagger) return p; // a no-op keeps the prediction
     setPlaying(false);
     if ('fill' in p) {
       const r = fillGap(filled, p.fill);
@@ -186,7 +187,7 @@ export default function TsdBuilder() {
       <ol className="tsd-steps" aria-label="Insertion steps">
         {TSD_STAGES.map((s, i) => <li key={s.id} className={i === stage ? 'current' : i < stage ? 'done' : ''} aria-current={i === stage ? 'step' : undefined}><span>{i < stage ? '✓' : i + 1}</span>{s.title}</li>)}
       </ol>
-      <div className="tsd-canvas">
+      <div className="tsd-canvas gx-scroll" style={{'--gx-min': narrow ? '0px' : `${viewW}px`}}>
         <BenchStage variant="molecular" className="gx-stage" width={viewW} height={VIEW_H} label={describeLayout(layout)}
           after={<NextStep className="gx-note">{note || (stage === 0 ? 'Drag a cut mark along its strand.' : stage === PREDICT_STAGE ? 'Move the cuts, predict, then drag the element into the gap.' : stage === 2 ? 'Drag the polymerase onto each gap.' : 'The gaps are filled.')}</NextStep>}>
           <TsdScene layout={layout} hatch={hatch} offset={offset} viewW={viewW} cut={cut} stagger={stagger} stage={stage} predicted={prediction !== null} challenge={challenge} showStagger={showStagger} filled={filled} onGesture={onGesture} setNote={setNote} />

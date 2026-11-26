@@ -12,7 +12,8 @@ export function operonIntent(g, current = {}) {
   switch (g.kind) {
     case 'drop':
       if (g.part === 'element') {
-        if (g.target === 'tray') return {slot: 'none'};
+        // Back in the tray the element takes its terminator with it.
+        if (g.target === 'tray') return {slot: 'none', terminator: false, bPromoter: false};
         return g.target !== 'none' && Object.hasOwn(SLOTS, g.target) ? {slot: g.target} : null;
       }
       if (g.part === 'terminator' && placed) return g.target === 'te' ? {terminator: true} : g.target === 'tray' ? {terminator: false} : null;

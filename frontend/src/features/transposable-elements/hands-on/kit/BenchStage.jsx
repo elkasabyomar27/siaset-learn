@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useId, useMemo, useRef, useState} from 'react';
+import {createContext, useContext, useLayoutEffect, useId, useMemo, useRef, useState} from 'react';
 import {HandsOnDefs, defIds, safeId} from './HandsOnDefs.jsx';
 import {cls} from './cls.js';
 import './handsOn.css';
@@ -20,9 +20,12 @@ export function BenchStage({variant = 'molecular', width, height, label, classNa
   const prefix = safeId(useId());
   const box = useRef(null);
   const [scale, setScale] = useState(1);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = box.current;
-    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    if (!el) return undefined;
+    const w0 = el.getBoundingClientRect?.().width;
+    if (w0) setScale(w0 / width);
+    if (typeof ResizeObserver === 'undefined') return undefined;
     const ro = new ResizeObserver(([entry]) => { if (entry.contentRect.width) setScale(entry.contentRect.width / width); });
     ro.observe(el);
     return () => ro.disconnect();

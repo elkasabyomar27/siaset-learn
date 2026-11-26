@@ -1,6 +1,6 @@
 /* Scenes for the Genetics experiments on the hands-on kit. Tokens only. */
 .gx-scroll { overflow-x: auto; }
-.gx-stage { min-width: var(--gx-min, 560px); }
+.gx-stage { min-width: calc(var(--gx-min, 560px) + 2 * (var(--space-4) + 1px)); }
 .gx-note { margin: var(--space-3) 0 0; }
 .gx-text { fill: var(--color-molecular-text); font-size: 13px; pointer-events: none; }
 .gx-small { fill: var(--color-molecular-muted); font-size: 11px; pointer-events: none; }
