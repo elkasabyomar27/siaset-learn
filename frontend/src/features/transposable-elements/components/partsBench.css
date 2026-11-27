@@ -379,3 +379,34 @@
   .pr-layout { grid-template-columns:1fr; }
 }
 @media (max-width:460px) { .rs-stages { grid-template-columns:1fr; } }
+
+/* Station 15: conjugation experiments */
+.hg-cj-svg { width:100%; height:auto; display:block; padding:8px 12px; box-sizing:border-box; }
+.hg-orit { fill:#ffd27a; }
+.hg-nick { fill:#ffd27a; }
+.hg-bridge-line line, line.hg-bridge-line { stroke:#9fd3a8; stroke-width:6; stroke-linecap:round; }
+.hg-strand { stroke:var(--scientific-element); stroke-width:3; stroke-dasharray:6 5; }
+.hg-strand-ring { fill:none; stroke:var(--scientific-element); stroke-width:4; }
+.hg-strand-ring.is-partial { stroke-dasharray:60 80; }
+.hg-strand-new { fill:none; stroke:#9fd3a8; stroke-width:3; stroke-dasharray:5 4; }
+.hg-is { fill:#ffd27a; }
+.hg-arrow { stroke:#ffd27a; stroke-width:8; transition:stroke-dasharray .4s; }
+.hg-gene { fill:#1a2a33; stroke:#8fa4b0; stroke-width:2; }
+.hg-gene.is-in { fill:#9fd3a8; stroke:#9fd3a8; }
+.hg-origin { fill:#ffd27a; }
+.hg-step-label { padding:4px 16px 14px; font-size:14px; color:#dfe8ec; }
+.hg-note { padding:0 16px 12px; margin:0; color:#b9c8d0; }
+.hg-zoom { margin:10px 0 0; padding-left:22px; display:grid; gap:4px; font-size:14px; }
+.hg-dots { display:grid; grid-template-columns:repeat(16,1fr); gap:5px; max-width:360px; margin:8px 0; }
+.hg-dots i { aspect-ratio:1; border-radius:50%; background:#2b3a44; border:1px solid #5d7c8c; transition:background .3s; }
+.hg-dots i.is-f { background:#9fd3a8; border-color:#9fd3a8; }
+.hg-range { display:grid; gap:4px; font-size:13px; }
+.hg-range input { min-height:44px; width:100%; max-width:360px; }
+.hg-quiz { margin:14px 0 0; border:1px solid #d6ddd0; border-radius:12px; padding:10px 14px; display:grid; gap:6px; }
+.hg-quiz legend { font-weight:700; padding:0 6px; }
+.hg-ok { color:#2f6b4f; } .hg-no { color:#8a3f2b; }
+.hg-compare { border-collapse:collapse; margin-top:14px; font-size:13px; width:100%; }
+.hg-compare caption { text-align:left; font-weight:700; padding-bottom:6px; }
+.hg-compare th, .hg-compare td { border:1px solid #d6ddd0; padding:6px 10px; text-align:left; }
+.hg-actions button[aria-pressed="true"] { outline:2px solid #ffd27a; outline-offset:2px; }
+@media (prefers-reduced-motion:reduce) { .hg-arrow, .hg-dots i { transition:none; } }

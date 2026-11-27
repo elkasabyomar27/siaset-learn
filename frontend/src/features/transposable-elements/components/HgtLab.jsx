@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import { PREREQS, HGT_GOALS, newHgt, act, setPrereq, applySelection } from '../hgtLab.js';
+import ConjugationLab from './ConjugationLab.jsx';
 import './partsBench.css';
 
 function Cell({ role, lab }) {
@@ -18,7 +19,7 @@ function Cell({ role, lab }) {
   </figure>;
 }
 
-export default function HgtLab() {
+function HgtBasics() {
   const uid = useId().replace(/[^a-zA-Z0-9-]/g, '');
   const [lab, setLab] = useState(newHgt);
   const [assume, setAssume] = useState(true);
@@ -58,4 +59,8 @@ export default function HgtLab() {
     </section>
     <p className="quiet">Practice only; it doesn’t change lesson completion. Transposition and conjugation use the lesson’s bacterial model. Growth outcomes are qualitative and depend on the stated assumption.</p>
   </section>;
+}
+
+export default function HgtLab() {
+  return <><HgtBasics /><ConjugationLab /></>;
 }
