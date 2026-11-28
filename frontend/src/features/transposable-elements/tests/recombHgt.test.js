@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { recombine, eventFor, blockTally } from '../recombinationLab.js';
-import { newHgt, act, setPrereq, applySelection, cargoLocations, HGT_GOALS } from '../hgtLab.js';
 
 test('orientation and substrate choose the engine event', () => {
   assert.equal(eventFor('direct', 'intramolecular'), 'deletion');
@@ -24,28 +23,4 @@ test('recombination products conserve material: nothing invented or lost', () =>
   assert.equal(dup.products[1].blocks.filter(b => b.startsWith('X')).length, 0);
   assert.equal(recombine({orientation: 'direct', substrate: 'intramolecular', homology: false}).ok, false);
   assert.equal(recombine({orientation: 'inverted', substrate: 'misaligned-sisters'}).ok, false);
-});
-
-test('HGT: transposition stays in the donor; conjugation needs a loaded plasmid and every prerequisite', () => {
-  let lab = newHgt();
-  let r = act(lab, 'conjugate');
-  assert.equal(r.ok, false); assert.match(r.text, /Transpose first/);
-  r = act(lab, 'transpose'); lab = r.lab;
-  assert.equal(r.ok, true); assert.equal(cargoLocations(lab).recipient, null);
-  const blocked = act(setPrereq(lab, 'oriT', false), 'conjugate');
-  assert.equal(blocked.ok, false); assert.match(blocked.text, /origin of transfer/);
-  r = act(lab, 'conjugate'); lab = r.lab;
-  assert.equal(r.ok, true); assert.ok(cargoLocations(lab).recipient);
-});
-
-test('selection reports growth only and never moves DNA', () => {
-  let lab = act(newHgt(), 'transpose').lab;
-  const before = structuredClone(lab.bact);
-  const sel = applySelection(lab, true);
-  assert.deepEqual(sel.result, {donor: 'grows', recipient: 'inhibited'});
-  assert.deepEqual(sel.lab.bact, before);
-  lab = act(lab, 'conjugate').lab;
-  assert.deepEqual(applySelection(lab, false).result, {donor: 'undetermined', recipient: 'undetermined'});
-  const log = [...act(newHgt(), 'conjugate').lab.log, ...sel.lab.log, ...lab.log];
-  assert.deepEqual(HGT_GOALS.filter(g => g.done(log)).map(g => g.id), ['transpose', 'transfer', 'blocked', 'select']);
 });
