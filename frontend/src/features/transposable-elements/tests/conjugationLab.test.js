@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { F_STEPS, fStatus, pickDonor, mixedCulture, integrateF, transferredGenes, transferredFraction, HFR_STOPS, CJ_QUIZ, CJ_GOALS } from '../conjugationLab.js';
+import { F_STEPS, fStatus, pickDonor, mixedCulture, integrateF, transferredGenes, transferredFraction, HFR_STOPS, CJ_QUIZ, CJ_GOALS, newProgress, record, matingUnlocked } from '../conjugationLab.js';
 
 test('F+ x F- ends with both cells F+', () => {
   assert.equal(F_STEPS.length, 6);
@@ -45,4 +45,22 @@ test('quiz answers are in range and goals read progress', () => {
   const p = {maxStep: 5, triedF: true, hfr: true, stops: [10, 17, 25]};
   assert.ok(CJ_GOALS.every(g => g.done(p)));
   assert.ok(CJ_GOALS.every(g => !g.done({maxStep: 0, triedF: false, hfr: false, stops: []})));
+});
+
+test('interrupted mating is locked until F has integrated', () => {
+  assert.equal(matingUnlocked(null), false);
+  assert.equal(matingUnlocked(integrateF(false)), false);
+  assert.equal(matingUnlocked(integrateF(true)), true);
+});
+
+test('goal progress records each event once and never goes backwards', () => {
+  let p = newProgress();
+  p = record(p, {type: 'step', step: 3}); p = record(p, {type: 'step', step: 1});
+  assert.equal(p.maxStep, 3);
+  for (const m of [10, 17, 17, 99, 25]) p = record(p, {type: 'stop', minutes: m});
+  assert.deepEqual(p.stops, [10, 17, 25]);
+  assert.equal(CJ_GOALS.find(g => g.id === 'interrupt').done(p), true);
+  assert.equal(CJ_GOALS.find(g => g.id === 'integrate').done(p), false);
+  p = record(p, {type: 'hfr'});
+  assert.equal(CJ_GOALS.find(g => g.id === 'integrate').done(p), true);
 });

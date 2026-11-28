@@ -79,13 +79,13 @@ export const COMPARE = [
 ];
 
 export const CJ_QUIZ = [
-  {id: 'both', after: 'A', q: 'After F+ × F-, what are the two cells?', options: ['Both F+', 'Donor F+, recipient still F-', 'Both F-'], correct: 0,
+  {id: 'both', q: 'After F+ × F-, what are the two cells?', options: ['Both F+', 'Donor F+, recipient still F-', 'Both F-'], correct: 0,
     why: 'The donor keeps its copy of F and the recipient receives one, so both are F+.'},
-  {id: 'integration', after: 'B', q: 'How does F integrate into the chromosome to make an Hfr cell?', options: ['Transposition of F', 'Homologous recombination between matching IS elements', 'It never integrates'], correct: 1,
+  {id: 'integration', q: 'How does F integrate into the chromosome to make an Hfr cell?', options: ['Transposition of F', 'Homologous recombination between matching IS elements', 'It never integrates'], correct: 1,
     why: 'Matching IS sequences on F and the chromosome give a site for an occasional crossover.'},
-  {id: 'whole', after: 'B', q: 'Why is the whole chromosome rarely transferred?', options: ['The recipient refuses it', 'The mating bridge usually breaks first', 'oriV stops transfer'], correct: 1,
+  {id: 'whole', q: 'Why is the whole chromosome rarely transferred?', options: ['The recipient refuses it', 'The mating bridge usually breaks first', 'oriV stops transfer'], correct: 1,
     why: 'Transfer is possible in theory, but the bridge usually breaks, so the recipient gets only part.'},
-  {id: 'use', after: 'B', q: 'What is an Hfr strain used for?', options: ['Gene mapping by interrupted mating', 'Making F- cells', 'Replicating oriV'], correct: 0,
+  {id: 'use', q: 'What is an Hfr strain used for?', options: ['Gene mapping by interrupted mating', 'Making F- cells', 'Replicating oriV'], correct: 0,
     why: 'Stopping the mating at different times shows the order in which genes enter the recipient.'},
 ];
 
@@ -95,3 +95,17 @@ export const CJ_GOALS = [
   {id: 'integrate', title: 'Make an Hfr cell by IS crossover', done: p => p.hfr},
   {id: 'interrupt', title: 'Stop the mating at 10, 17 and 25 minutes', done: p => HFR_STOPS.every(s => p.stops.includes(s))},
 ];
+
+export const newProgress = () => ({maxStep: 0, triedF: false, hfr: false, stops: []});
+
+/** Goal progress reducer: events are {type:'step',step} | 'triedF' | 'hfr' | {type:'stop',minutes}. Never moves backwards. */
+export function record(p, e) {
+  if (e.type === 'step') return {...p, maxStep: Math.max(p.maxStep, e.step)};
+  if (e.type === 'triedF') return {...p, triedF: true};
+  if (e.type === 'hfr') return {...p, hfr: true};
+  if (e.type === 'stop') return HFR_STOPS.includes(e.minutes) && !p.stops.includes(e.minutes) ? {...p, stops: [...p.stops, e.minutes]} : p;
+  return p;
+}
+
+/** Interrupted mating needs an Hfr cell: only an integrated F drags the chromosome along. */
+export const matingUnlocked = integ => !!integ?.hfr;

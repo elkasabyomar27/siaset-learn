@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { F_STEPS, ZOOM_NOTES, CELL_TYPES, fStatus, pickDonor, mixedCulture, integrateF, HFR_GENES, HFR_STOPS, HFR_MAX_MIN, transferredGenes, transferredFraction, COMPARE, CJ_QUIZ, CJ_GOALS } from '../conjugationLab.js';
+import { F_STEPS, ZOOM_NOTES, CELL_TYPES, fStatus, pickDonor, mixedCulture, integrateF, newProgress, record, matingUnlocked, HFR_GENES, HFR_STOPS, HFR_MAX_MIN, transferredGenes, transferredFraction, COMPARE, CJ_QUIZ, CJ_GOALS } from '../conjugationLab.js';
 import './partsBench.css';
 
 function FStage({ step }) {
@@ -11,11 +11,12 @@ function FStage({ step }) {
     <text className="hg-tag" x="101" y="14" textAnchor="middle">Donor {st.donor}{' (tet-R)'}</text>
     <text className="hg-tag" x="419" y="14" textAnchor="middle">Recipient {st.recipient}{st.recipient === 'F+' ? ' (tet-R)' : ' (tet-S)'}</text>
     <ellipse className="hg-chromosome" cx="75" cy="95" rx="40" ry="28" />
-    <ellipse className="hg-chromosome" cx="393" cy="95" rx="40" ry="28" />
+    <ellipse className="hg-chromosome" cx="458" cy="95" rx="38" ry="28" />
     <g className="hg-plasmid"><circle cx="150" cy="95" r="22" /><path className="hg-tn" d="M150 73 A22 22 0 0 1 172 95" /><circle className="hg-orit" cx="128" cy="95" r="4" /><text className="hg-tag" x="150" y="136" textAnchor="middle">F plasmid</text>{s.nick && <text className="hg-tag hg-nick" x="128" y="62" textAnchor="middle">nick at oriT</text>}</g>
+    {step === 0 && <g><line className="hg-pilus" x1="196" x2="262" y1="95" y2="95" /><text className="hg-tag" x="230" y="82" textAnchor="middle">F pilus reaches out</text></g>}
     {s.contact && <g className="hg-bridge-line"><line x1="196" x2="324" y1="95" y2="95" /><text className="hg-tag" x="260" y="82" textAnchor="middle">mating pair</text></g>}
     {step === 2 && <g><line className="hg-strand" x1="196" x2="300" y1="102" y2="102" /><text className="hg-tag" x="260" y="124" textAnchor="middle">ssDNA + helicase</text></g>}
-    {rec !== 'none' && <g className="hg-plasmid is-new"><circle className={`hg-strand-ring${rec === 'single' ? ' is-partial' : ''}`} cx="370" cy="95" r="22" />{(rec === 'double' || rec === 'circular') && <circle className="hg-strand-new" cx="370" cy="95" r="16" />}<text className="hg-tag" x="370" y="136" textAnchor="middle">{rec === 'single' ? 'single strand' : rec === 'double' ? 'making complement' : 'F plasmid'}</text></g>}
+    {rec !== 'none' && <g className="hg-plasmid is-new"><circle className={`hg-strand-ring${rec === 'single' ? ' is-partial' : ''}`} cx="370" cy="95" r="22" />{rec === 'double' && <circle className="hg-strand-new" cx="370" cy="95" r="16" />}{rec === 'circular' && <path className="hg-tn" d="M370 73 A22 22 0 0 1 392 95" />}<text className="hg-tag" x="370" y="136" textAnchor="middle">{rec === 'single' ? 'single strand' : rec === 'double' ? 'making complement' : 'F plasmid'}</text></g>}
   </svg>;
 }
 
@@ -27,7 +28,7 @@ function Quiz({ item, answers, setAnswers }) {
   const a = answers[item.id], name = useId();
   return <fieldset className="hg-quiz"><legend>{item.q}</legend>
     {item.options.map((o, i) => <label key={o} className="mg-toggle"><input type="radio" name={name} checked={a === i} onChange={() => setAnswers({...answers, [item.id]: i})} /> {o}</label>)}
-    {a !== undefined && <p role="status" className={a === item.correct ? 'hg-ok' : 'hg-no'}>{a === item.correct ? 'Correct. ' : 'Not quite. '}{item.why}</p>}
+    <p role="status" className={a === undefined ? '' : a === item.correct ? 'hg-ok' : 'hg-no'}>{a !== undefined && <>{a === item.correct ? 'Correct. ' : 'Not quite. '}{item.why}</>}</p>
   </fieldset>;
 }
 
@@ -41,16 +42,16 @@ export default function ConjugationLab() {
   const [sharedIS, setSharedIS] = useState(true);
   const [integ, setInteg] = useState(null);
   const [minutes, setMinutes] = useState(0);
-  const [prog, setProg] = useState({maxStep: 0, triedF: false, hfr: false, stops: []});
+  const [prog, setProg] = useState(newProgress);
   const [answers, setAnswers] = useState({});
   const culture = mixedCulture();
   const done = new Set(CJ_GOALS.filter(g => g.done(prog)).map(g => g.id));
-  const hfr = !!integ?.hfr;
+  const hfr = matingUnlocked(integ);
 
-  const go = n => { const s = Math.max(0, Math.min(F_STEPS.length - 1, n)); setStep(s); setProg(p => ({...p, maxStep: Math.max(p.maxStep, s)})); };
-  const choose = c => { const r = pickDonor(c); setPick({c, ...r}); if (!r.ok) setProg(p => ({...p, triedF: true})); };
-  const cross = () => { const r = integrateF(sharedIS); setInteg(r); if (r.hfr) setProg(p => ({...p, hfr: true})); else setMinutes(0); };
-  const setMin = m => { setMinutes(m); if (HFR_STOPS.includes(m)) setProg(p => p.stops.includes(m) ? p : {...p, stops: [...p.stops, m]}); };
+  const go = n => { const s = Math.max(0, Math.min(F_STEPS.length - 1, n)); setStep(s); setProg(p => record(p, {type: 'step', step: s})); };
+  const choose = c => { const r = pickDonor(c); setPick({c, ...r}); if (!r.ok) setProg(p => record(p, {type: 'triedF'})); };
+  const cross = () => { const r = integrateF(sharedIS); setInteg(r); if (r.hfr) setProg(p => record(p, {type: 'hfr'})); else setMinutes(0); };
+  const setMin = m => { setMinutes(m); setProg(p => record(p, {type: 'stop', minutes: m})); };
   const got = transferredGenes(minutes), frac = transferredFraction(minutes);
   const R = 62, C = 2 * Math.PI * R;
 
@@ -82,7 +83,7 @@ export default function ConjugationLab() {
       <div className="cb-controls hg-prereqs">
         <div className="cb-control"><span>Which cell is the donor?</span>
           <div className="hg-actions"><button type="button" className="outline-button" aria-pressed={pick?.c === 'F+'} onClick={() => choose('F+')}>The F+ cell</button><button type="button" className="outline-button" aria-pressed={pick?.c === 'F-'} onClick={() => choose('F-')}>The F- cell</button></div>
-          {pick && <p role="status" className={pick.ok ? 'hg-ok' : 'hg-no'}>{pick.text}</p>}
+          <p role="status" className={!pick ? '' : pick.ok ? 'hg-ok' : 'hg-no'}>{pick?.text}</p>
           <p className="quiet">{CELL_TYPES['F-'].text}</p>
         </div>
         <div className="cb-control"><span>Mixed culture: a few F+ among many F-</span>
@@ -99,8 +100,8 @@ export default function ConjugationLab() {
         <div className="pb-stage-head"><span>B1 · F JOINS THE CHROMOSOME</span><span>{hfr ? 'Hfr cell' : 'F+ cell'}</span></div>
         <svg className="hg-cj-svg" viewBox="0 0 520 190" role="img" aria-label={hfr ? 'F plasmid integrated into the chromosome, flanked by IS on both sides.' : `Separate chromosome and F plasmid${sharedIS ? ', each carrying an IS element' : '; only F carries an IS element'}.`}>
           <circle className="hg-chromosome" cx="170" cy="95" r="70" fill="none" />
-          {hfr ? <path className="hg-tn" d="M170 25 A70 70 0 0 1 235 52" fill="none" /> : <g className="hg-plasmid"><circle cx="400" cy="95" r="30" /><text className="hg-tag" x="400" y="146" textAnchor="middle">F plasmid</text></g>}
-          {hfr ? <g><circle className="hg-is" cx="170" cy="25" r="6" /><circle className="hg-is" cx="235" cy="52" r="6" /><text className="hg-tag" x="170" y="14" textAnchor="middle">IS</text><text className="hg-tag" x="252" y="50">IS</text><text className="hg-tag" x="212" y="30" textAnchor="middle">F</text></g>
+          {hfr ? <path className="hg-tn" d="M170 25 A70 70 0 0 1 227 55" fill="none" /> : <g className="hg-plasmid"><circle cx="400" cy="95" r="30" /><text className="hg-tag" x="400" y="146" textAnchor="middle">F plasmid</text></g>}
+          {hfr ? <g><circle className="hg-is" cx="170" cy="25" r="6" /><circle className="hg-is" cx="227" cy="55" r="6" /><text className="hg-tag" x="170" y="14" textAnchor="middle">IS</text><text className="hg-tag" x="244" y="58">IS</text><text className="hg-tag" x="205" y="20" textAnchor="middle">F</text></g>
             : <g><circle className="hg-is" cx="170" cy="25" r={sharedIS ? 6 : 0} /><circle className="hg-is" cx="400" cy="65" r="6" /><text className="hg-tag" x="170" y="14" textAnchor="middle">{sharedIS ? 'IS' : ''}</text><text className="hg-tag" x="418" y="62">IS</text></g>}
           <text className="hg-tag" x="170" y="176" textAnchor="middle">chromosome</text>
         </svg>

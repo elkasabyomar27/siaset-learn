@@ -404,6 +404,8 @@
 .hg-range input { min-height:44px; width:100%; max-width:360px; }
 .hg-quiz { margin:14px 0 0; border:1px solid #d6ddd0; border-radius:12px; padding:10px 14px; display:grid; gap:6px; }
 .hg-quiz legend { font-weight:700; padding:0 6px; }
+.hg-pilus { stroke:#9fd3a8; stroke-width:2; stroke-dasharray:4 4; }
+.cb-control p[role="status"]:empty, .hg-quiz p:empty { margin:0; }
 .hg-ok { color:#2f6b4f; } .hg-no { color:#8a3f2b; }
 .hg-compare { border-collapse:collapse; margin-top:14px; font-size:13px; width:100%; }
 .hg-compare caption { text-align:left; font-weight:700; padding-bottom:6px; }
